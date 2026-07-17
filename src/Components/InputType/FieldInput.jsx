@@ -28,7 +28,7 @@ const Container = Styled.div.attrs(({ withBorder, isDisabled }) => ({ withBorder
     ${(props) => props.withBorder && `
         padding: 12px;
         border: 1px solid var(--input-border);
-        border-radius: var(--border-radius);
+        border-radius: var(--input-border-radius);
 
         ${props.isDisabled ? `
             border-color: var(--input-border-disabled);
