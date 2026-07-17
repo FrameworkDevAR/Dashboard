@@ -14,7 +14,7 @@ import Utils                from "../../Utils/Utils";
 function AccordionList(props) {
     const {
         isHidden, className, initial, selected,
-        onChange, noClose, children,
+        maxWidth, hideAside, noClose, onChange, children,
     } = props;
 
 
@@ -56,9 +56,10 @@ function AccordionList(props) {
     };
 
     // Generate the Items
-    const items = Utils.cloneChildren(children.flat(), (child, index) => {
+    const items = Utils.cloneChildren(children, (child, index) => {
         const id = child.props.value || index;
         return {
+            maxWidth, hideAside,
             number     : index + 1,
             isSelected : id === selection,
             onClick    : handleClick(id, child.props.isDisabled),
@@ -84,8 +85,10 @@ AccordionList.propTypes = {
     className : PropTypes.string,
     initial   : PropTypes.string,
     selected  : PropTypes.string,
-    onChange  : PropTypes.func,
+    maxWidth  : PropTypes.number,
+    hideAside : PropTypes.bool,
     noClose   : PropTypes.bool,
+    onChange  : PropTypes.func,
     children  : PropTypes.any,
 };
 

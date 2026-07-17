@@ -23,7 +23,10 @@ const Container = Styled(AccordionList).attrs(({ withSpacing }) => ({ withSpacin
  * @returns {React.ReactElement}
  */
 function PageAccordion(props) {
-    const { initial, selected, onChange, noClose, withSpacing, children } = props;
+    const {
+        initial, selected, onChange, maxWidth, noClose,
+        withSpacing, hideAside, children,
+    } = props;
 
 
     // Do the Render
@@ -31,8 +34,10 @@ function PageAccordion(props) {
         initial={initial}
         selected={selected}
         onChange={onChange}
+        maxWidth={maxWidth}
         noClose={noClose}
         withSpacing={withSpacing}
+        hideAside={hideAside}
     >
         {children}
     </Container>;
@@ -46,8 +51,10 @@ PageAccordion.propTypes = {
     initial     : PropTypes.string,
     selected    : PropTypes.string,
     onChange    : PropTypes.func,
+    maxWidth    : PropTypes.number,
     noClose     : PropTypes.bool,
     withSpacing : PropTypes.bool,
+    hideAside   : PropTypes.bool,
     children    : PropTypes.any,
 };
 

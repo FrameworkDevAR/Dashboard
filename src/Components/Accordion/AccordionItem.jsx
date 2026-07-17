@@ -83,13 +83,13 @@ const Complete = Styled(Icon)`
     }
 `;
 
-const Inside = Styled.div.attrs(({ isLast, maxWidth }) => ({ isLast, maxWidth }))`
+const Inside = Styled.div.attrs(({ isLast, hideAside, maxWidth }) => ({ isLast, hideAside, maxWidth }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     flex-grow: 2;
     gap: 24px;
-    width: calc(100% - 56px);
+    width: ${(props) => props.hideAside ? "100%" : "calc(100% - 56px)"};
     padding: 6px 12px 32px 12px;
     transition: 0.3s all;
 
@@ -101,7 +101,7 @@ const Inside = Styled.div.attrs(({ isLast, maxWidth }) => ({ isLast, maxWidth })
     }
 `;
 
-const Header = Styled.header.attrs(({ isDisabled }) => ({ isDisabled }))`
+const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled, hideAside }))`
     grid-area: header;
     display: flex;
     justify-content: space-between;
@@ -115,9 +115,11 @@ const Header = Styled.header.attrs(({ isDisabled }) => ({ isDisabled }))`
         background-color: var(--content-color);
     `}
 
-    @media (max-width: 500px) {
-        margin-left: 38px;
-    }
+    ${(props) => !props.hideAside && `
+        @media (max-width: 500px) {
+            margin-left: 38px;
+        }
+    `}
 `;
 
 const Div = Styled.div`
@@ -164,7 +166,7 @@ const Content = Styled.section.attrs(({ isSelected, withGap }) => ({ isSelected,
 function AccordionItem(props) {
     const {
         className, message, description, error, errorCount,
-        number, icon, withGap, maxWidth,
+        number, icon, withGap, maxWidth, hideAside,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
     } = props;
 
@@ -182,13 +184,21 @@ function AccordionItem(props) {
         isSelected={isSelected}
         isDisabled={isDisabled}
     >
-        <Aside>
+        {!hideAside && <Aside>
             {isComplete && <Complete icon="check" />}
             {showIcon && <Icon icon={icon} />}
             {showNumber && <span>{number}</span>}
-        </Aside>
-        <Inside isLast={isLast} maxWidth={maxWidth}>
-            <Header isDisabled={isDisabled} onClick={onClick}>
+        </Aside>}
+        <Inside
+            isLast={isLast}
+            hideAside={hideAside}
+            maxWidth={maxWidth}
+        >
+            <Header
+                isDisabled={isDisabled}
+                hideAside={hideAside}
+                onClick={onClick}
+            >
                 <Div>
                     <Title>{NLS.get(message)}</Title>
                     {!!description && <Description>{NLS.get(description)}</Description>}
@@ -221,6 +231,7 @@ AccordionItem.propTypes = {
     icon        : PropTypes.string,
     withGap     : PropTypes.bool,
     maxWidth    : PropTypes.number,
+    hideAside   : PropTypes.bool,
     isFirst     : PropTypes.bool,
     isLast      : PropTypes.bool,
     isComplete  : PropTypes.bool,
