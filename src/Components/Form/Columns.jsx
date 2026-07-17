@@ -14,6 +14,10 @@ const Div = Styled.div.attrs(({ amount, topSpace, doubleWidth, singleWidth }) =>
     gap: var(--main-gap);
     ${(props) => props.topSpace && `padding-top: ${props.topSpace}px;`}
 
+    > * {
+        min-width: 0;
+    }
+
     .columns-double {
         grid-column-end: span 2;
     }
