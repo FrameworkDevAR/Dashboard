@@ -66,7 +66,7 @@ const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`
  */
 function SelectInput(props) {
     const {
-        inputRef, className, icon, postIcon,
+        inputRef, className, icon, postIcon, prefixText, suffixText,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
         id, name, placeholder, value, allowMultiple,
         defaultText, emptyText, noneText, noneValue,
@@ -417,6 +417,8 @@ function SelectInput(props) {
         className={className}
         icon={icon}
         postIcon={postIcon}
+        prefixText={prefixText}
+        suffixText={suffixText}
         isFocused={isFocused}
         isDisabled={showDisabled}
         isSmall={isSmall}
@@ -425,6 +427,7 @@ function SelectInput(props) {
         withBorder={withBorder}
         withLabel={withLabel}
         withPadding
+        withClick
     >
         <Inside inlineDescription={inlineDescription}>
             <Input
@@ -492,6 +495,8 @@ SelectInput.propTypes = {
     className         : PropTypes.string,
     icon              : PropTypes.string,
     postIcon          : PropTypes.string,
+    prefixText        : PropTypes.string,
+    suffixText        : PropTypes.string,
     isFocused         : PropTypes.bool,
     isDisabled        : PropTypes.bool,
     isSmall           : PropTypes.bool,
