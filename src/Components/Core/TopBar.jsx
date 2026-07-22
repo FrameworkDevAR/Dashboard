@@ -176,7 +176,7 @@ TopBar.propTypes = {
     withTopBar    : PropTypes.bool,
     withTitle     : PropTypes.bool,
     showDev       : PropTypes.bool,
-    logo          : PropTypes.string.isRequired,
+    logo          : PropTypes.string,
     avatarUrl     : PropTypes.string,
     avatarEmail   : PropTypes.string,
     avatarAvatar  : PropTypes.string,
