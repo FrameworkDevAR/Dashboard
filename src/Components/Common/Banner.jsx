@@ -19,7 +19,7 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, inlineChil
     padding: 12px 16px;
     line-height: 1.4;
     border: 1px solid;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-medium);
 
     ${(props) => props.variant === Outcome.SUCCESS && `
         background-color: hsl(170, 61%, 96%);
