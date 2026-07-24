@@ -65,7 +65,14 @@ const Chips = Styled(ChipList).attrs(({ isNarrow }) => ({ isNarrow }))`
     margin-left: calc(var(--main-gap) / 2);
 
     li {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        line-height: 18px;
         white-space: nowrap;
+        background-color: var(--lighter-gray);
+    }
+    li:hover {
+        background-color: var(--light-gray);
     }
     ${(props) => !props.isNarrow && "overflow: auto;"}
 `;
