@@ -40,7 +40,7 @@ function ChooserInput(props) {
     const {
         inputRef, className, isFocused, isDisabled,
         id, name, value, placeholder, createOption, onCreate,
-        onChange, onClear, onFocus, onBlur,
+        minHeight, onChange, onClear, onFocus, onBlur,
     } = props;
 
 
@@ -54,7 +54,7 @@ function ChooserInput(props) {
     const [ filter,   setFilter ] = React.useState("");
     const [ timer,    setTimer  ] = React.useState(null);
     const [ hasFocus, setFocus  ] = React.useState(false);
-    const [ bounds,   setBounds ] = React.useState({ top : 0, left : 0, width : 0, maxHeight : 0 });
+    const [ bounds,   setBounds ] = React.useState({ top : 0, bottom : undefined, left : 0, width : 0, maxHeight : 0 });
     const [ update,   setUpdate ] = React.useState(0);
 
 
@@ -131,13 +131,20 @@ function ChooserInput(props) {
 
     // Handles the Focus
     const handleFocus = () => {
-        const bounds = Utils.getBounds(containerRef);
-        setBounds({
-            top       : bounds.bottom,
-            left      : bounds.left,
-            width     : bounds.width,
-            maxHeight : window.innerHeight - bounds.bottom - 10,
-        });
+        const rect    = Utils.getBounds(containerRef);
+
+        let top       = rect.bottom;
+        let bottom    = undefined;
+        let maxHeight = window.innerHeight - rect.bottom - 10;
+
+        // Show the Options above the Input if there is not enough space below
+        if (top + minHeight > window.innerHeight) {
+            top       = undefined;
+            bottom    = window.innerHeight - rect.top + 5;
+            maxHeight = 300;
+        }
+
+        setBounds({ top, bottom, left : rect.left, width : rect.width, maxHeight });
         setFocus(true);
         onFocus();
         setSelectedIndex();
@@ -305,6 +312,7 @@ function ChooserInput(props) {
             passedRef={optionsRef}
             inputRef={inputRef}
             top={bounds.top}
+            bottom={bounds.bottom}
             left={bounds.left}
             width={bounds.width}
             maxHeight={bounds.maxHeight}
@@ -341,6 +349,7 @@ ChooserInput.propTypes = {
     noneValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     createOption : PropTypes.string,
     onCreate     : PropTypes.func,
+    minHeight    : PropTypes.number,
     onChange     : PropTypes.func,
     onClear      : PropTypes.func,
     onFocus      : PropTypes.func,
@@ -357,6 +366,7 @@ ChooserInput.defaultProps = {
     isDisabled  : false,
     placeholder : "",
     noneText    : "",
+    minHeight   : 100,
 };
 
 export default ChooserInput;
