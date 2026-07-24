@@ -30,8 +30,15 @@ const Link = Styled.a.attrs(({ isSelected, isDisabled, isSmall }) => ({ isSelect
     position: relative;
     display: flex;
     align-items: center;
+    margin: 0;
+    padding: 0;
+    border: none;
     border-radius: var(--border-radius);
+    background: transparent;
     text-decoration: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
     color: var(--link-color, black);
     cursor: pointer;
 
@@ -132,7 +139,6 @@ const Content = Styled.div.attrs(({ onlyIcon }) => ({ onlyIcon }))`
     flex: 1;
 
     ${(props) => props.onlyIcon && `
-        justify-content: center;
         .link-preicon {
             margin-right: 0;
         }
@@ -171,7 +177,7 @@ const Components = {
 function MenuLink(props) {
     const {
         isHidden, passedRef, variant, className,
-        isSelected, isDisabled, onlyIcon, isSmall,
+        isSelected, isDisabled, onlyIcon, isSmall, isButton,
         target, message, emoji, html, icon, iconColor, afterIcon, amount, badge,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
         onMouseEnter, onMouseLeave, children,
@@ -220,11 +226,13 @@ function MenuLink(props) {
     }
     return <Component
         ref={elementRef}
+        as={isButton ? "button" : undefined}
+        type={isButton ? "button" : undefined}
         className={`link ${className}`}
         isSelected={isSelected}
         isDisabled={isDisabled}
         isSmall={isSmall}
-        href={Navigate.getUrl(props)}
+        href={isButton ? undefined : Navigate.getUrl(props)}
         target={target}
         onClick={onClick}
         onMouseEnter={handleMouseEnter}
@@ -290,6 +298,7 @@ MenuLink.propTypes = {
     isSelected     : PropTypes.bool,
     isDisabled     : PropTypes.bool,
     onlyIcon       : PropTypes.bool,
+    isButton       : PropTypes.bool,
     isSmall        : PropTypes.bool,
     dontStop       : PropTypes.bool,
     tooltip        : PropTypes.string,
