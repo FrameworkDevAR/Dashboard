@@ -7,7 +7,7 @@ import Responsive           from "../../Core/Responsive";
 import Utils                from "../../Utils/Utils";
 
 // Components
-import CircularLoader       from "../Loader/CircularLoader";
+import PageLoader           from "../Loader/PageLoader";
 import FilterList           from "../Filter/FilterList";
 import FilterBar            from "../Filter/FilterBar";
 import StatList             from "../Stats/StatList";
@@ -63,11 +63,11 @@ function Content(props) {
     // Render the Loading
     if (isLoading) {
         return <Section
-            ref={passedRef}
             className={className}
+            ref={passedRef}
             centered
         >
-            <CircularLoader topSpace={40} />
+            <PageLoader />
         </Section>;
     }
 
