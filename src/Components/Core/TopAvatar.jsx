@@ -41,13 +41,13 @@ const Content = Styled.div`
     max-width: 160px;
 
     b {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 600;
         white-space: nowrap;
         color: var(--font-lighter);
     }
     span {
-        font-size: 12px;
+        font-size: 13px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
