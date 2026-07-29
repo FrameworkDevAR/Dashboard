@@ -255,9 +255,7 @@ function MenuLink(props) {
             {hasContent && <span className="link-content">
                 {content}
             </span>}
-            {hasAmount && <Amount className="link-amount">
-                {amount}
-            </Amount>}
+            {hasAmount && <Amount className="link-amount" value={amount} />}
         </Content>
 
         {hasAfterIcon && <Icon

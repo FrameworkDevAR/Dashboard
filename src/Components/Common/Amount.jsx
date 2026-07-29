@@ -28,7 +28,7 @@ function Amount(props) {
 
 
     // Do the Render
-    if (!value) {
+    if (value === undefined || value === null || value === "") {
         return <React.Fragment />;
     }
     return <Span className={`amount ${className}`}>
@@ -41,7 +41,7 @@ function Amount(props) {
  * @type {object} propTypes
  */
 Amount.propTypes = {
-    value     : PropTypes.number,
+    value     : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     className : PropTypes.string,
 };
 

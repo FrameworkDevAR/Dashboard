@@ -167,7 +167,7 @@ function TabItem(props) {
 
         {!!icon && <Icon icon={icon} size="16" />}
         {!!message && NLS.get(message)}
-        {hasAmount && <Amount className="tab-amount">{amount}</Amount>}
+        {hasAmount && <Amount className="tab-amount" value={amount} />}
         <TabBadge className="tab-badge" value={badge} />
 
         {showDelete && <DeleteIcon
