@@ -42,8 +42,8 @@ const Container = Styled.div.attrs(({ hideMobile, hasContent, isSelected }) => (
     }
 
     ${(props) => props.isSelected && `
-        color: var(--bar-icon-hover-color, var(--bar-icon-color));
-        background-color: var(--bar-icon-hover-bg);
+        color: var(--bar-icon-sel-color, var(--bar-icon-hover-color, var(--bar-icon-color)));
+        background-color: var(--bar-icon-sel-bg, var(--bar-icon-hover-bg));
     `}
 
     ${(props) => props.hideMobile && `
@@ -81,7 +81,7 @@ function BarIcon(props) {
 
 
     // Variables
-    const defaultRef = React.useRef(null);
+    const defaultRef = React.useRef();
     const elementRef = passedRef || defaultRef;
 
     const onClick    = Navigate.useClick(props);
