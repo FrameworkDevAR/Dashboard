@@ -54,6 +54,8 @@ InputItem.propTypes = {
     customKey       : PropTypes.string,
     hasClear        : PropTypes.bool,
     hideClear       : PropTypes.bool,
+    createOption    : PropTypes.string,
+    onCreate        : PropTypes.func,
     onClear         : PropTypes.func,
     onChange        : PropTypes.func,
     onMedia         : PropTypes.func,

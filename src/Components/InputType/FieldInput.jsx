@@ -412,6 +412,7 @@ function FieldInput(props) {
                                 }}
                                 onPaste={(e) => handlePaste(item, index, item.name, e)}
                                 onMedia={() => item.onMedia?.(index, item.name)}
+                                onCreate={item.onCreate ? (value) => item.onCreate(value, index) : undefined}
                                 withLabel={!!item.label || (!withTitle && index === 0)}
                                 isSmall={!item.label && (withTitle || index > 0)}
                                 fullWidth
