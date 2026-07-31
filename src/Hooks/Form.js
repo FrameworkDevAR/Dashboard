@@ -118,7 +118,10 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
 
         // Handle the Errors of a Field input
         try {
-            const data = JSON.parse(value);
+            const newItems   = JSON.parse(value);
+            const oldItems   = JSON.parse(data[name]);
+            const sameAmount = newItems.length === oldItems.length;
+
             for (const key of Object.keys(errors)) {
                 if (!key.startsWith(name)) {
                     continue;
@@ -127,14 +130,16 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
                 if (parts.length !== 3) {
                     continue;
                 }
-                if (data[parts[1]]?.[parts[2]]) {
+                // Remove the Error if an Item was added or removed, as the
+                // Errors are stored by index, or if the value is now set
+                if (!sameAmount || newItems[parts[1]]?.[parts[2]]) {
                     removeErrors[key] = "";
                 }
             }
         } catch {
             // Do Nothing
         }
-        setErrors(removeErrors);
+        setErrorsInt({ ...errors, ...removeErrors });
     };
 
     // Starts the Submit
