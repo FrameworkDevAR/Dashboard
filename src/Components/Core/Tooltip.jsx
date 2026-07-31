@@ -22,7 +22,7 @@ const open = keyframes`
 `;
 
 // Styles
-const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, delay }) => ({ variant, top, left, width, maxWidth, toLeft, delay }))`
+const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, delay, hasBreaks }) => ({ variant, top, left, width, maxWidth, toLeft, delay, hasBreaks }))`
     box-sizing: border-box;
     position: fixed;
     top: ${(props) => `${props.top}px`};
@@ -33,9 +33,9 @@ const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toL
     padding: 5px 8px;
     font-size: 12px;
     line-height: 1.5em;
-    white-space: normal;
+    white-space: ${(props) => props.hasBreaks ? "pre-wrap" : "normal"};
     word-wrap: break-word;
-    text-align: center;
+    text-align: ${(props) => props.hasBreaks ? "left" : "center"};
     color: var(--tooltip-color);
     background-color: var(--tooltip-background);
     border-radius: var(--border-radius);
@@ -99,7 +99,7 @@ const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toL
  */
 function Tooltip() {
     const { tooltip } = Store.useState("core");
-    const { open, targetRef, variant, message, maxWidth, delay } = tooltip;
+    const { open, targetRef, variant, message, maxWidth, delay, hasBreaks } = tooltip;
 
 
     // Variables
@@ -163,6 +163,7 @@ function Tooltip() {
         maxWidth={maxWidth}
         toLeft={toLeft}
         delay={delay || 1}
+        hasBreaks={hasBreaks}
         content={content}
     />;
 }
