@@ -22,6 +22,10 @@ const Container = Styled.header.attrs(({ isConnected }) => ({ isConnected }))`
         padding-left: 0;
         padding-right: 0;
     }
+    & > header:last-child {
+        height: calc(var(--header-height) - var(--main-padding) / 2);
+        padding-bottom: 0;
+    }
     & > :last-child {
         margin-bottom: 0;
     }
