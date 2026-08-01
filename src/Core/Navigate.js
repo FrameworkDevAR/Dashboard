@@ -421,6 +421,7 @@ export default {
     useSearchParams,
     useFrom,
     useParent,
+    useChildPath,
     useMenuUrl,
     useSelect,
 

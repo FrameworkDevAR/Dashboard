@@ -5,6 +5,7 @@ import Styled               from "styled-components";
 // Core & Utils
 import Action               from "../../Core/Action";
 import Navigate             from "../../Core/Navigate";
+import Responsive           from "../../Core/Responsive";
 import Store                from "../../Core/Store";
 
 // Components
@@ -14,14 +15,14 @@ import IconLink             from "../Link/IconLink";
 
 
 // Styles
-const Content = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
+const Content = Styled.div.attrs(({ hideActions, isSelected }) => ({ hideActions, isSelected }))`
     position: relative;
     margin-bottom: 4px;
 
     ${(props) => props.hideActions && `
         &:hover > .nav-actions {
             display: flex;
-            background-color: var(--navigation-hover, rgba(0, 0, 0, 0.1));
+            background-color: ${props.isSelected ? "var(--navigation-selected-icon, rgba(0, 0, 0, 0.1))" : "var(--navigation-hover, rgba(0, 0, 0, 0.1))"};
         }
     `}
 `;
@@ -33,6 +34,13 @@ const NavMenu = Styled(MenuLink)`
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
     --link-selected-bg: var(--navigation-selected-bg, rgba(0, 0, 0, 0.1));
     --link-selected-color: var(--navigation-selected-color, var(--link-color));
+`;
+
+const NavIcon = Styled(IconLink).attrs(({ isSelected }) => ({ isSelected }))`
+    ${(props) => props.isSelected && `
+        --link-color: var(--navigation-selected-color, var(--title-color));
+        --link-background: var(--navigation-selected-hover, rgba(0, 0, 0, 0.1));
+    `}
 `;
 
 const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
@@ -67,9 +75,13 @@ function NavigationItem(props) {
     } = props;
 
     const isSelect   = Navigate.useSelect();
+    const isForMenu  = Responsive.useIsForMenu();
     const elementRef = React.useRef(null);
 
+    const { smallNav : navSmallNav } = Store.useState("core");
     const { closeMenu, showTooltip, hideTooltip } = Store.useAction("core");
+
+    const isSmallNav = smallNav || (navSmallNav && !isForMenu);
 
 
     // Returns true if the Menu should be selected
@@ -112,8 +124,8 @@ function NavigationItem(props) {
 
     // Handles the Tooltip
     const handleTooltip = () => {
-        if (smallNav) {
-            showTooltip(elementRef, "right", message);
+        if (isSmallNav) {
+            showTooltip(elementRef, "right", message, 0, 0.2);
         }
     };
 
@@ -127,7 +139,7 @@ function NavigationItem(props) {
 
     // Do the Render
     return <li>
-        <Content hideActions={hideActions}>
+        <Content hideActions={hideActions} isSelected={selected}>
             <NavMenu
                 passedRef={elementRef}
                 variant="light"
@@ -144,7 +156,7 @@ function NavigationItem(props) {
                 afterIcon={afterIcon}
                 amount={amount}
                 badge={badge}
-                onlyIcon={smallNav}
+                onlyIcon={isSmallNav}
                 onMouseEnter={handleTooltip}
                 onMouseLeave={hideTooltip}
             />
@@ -153,20 +165,23 @@ function NavigationItem(props) {
                 className="nav-actions"
                 hideActions={hideActions}
             >
-                {canCollapse && <IconLink
+                {canCollapse && <NavIcon
                     variant="black"
+                    isSelected={selected}
                     icon={isCollapsed ? "closed" : "open"}
                     onClick={(e) => handleAction(e, "COLLAPSE")}
                     isSmall
                 />}
-                {collapseOnSelect && <IconLink
+                {collapseOnSelect && <NavIcon
                     variant="black"
+                    isSelected={selected}
                     icon={selected ? "closed" : "open"}
                     onClick={handleClick}
                     isSmall
                 />}
-                {canEdit && <IconLink
+                {canEdit && <NavIcon
                     variant="black"
+                    isSelected={selected}
                     icon="edit"
                     onClick={(e) => handleAction(e, "EDIT")}
                     isSmall

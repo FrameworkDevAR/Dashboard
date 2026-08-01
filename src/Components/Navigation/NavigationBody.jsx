@@ -17,9 +17,10 @@ import Button               from "../Form/Button";
 // Styles
 const Container = Styled.nav.attrs(({ withSpacing }) => ({ withSpacing }))`
     display: flex;
+    flex-grow: 2;
     flex-direction: column;
     justify-content: flex-start;
-    padding: ${(props) => props.withSpacing && "0px 16px 16px 6px"};
+    padding: ${(props) => props.withSpacing && "var(--navigation-body-padding, 0px 16px 16px 6px)"};
     overflow: auto;
 `;
 
@@ -45,12 +46,13 @@ const Ul = Styled.ul`
  */
 function NavigationBody(props) {
     const {
-        className, onAction, onClose,
+        className, passedRef, onAction, onClose, smallNav,
         isLoading, none, canAdd, add, withSpacing, children,
     } = props;
 
     // The References
     const navigationRef = React.useRef(null);
+    const elementRef    = passedRef || navigationRef;
 
 
     // Handles the Action
@@ -71,9 +73,17 @@ function NavigationBody(props) {
             addList = false;
         }
         if (!child.props.isHidden) {
-            items.push(React.cloneElement(child, {
-                key, onAction, onClose,
-            }));
+            const childProps = { key };
+            if (onAction) {
+                childProps.onAction = onAction;
+            }
+            if (onClose) {
+                childProps.onClose = onClose;
+            }
+            if (smallNav && child.type === CircularLoader) {
+                childProps.isTiny = true;
+            }
+            items.push(React.cloneElement(child, childProps));
         }
     }
 
@@ -87,11 +97,14 @@ function NavigationBody(props) {
 
     // Do the Render
     return <Container
-        ref={navigationRef}
+        ref={elementRef}
         className={`navigation-body ${className}`}
         withSpacing={withSpacing}
     >
-        {showLoader && <CircularLoader />}
+        {showLoader && <CircularLoader
+            isTiny={smallNav}
+            topSpace={20}
+        />}
         {showNone   && <div>
             <None message={none} />
             {showAdd && <Button
@@ -112,12 +125,14 @@ function NavigationBody(props) {
  */
 NavigationBody.propTypes = {
     className   : PropTypes.string,
+    passedRef   : PropTypes.any,
     variant     : PropTypes.string,
     isLoading   : PropTypes.bool,
     none        : PropTypes.string,
     canAdd      : PropTypes.bool,
     add         : PropTypes.string,
     withSpacing : PropTypes.bool,
+    smallNav    : PropTypes.bool,
     onAction    : PropTypes.func,
     onClose     : PropTypes.func,
     children    : PropTypes.any,

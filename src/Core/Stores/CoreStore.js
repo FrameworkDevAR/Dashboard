@@ -4,6 +4,7 @@ const initialState = {
     section     : "",
     redirect    : "/",
     showMenu    : false,
+    smallNav    : false,
     hasDetails  : false,
     showDetails : false,
     result      : {
@@ -19,6 +20,7 @@ const initialState = {
         message   : "",
         maxWidth  : 0,
         delay     : 0,
+        hasBreaks : false,
     },
     error       : {
         open    : false,
@@ -104,10 +106,11 @@ const actions = {
      * @param {string}   message
      * @param {number}   maxWidth
      * @param {number}   delay
+     * @param {boolean=} hasBreaks
      * @returns {void}
      */
-    showTooltip(dispatch, targetRef, variant, message, maxWidth, delay) {
-        const tooltip = { open : true, targetRef, variant, message, maxWidth, delay };
+    showTooltip(dispatch, targetRef, variant, message, maxWidth, delay, hasBreaks) {
+        const tooltip = { open : true, targetRef, variant, message, maxWidth, delay, hasBreaks };
         return dispatch({ type : "CORE_TOOLTIP", tooltip });
     },
 
@@ -161,6 +164,16 @@ const actions = {
      */
     closeMenu(dispatch) {
         return dispatch({ type : "CORE_MENU_CLOSE" });
+    },
+
+    /**
+     * Sets the Small Nav
+     * @param {Function} dispatch
+     * @param {boolean}  smallNav
+     * @returns {void}
+     */
+    setSmallNav(dispatch, smallNav) {
+        return dispatch({ type : "CORE_SMALL_NAV", smallNav });
     },
 
     /**
@@ -247,6 +260,13 @@ const reducer = (state = initialState, action = {}) => {
         return {
             ...state,
             showMenu : false,
+        };
+
+    // The Navigation Actions
+    case "CORE_SMALL_NAV":
+        return {
+            ...state,
+            smallNav : action.smallNav,
         };
 
     // The Details Actions

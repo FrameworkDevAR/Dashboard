@@ -4,19 +4,21 @@ import Styled               from "styled-components";
 
 // Core
 import Responsive           from "../../Core/Responsive";
+import Store                from "../../Core/Store";
 
 
 
 // Styles
-const Content = Styled.main.attrs(({ withNavigation, withDetails, wideDetails, largeDetails }) => ({ withNavigation, withDetails, wideDetails, largeDetails }))`
-    --main-navigation: ${(props) => props.withNavigation ? "var(--navigation-width)" : "0px"};
-    --main-details: calc(${(props) => props.withDetails ? (props.wideDetails ? "var(--details-width-wide)" : (props.largeDetails ? "var(--details-width-large)" : "var(--details-width)")) : "0px"} + var(--main-margin));
+const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails }) => ({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails }))`
+    --main-navigation: ${(props) => props.withNavigation ? (props.isCollapsed ? "calc(var(--navigation-small-width) + 16px)" : "var(--navigation-width)") : "0px"};
+    --main-details: ${(props) => props.withDetails ? `calc(${props.wideDetails ? "var(--details-width-wide)" : (props.largeDetails ? "var(--details-width-large)" : "var(--details-width)")} + var(--main-margin))` : "0px"};
 
     display: flex;
     flex-grow: 2;
     flex-direction: column;
     height: var(--main-height, var(--full-height));
     width: calc(100vw - var(--sidebar-width) - var(--main-navigation) - var(--main-details) - var(--main-margin));
+    transition: width 0.2s ease;
     margin-right: var(--main-margin);
     margin-bottom: var(--main-margin);
     border-radius: var(--main-radius);
@@ -42,9 +44,15 @@ const Content = Styled.main.attrs(({ withNavigation, withDetails, wideDetails, l
 function Main(props) {
     const { className, withNavigation, withDetails, wideDetails, largeDetails, children } = props;
 
+    const isForMenu = Responsive.useIsForMenu();
+    const { smallNav } = Store.useState("core");
+
+
+    // Do the Render
     return <Content
         className={`main ${className}`}
         withNavigation={withNavigation}
+        isCollapsed={smallNav && !isForMenu}
         withDetails={withDetails}
         largeDetails={largeDetails}
         wideDetails={wideDetails}

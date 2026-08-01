@@ -6,34 +6,42 @@ import Styled               from "styled-components";
 import Action               from "../../Core/Action";
 import Navigate             from "../../Core/Navigate";
 import NLS                  from "../../Core/NLS";
+import Responsive           from "../../Core/Responsive";
 
 // Components
 import IconLink             from "../Link/IconLink";
 import Icon                 from "../Common/Icon";
+import Circle               from "../Common/Circle";
 
 
 
 // Styles
-const Container = Styled.header.attrs(({ smallNav }) => ({ smallNav }))`
+const Container = Styled.header.attrs(({ smallNav, onlyIcon }) => ({ smallNav, onlyIcon }))`
     flex-shrink: 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 4px;
     min-height: var(--header-height);
+    height: var(--navigation-height, auto);
     padding: var(--navigation-title-padding, 12px 12px 10px 8px);
     z-index: 1;
 
-    ${(props) => props.smallNav && `
+    ${(props) => props.onlyIcon && `
         --navigation-title-icon: 24px;
         justify-content: center;
         padding-left: 0;
         padding-right: 4px;
         gap: 0;
     `}
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+        flex-wrap: wrap;
+    }
 `;
 
 const HeaderIcon = Styled(Icon)`
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -43,11 +51,33 @@ const HeaderIcon = Styled(Icon)`
     color: var(--navigation-title-color, var(--title-color));
 `;
 
-const Title = Styled.h2`
+const BackLink = Styled(IconLink)`
+    &.navigation-back {
+        display: var(--navigation-back-display, none);
+    }
+`;
+
+const Title = Styled.h2.attrs(({ hasSubTitle }) => ({ hasSubTitle }))`
     display: flex;
-    flex-grow: 2;
     flex-direction: column;
     margin: 0;
+
+    ${(props) => props.hasSubTitle ? `
+        --navigation-title-size: 18px;
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: max-content;
+
+        @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+            flex-shrink: 1;
+            width: auto;
+            min-width: 0;
+        }
+    ` : `
+        flex-grow: 2;
+        min-width: 0;
+    `}
+
     font-family: var(--title-font);
     font-size: var(--title-font-size);
     font-weight: var(--title-font-weight);
@@ -56,17 +86,55 @@ const Title = Styled.h2`
     color: var(--navigation-title-color, var(--title-color));
 `;
 
+const SubCircle = Styled(Circle)`
+    width: 8px;
+    height: 8px;
+    margin: 0;
+    flex-shrink: 0;
+    opacity: 0.8;
+`;
+
 const Span1 = Styled.span`
     display: block;
+    overflow: visible;
+    white-space: var(--navigation-title-wrap, normal);
     font-family: var(--main-font);
     font-size: 14px;
     font-weight: 400;
     color: var(--navigation-subtitle-color, var(--subtitle-color));
 `;
 
+const SubTitle = Styled.h3`
+    flex-grow: 2;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    margin-left: 8px;
+    padding-left: 12px;
+    border-left: 1px solid var(--darker-gray);
+    white-space: nowrap;
+    color: var(--darkest-gray);
+    font-family: var(--main-font);
+    font-weight: 400;
+    font-size: 14px;
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+        flex-grow: 0;
+        flex-basis: 100%;
+        margin-left: 28px;
+        padding-left: 0;
+        border-left: none;
+        white-space: normal;
+    }
+`;
+
 const Span2 = Styled.span`
     display: block;
-    font-size: 18px;
+    overflow: visible;
+    white-space: var(--navigation-title-wrap, normal);
+    font-size: var(--navigation-title-size, 18px);
     color: var(--navigation-title-color, var(--title-color));
 `;
 
@@ -79,8 +147,8 @@ const Span2 = Styled.span`
  */
 function NavigationTitle(props) {
     const {
-        className, icon, href, message, fallback,
-        smallNav, canAdd, canEdit, canManage,
+        className, icon, href, message, fallback, subTitle, subCircle,
+        smallNav, onlyIcon, canAdd, canEdit, canManage,
         noBack, onClick, onAction,
     } = props;
 
@@ -99,16 +167,21 @@ function NavigationTitle(props) {
 
     // Variables
     const showLink   = (!icon || smallNav) && !noBack;
-    const showTitle  = !smallNav;
+    const showTitle  = !onlyIcon;
     const showAdd    = canAdd && !smallNav;
     const showEdit   = canEdit && !smallNav;
     const showManage = canManage && !smallNav;
 
 
     // Do the Render
-    return <Container className={`navigation-title ${className}`} smallNav={smallNav}>
-        <IconLink
-            isHidden={!showLink}
+    return <Container
+        className={`navigation-title ${className}`}
+        smallNav={smallNav}
+        onlyIcon={onlyIcon}
+    >
+        <BackLink
+            isHidden={noBack}
+            className={showLink ? "" : "navigation-back"}
             icon="back"
             href={onClick ? null : (href || parent)}
             onClick={onClick}
@@ -116,12 +189,17 @@ function NavigationTitle(props) {
         />
         {!!icon && <HeaderIcon icon={icon} />}
 
-        {showTitle && <Title>
+        {showTitle && <Title hasSubTitle={Boolean(subTitle)}>
             {!message ? NLS.get(fallback) : <>
-                <Span1>{NLS.get(fallback)}</Span1>
+                {!!fallback && <Span1>{NLS.get(fallback)}</Span1>}
                 <Span2>{NLS.get(message)}</Span2>
             </>}
         </Title>}
+
+        {showTitle && !!subTitle && <SubTitle className="navigation-subtitle">
+            {!!subCircle && <SubCircle color={subCircle} />}
+            {NLS.get(subTitle)}
+        </SubTitle>}
 
         {showAdd && <IconLink
             icon="add"
@@ -151,7 +229,10 @@ NavigationTitle.propTypes = {
     href      : PropTypes.string,
     message   : PropTypes.string,
     fallback  : PropTypes.string,
+    subTitle  : PropTypes.string,
+    subCircle : PropTypes.string,
     smallNav  : PropTypes.bool,
+    onlyIcon  : PropTypes.bool,
     canAdd    : PropTypes.bool,
     canEdit   : PropTypes.bool,
     canManage : PropTypes.bool,
@@ -169,6 +250,7 @@ NavigationTitle.defaultProps = {
     icon      : "",
     href      : "",
     smallNav  : false,
+    onlyIcon  : false,
     canAdd    : false,
     canEdit   : false,
     canManage : false,

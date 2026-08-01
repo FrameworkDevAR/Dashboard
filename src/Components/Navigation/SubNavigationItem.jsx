@@ -29,8 +29,8 @@ const NavMenu = Styled(MenuLink)`
     --link-icon: 18px;
     --link-color: var(--navigation-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
-    --link-selected-bg: var(--navigation-selected-bg, rgba(0, 0, 0, 0.1));
-    --link-selected-color: var(--navigation-selected-color, var(--link-color));
+    --link-selected-bg: var(--subnav-selected-bg, var(--navigation-selected-bg, rgba(0, 0, 0, 0.1)));
+    --link-selected-color: var(--subnav-selected-color, var(--navigation-selected-color, var(--link-color)));
 
     padding: 5px 8px;
     font-size: 13px;
