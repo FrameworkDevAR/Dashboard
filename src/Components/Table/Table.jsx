@@ -66,6 +66,13 @@ const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, h
     `}
 `;
 
+const Loading = Styled(Wrapper)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+`;
+
 const Container = Styled.table.attrs(({ isEditable, totalWidth, hasRadius, hasScroll }) => ({ isEditable, totalWidth, hasRadius, hasScroll }))`
     display: flex;
     flex-direction: column;
@@ -127,7 +134,8 @@ function Table(props) {
 
     // Handles the Column Edit
     const handleColEdit = (columns) => {
-        onColumnEdit(columns, true);
+        const hidden = columnList.filter((column) => hiddenCols.includes(column.id));
+        onColumnEdit([ ...columns, ...hidden ], true);
         setShowEdit(false);
     };
 
@@ -198,6 +206,7 @@ function Table(props) {
     const isEditable = Boolean(onColumnEdit);
     const columns    = [];
     const columnList = [];
+    const hiddenCols = [];
     const elemIDs    = [];
     const actions    = [];
 
@@ -247,6 +256,9 @@ function Table(props) {
                         position  : position,
                         isVisible : isVisible,
                     });
+                    if (tableHead.props.isHidden) {
+                        hiddenCols.push(tableHead.props.field);
+                    }
                     if (isVisible) {
                         totalWidth += width;
                     }
@@ -327,7 +339,21 @@ function Table(props) {
         return <React.Fragment />;
     }
     if (isLoading) {
-        return <CircularLoader topSpace={40} />;
+        return <Loading
+            inDialog={inDialog}
+            hasFilter={hasFilter}
+            statsAmount={statsAmount}
+            hasTabs={hasTabs}
+            hasAlert={hasAlert}
+            hasPaging={hasPaging}
+            hasChecks={hasChecks}
+            hasActions={hasActions}
+            notFixed={notFixed}
+            isEditable={isEditable}
+            extraSpace={extraSpace}
+        >
+            <CircularLoader />
+        </Loading>;
     }
     if (!hasContent && none) {
         return <div>
@@ -384,7 +410,7 @@ function Table(props) {
             open={showEdit}
             onSubmit={handleColEdit}
             onClose={() => setShowEdit(false)}
-            columns={columnList}
+            columns={columnList.filter((column) => !hiddenCols.includes(column.id))}
         />
     </>;
 }
