@@ -24,6 +24,12 @@ const EditItem = Styled.li`
     flex-grow: 2;
 `;
 
+const EmptyItem = Styled.li`
+    flex-grow: 2;
+    font-size: var(--input-font);
+    color: var(--darkest-gray);
+`;
+
 const InputIcon = Styled(Icon)`
     margin-top: -4px;
     margin-right: -6px;
@@ -39,7 +45,7 @@ const InputIcon = Styled(Icon)`
 function ChooserInput(props) {
     const {
         inputRef, className, isFocused, isDisabled,
-        id, name, value, placeholder, createOption, onCreate,
+        id, name, value, placeholder, emptyText, createOption, onCreate,
         minHeight, onChange, onClear, onFocus, onBlur,
     } = props;
 
@@ -90,7 +96,7 @@ function ChooserInput(props) {
 
     // Handles the Click
     const handleClick = () => {
-        if (!hasFocus) {
+        if (!hasFocus && inputRef.current) {
             inputRef.current.focus();
         }
     };
@@ -250,11 +256,14 @@ function ChooserInput(props) {
         return result;
     }, [ JSON.stringify(values), JSON.stringify(options), filter, hasCreate ]);
 
-    // Get the Chips
+    // Get the Chips, skipping the Values that are not in the Options
     const chips = React.useMemo(() => {
         const result = [];
         for (const key of values) {
-            result.push({ key, value : Utils.getValue(options, "key", key, "value") });
+            const value = Utils.getValue(options, "key", key, "value");
+            if (value) {
+                result.push({ key, value });
+            }
         }
         return result;
     }, [ JSON.stringify(values), JSON.stringify(options) ]);
@@ -264,6 +273,7 @@ function ChooserInput(props) {
     const showOptions  = Boolean(hasFocus && filteredOptions.length);
     const hasOptions   = Boolean(showOptions && filteredOptions.length);
     const isOnlyOption = Boolean(filteredOptions.length === 1);
+    const showEmpty    = Boolean(emptyText && !options.length);
 
 
     // Do the Render
@@ -271,7 +281,7 @@ function ChooserInput(props) {
         passedRef={containerRef}
         className={className}
         isFocused={isFocused}
-        isDisabled={isDisabled}
+        isDisabled={isDisabled || showEmpty}
         onClick={handleClick}
         onClear={onClear}
         withBorder
@@ -286,7 +296,11 @@ function ChooserInput(props) {
                 isDisabled={isDisabled}
             />)}
 
-            {!isDisabled && <EditItem>
+            {showEmpty && <EmptyItem>
+                {NLS.get(emptyText)}
+            </EmptyItem>}
+
+            {!isDisabled && !showEmpty && <EditItem>
                 <InputBase
                     inputRef={inputRef}
                     className="input-chooser"
@@ -303,10 +317,10 @@ function ChooserInput(props) {
                 />
             </EditItem>}
         </ChipList>
-        <InputIcon
+        {!showEmpty && <InputIcon
             icon="expand"
             size="18"
-        />
+        />}
 
         {hasOptions && <InputOptions
             passedRef={optionsRef}
@@ -343,6 +357,7 @@ ChooserInput.propTypes = {
     name         : PropTypes.string,
     value        : PropTypes.any,
     placeholder  : PropTypes.string,
+    emptyText    : PropTypes.string,
     options      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     extraOptions : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     noneText     : PropTypes.string,
@@ -365,6 +380,7 @@ ChooserInput.defaultProps = {
     isFocused   : false,
     isDisabled  : false,
     placeholder : "",
+    emptyText   : "",
     noneText    : "",
     minHeight   : 100,
 };

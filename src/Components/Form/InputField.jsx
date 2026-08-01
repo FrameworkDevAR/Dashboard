@@ -129,9 +129,10 @@ function InputField(props) {
     const hasLabel      = Boolean(label && InputType.hasLabel(type));
     const isValueFilled = InputType.isValueFilled(type, value);
     const hasValue      = InputType.hasValue(type, value);
+    const showsEmpty    = InputType.showsEmpty(type, props);
     const withTransform = !shrinkLabel && InputType.canShrink(type);
-    const withValue     = Boolean(isValueFilled || isFocused);
-    const withInsideCnt = !hasLabel || isValueFilled || isFocused || shrinkLabel;
+    const withValue     = Boolean(isValueFilled || isFocused || showsEmpty);
+    const withInsideCnt = !hasLabel || isValueFilled || isFocused || shrinkLabel || showsEmpty;
     const withClear     = forceClear || (hasValue && !hideClear && (hasClear || InputType.hasClear(type)));
     const hasError      = Boolean(error);
     const hasHelperText = !hasError && Boolean(helperText);

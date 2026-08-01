@@ -130,6 +130,19 @@ function getOptions(props) {
 }
 
 /**
+ * Returns true if the Input shows the Empty text instead of the Options
+ * @param {string} type
+ * @param {object} props
+ * @returns {boolean}
+ */
+function showsEmpty(type, props) {
+    if (!props.emptyText || ![ CHOOSER, SELECT ].includes(type)) {
+        return false;
+    }
+    return getOptions(props).length === 0;
+}
+
+/**
  * Memoizes the Options
  * @param {object} props
  * @returns {Array}
@@ -151,6 +164,7 @@ export default {
     isValueFilled,
     hasValue,
     getOptions,
+    showsEmpty,
     useOptions,
 
     BUTTONS,
