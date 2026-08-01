@@ -11,7 +11,14 @@ import DialogFooter         from "../Dialog/DialogFooter";
 
 
 // Styles
+const Body = Styled(DialogBody)`
+    display: flex;
+    flex-direction: column;
+`;
+
 const Content = Styled.div`
+    flex-grow: 2;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: var(--main-gap);
@@ -45,7 +52,7 @@ function ViewDialog(props) {
         zIndex={zIndex}
     >
         <DialogHeader message={title} icon={icon} />
-        <DialogBody
+        <Body
             passedRef={contentRef}
             className={className}
             minHeight={minHeight}
@@ -55,7 +62,7 @@ function ViewDialog(props) {
             hideFooter={hideFooter}
         >
             <Content>{children}</Content>
-        </DialogBody>
+        </Body>
         <DialogFooter
             isHidden={hideFooter}
             secondary={secondary}
