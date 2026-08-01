@@ -796,13 +796,17 @@ function jsonToHtml(content) {
         return "";
     }
 
+    // The content can have html characters, which are escaped before the
+    // markup is added, so they are shown and not interpreted as tags
     return JSON.stringify(content, null, 2)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br>")
-        // Blue Keys
+        // Highlight keys and values safely in one pass
         .replace(/"([\w-]+)"(?=:)/g, '<span style="color: #2980b9;">"$1"</span>')
-        // Highlight values safely in one pass
         .replace(/:\s*("(?:\\"|[^"])*"|\d+|true|false)/g, function(match, value) {
-            // Green Strings
+            // Green Strings (including dates)
             if (value.startsWith('"')) {
                 return `: <span style="color: #27ae60;">${value}</span>`;
             }
