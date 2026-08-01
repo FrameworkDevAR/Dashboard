@@ -13,7 +13,7 @@ import Html                 from "../Common/Html";
 
 
 // Styles
-const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, inlineChildren }) => ({ variant, topSpace, bottomSpace, inlineChildren }))`
+const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, inlineChildren }) => ({ variant, topSpace, bottomSpace, noBorder, inlineChildren }))`
     position: relative;
     gap: 8px;
     padding: 12px 16px;
@@ -49,6 +49,10 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, inlineChil
         }
     `}
 
+    ${(props) => props.noBorder && `
+        border: none;
+        padding: 0 0 0 12px;
+    `}
     ${(props) => props.inlineChildren && `
         display: flex;
         flex-direction: row;
@@ -85,7 +89,7 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
 function Banner(props) {
     const {
         isHidden, className, variant, message,
-        topSpace, bottomSpace, inlineChildren, children,
+        topSpace, bottomSpace, noBorder, inlineChildren, children,
     } = props;
 
 
@@ -113,6 +117,7 @@ function Banner(props) {
         variant={variant}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
+        noBorder={noBorder}
         inlineChildren={inlineChildren}
     >
         <Content>
@@ -140,6 +145,7 @@ Banner.propTypes = {
     message        : PropTypes.string.isRequired,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    noBorder       : PropTypes.bool,
     inlineChildren : PropTypes.bool,
     children       : PropTypes.any,
 };
