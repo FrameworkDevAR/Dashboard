@@ -50,7 +50,7 @@ function DialogFooter(props) {
     const {
         isHidden, className, onAction,
         primary, primaryVariant, onSubmit,
-        secondary, secondaryVariant, onSecondary,
+        secondary, secondaryVariant, secondaryLoading, onSecondary,
         tertiary, tertiaryVariant, onTertiary,
         cancel, cancelVariant, dontClose, onClose, onCancel,
         isLoading, isDisabled, children,
@@ -87,6 +87,8 @@ function DialogFooter(props) {
                     isHidden={!secondary}
                     variant={secondaryVariant}
                     message={secondary}
+                    isLoading={secondaryLoading}
+                    isDisabled={secondaryLoading}
                     onClick={onSecondary}
                 />
                 <Button
@@ -129,6 +131,7 @@ DialogFooter.propTypes = {
     onSubmit         : PropTypes.func,
     secondary        : PropTypes.string,
     secondaryVariant : PropTypes.string,
+    secondaryLoading : PropTypes.bool,
     onSecondary      : PropTypes.func,
     tertiary         : PropTypes.string,
     tertiaryVariant  : PropTypes.string,
@@ -152,6 +155,7 @@ DialogFooter.defaultProps = {
     className        : "",
     primaryVariant   : "primary",
     secondaryVariant : "outlined",
+    secondaryLoading : false,
     tertiaryVariant  : "outlined",
     cancel           : "GENERAL_CANCEL",
     cancelVariant    : "outlined",

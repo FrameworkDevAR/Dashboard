@@ -36,7 +36,8 @@ function ViewDialog(props) {
         contentRef, open, title, icon, className, isLoading,
         width, isWide, isNarrow, minHeight, fullHeight,
         withSpacing, bigSpacing, zIndex,
-        hideFooter, secondary, onSecondary, tertiary, onTertiary,
+        hideFooter, secondary, onSecondary, secondaryLoading,
+        tertiary, onTertiary,
         cancel, onClose, children,
     } = props;
 
@@ -67,6 +68,7 @@ function ViewDialog(props) {
             isHidden={hideFooter}
             secondary={secondary}
             onSecondary={onSecondary}
+            secondaryLoading={secondaryLoading}
             tertiary={tertiary}
             onTertiary={onTertiary}
             cancel={cancel}
@@ -96,6 +98,7 @@ ViewDialog.propTypes = {
     zIndex      : PropTypes.number,
     hideFooter  : PropTypes.bool,
     secondary   : PropTypes.string,
+    secondaryLoading : PropTypes.bool,
     tertiary    : PropTypes.string,
     onSecondary : PropTypes.func,
     onTertiary  : PropTypes.func,
