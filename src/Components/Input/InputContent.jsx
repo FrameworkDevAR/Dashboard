@@ -91,10 +91,16 @@ const Text = Styled.p`
     color: var(--font-lighter);
 `;
 
-const InputClear = Styled(IconLink).attrs(({ smallInput }) => ({ smallInput }))`
-    margin-top: -8px;
+const InputClear = Styled(IconLink).attrs(({ smallInput, withLabel }) => ({ smallInput, withLabel }))`
     margin-right: calc(2px - var(--input-horiz-padding));
-    ${(props) => props.smallInput && "margin-bottom: -4px;"}
+
+    ${(props) => props.withLabel ? `
+        margin-top: -8px;
+        ${props.smallInput ? "margin-bottom: -4px;" : ""}
+    ` : `
+        margin-top: -6px;
+        margin-bottom: -6px;
+    `}
 `;
 
 const InputButton = Styled(MenuLink)`
@@ -184,6 +190,7 @@ function InputContent(props) {
             icon="close"
             onClick={() => onClear()}
             smallInput={isSmall}
+            withLabel={withLabel}
             isSmall
         />}
         {hasButton && <InputButton
