@@ -46,11 +46,11 @@ const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled }) => 
     }
 `;
 
-const Aside = Styled.aside`
+const Aside = Styled.aside.attrs(({ hasIcon }) => ({ hasIcon }))`
     flex-shrink: 0;
     display: flex;
     justify-content: center;
-    width: 48px;
+    width: ${(props) => props.hasIcon ? "30px" : "48px"};
     color: var(--title-color);
     transition: 0.2s all;
 
@@ -83,14 +83,21 @@ const Complete = Styled(Icon)`
     }
 `;
 
-const Inside = Styled.div.attrs(({ isLast, hideAside, maxWidth }) => ({ isLast, hideAside, maxWidth }))`
+const IconItem = Styled(Icon).attrs(({ iconColor }) => ({ iconColor }))`
+    ${(props) => props.iconColor && `&& {
+        color: ${props.iconColor};
+        border-color: ${props.iconColor};
+    }`}
+`;
+
+const Inside = Styled.div.attrs(({ isLast, hasIcon, hideAside, maxWidth }) => ({ isLast, hasIcon, hideAside, maxWidth }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     flex-grow: 2;
     gap: 24px;
-    width: ${(props) => props.hideAside ? "100%" : "calc(100% - 56px)"};
-    padding: 6px 12px 32px 12px;
+    width: ${(props) => props.hideAside ? "100%" : (props.hasIcon ? "calc(100% - 46px)" : "calc(100% - 56px)")};
+    padding: ${(props) => props.hasIcon ? "0 0 0 16px" : "6px 12px 32px 12px"};
     transition: 0.3s all;
 
     ${(props) => !props.isLast && "border-bottom: 1px solid var(--border-color-light);"}
@@ -106,7 +113,8 @@ const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-sizing: border-box; : ""
+    gap: 16px;
+    box-sizing: border-box;
     width: 100%;
     cursor: pointer;
 
@@ -123,9 +131,19 @@ const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled,
 `;
 
 const Div = Styled.div`
+    flex-grow: 2;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
+`;
+
+const Arrow = Styled.div`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
 `;
 
 const Title = Styled.h2`
@@ -165,8 +183,8 @@ const Content = Styled.section.attrs(({ isSelected, withGap }) => ({ isSelected,
  */
 function AccordionItem(props) {
     const {
-        className, message, description, error, errorCount,
-        number, icon, withGap, maxWidth, hideAside,
+        className, header, message, description, error, errorCount,
+        number, icon, iconColor, withGap, maxWidth, hideAside,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
     } = props;
 
@@ -184,13 +202,14 @@ function AccordionItem(props) {
         isSelected={isSelected}
         isDisabled={isDisabled}
     >
-        {!hideAside && <Aside>
+        {!hideAside && <Aside hasIcon={showIcon}>
             {isComplete && <Complete icon="check" />}
-            {showIcon && <Icon icon={icon} />}
+            {showIcon && <IconItem icon={icon} iconColor={iconColor} />}
             {showNumber && <span>{number}</span>}
         </Aside>}
         <Inside
             isLast={isLast}
+            hasIcon={showIcon}
             hideAside={hideAside}
             maxWidth={maxWidth}
         >
@@ -200,11 +219,15 @@ function AccordionItem(props) {
                 onClick={onClick}
             >
                 <Div>
-                    <Title>{NLS.get(message)}</Title>
-                    {!!description && <Description>{NLS.get(description)}</Description>}
+                    {header ? header : <>
+                        <Title>{NLS.get(message)}</Title>
+                        {!!description && <Description>{NLS.get(description)}</Description>}
+                    </>}
                     {!!errorMessage && <Error>{NLS.get(errorMessage)}</Error>}
                 </Div>
-                {!isDisabled && <Icon icon={isSelected ? "down" : "up"} />}
+                <Arrow>
+                    {!isDisabled && <Icon icon={isSelected ? "down" : "up"} />}
+                </Arrow>
             </Header>
             <Content
                 isSelected={isSelected}
@@ -223,12 +246,14 @@ function AccordionItem(props) {
 AccordionItem.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
-    message     : PropTypes.string.isRequired,
+    header      : PropTypes.any,
+    message     : PropTypes.string,
     description : PropTypes.string,
     error       : PropTypes.string,
     errorCount  : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     number      : PropTypes.number,
     icon        : PropTypes.string,
+    iconColor   : PropTypes.string,
     withGap     : PropTypes.bool,
     maxWidth    : PropTypes.number,
     hideAside   : PropTypes.bool,
@@ -248,6 +273,8 @@ AccordionItem.propTypes = {
 AccordionItem.defaultProps = {
     isHidden   : false,
     className  : "",
+    message    : "",
+    iconColor  : "",
     errorCount : 0,
     withGap    : false,
     maxWidth   : 0,
