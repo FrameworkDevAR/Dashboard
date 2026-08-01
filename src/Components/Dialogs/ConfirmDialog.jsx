@@ -23,6 +23,10 @@ const Content = Styled(Html)`
     text-align: center;
 `;
 
+const Children = Styled.div`
+    margin-top: var(--main-padding);
+`;
+
 
 
 /**
@@ -33,7 +37,7 @@ const Content = Styled(Html)`
 function ConfirmDialog(props) {
     const {
         open, icon, title, message, content, isLoading, isWide,
-        bigSpacing, primary, primaryVariant, onSubmit, onClose,
+        bigSpacing, primary, primaryVariant, onSubmit, onClose, children,
     } = props;
 
 
@@ -53,6 +57,7 @@ function ConfirmDialog(props) {
         <DialogHeader message={title} icon={icon} />
         <DialogBody bigSpacing={bigSpacing} withSpacing>
             <Content variant="h3">{body}</Content>
+            {!!children && <Children>{children}</Children>}
         </DialogBody>
         <DialogFooter
             primary={primary}
@@ -80,6 +85,7 @@ ConfirmDialog.propTypes = {
     isWide         : PropTypes.bool,
     onSubmit       : PropTypes.func.isRequired,
     onClose        : PropTypes.func.isRequired,
+    children       : PropTypes.any,
 };
 
 /**
