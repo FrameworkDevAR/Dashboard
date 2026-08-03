@@ -33,13 +33,13 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     `}
 
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: var(--link-size);
     height: var(--link-size);
-    line-height: var(--link-size);
     padding: 0;
     font-size: var(--link-font);
-    text-align: center;
     border-radius: var(--link-radius);
     text-decoration: none;
     transition: background-color 0.2s ease-in-out;

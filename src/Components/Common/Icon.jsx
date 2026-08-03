@@ -9,8 +9,11 @@ import Store                from "../../Core/Store";
 
 // Styles
 const Span = Styled.span.attrs(({ size, color, cursor }) => ({ size, color, cursor }))`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     ${(props) => props.size && `
-        display: inline-block;
         height: ${props.size}px;
         font-size: ${props.size}px;
         line-height: 1;
