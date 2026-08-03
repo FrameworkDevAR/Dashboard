@@ -22,11 +22,13 @@ const Container = Styled.header.attrs(({ isConnected }) => ({ isConnected }))`
         padding-left: 0;
         padding-right: 0;
     }
-    & > header:last-child {
+    & > header:last-child,
+    & > header:has(+ .backdrop:last-child) {
         height: calc(var(--header-height) - var(--main-padding) / 2);
         padding-bottom: 0;
     }
-    & > :last-child {
+    & > :last-child,
+    & > :has(+ .backdrop:last-child) {
         margin-bottom: 0;
     }
 

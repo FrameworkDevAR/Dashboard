@@ -79,6 +79,7 @@ function InputOptions(props) {
 
     // Do the Render
     return <Backdrop
+        className="backdrop"
         onMouseDown={handleClose}
         hide={!onClose}
     >
