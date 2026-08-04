@@ -26,6 +26,7 @@ const Content = Styled.nav`
     box-sizing: border-box;
     width: var(--navigation-width);
     max-height: var(--main-height);
+    border-left: var(--navigation-border-left, none);
     border-right: var(--navigation-border);
     font-size: var(--navigation-font-size, var(--font-size));
     color: var(--navigation-color, var(--font-light));
