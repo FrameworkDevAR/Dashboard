@@ -134,6 +134,7 @@ function TableCell(props) {
     const hasHtml     = !!content && String(content).includes("<");
     const hasMessage  = message !== undefined && !hasHtml;
     const hasChildren = !hasMessage;
+    const isColor     = Boolean(textColor) && (/^(#|rgb|hsl)/i).test(textColor);
 
 
     // Do the Render
@@ -142,7 +143,8 @@ function TableCell(props) {
     }
     return <TData
         ref={elementRef}
-        className={textColor ? `text-${textColor}` : className}
+        className={textColor && !isColor ? `text-${textColor}` : className}
+        style={isColor ? { color : textColor } : undefined}
         flexGrow={grow}
         flexShrink={shrink}
         flexWidth={width}
