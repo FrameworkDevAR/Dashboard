@@ -1643,12 +1643,23 @@ function formatSize(bytes) {
 
 /**
  * Downloads the given File
- * @param {string} source
- * @param {string} fileName
+ * The params are sent in the body, as the access token can make the url too long
+ * @param {string}       source
+ * @param {string}       fileName
+ * @param {AbortSignal=} signal
  * @returns {Promise}
  */
-function download(source, fileName) {
-    return fetch(source)
+function download(source, fileName, signal = null) {
+    const sourceUrl = new URL(source);
+    const params    = new URLSearchParams(sourceUrl.search);
+    const options   = { method : "POST", body : params };
+
+    sourceUrl.search = "";
+    if (signal) {
+        options.signal = signal;
+    }
+
+    return fetch(sourceUrl.href, options)
         .then((response) => response.blob())
         .then((blob) => {
             const url = window.URL.createObjectURL(new Blob([ blob ]));
