@@ -26,6 +26,7 @@ const Content = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
 `;
 
 const NavMenu = Styled(MenuLink)`
+    --link-icon: 18px;
     --link-color: var(--navigation-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
     --link-selected-bg: var(--navigation-selected-bg, rgba(0, 0, 0, 0.1));

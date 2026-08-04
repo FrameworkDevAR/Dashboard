@@ -63,12 +63,12 @@ const NavLink = Styled(Link).attrs(({ isSmall }) => ({ isSmall }))`
     }
 
     .link-preicon {
-        font-size: 1.4em;
+        font-size: var(--link-icon, 1.4em);
         height: 1em;
         margin-right: var(--link-gap);
     }
     .link-aftericon {
-        font-size: 1.4em;
+        font-size: var(--link-icon, 1.4em);
         height: 1em;
         margin-left: var(--link-gap);
     }
