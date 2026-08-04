@@ -10,10 +10,14 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected }) => ({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected }))`
+const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }) => ({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }))`
     margin: 0;
     color: var(--title-color);
     background-color: var(--white-color);
+
+    ${(props) => props.leftSpace && `
+        margin-left: 16px;
+    `}
 
     ${(props) => props.hasValue && `
         scroll-margin-top: 51px;
@@ -65,7 +69,7 @@ const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, i
     `}
 `;
 
-const Content = Styled.div.attrs(({ inlineDescription, isSelected }) => ({ inlineDescription, isSelected }))`
+const Content = Styled.div.attrs(({ inlineDescription, isSelected, isTitle }) => ({ inlineDescription, isSelected, isTitle }))`
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -90,6 +94,19 @@ const Content = Styled.div.attrs(({ inlineDescription, isSelected }) => ({ inlin
         color: white;
         &:hover {
             background-color: var(--primary-color);
+        }
+    `}
+
+    ${(props) => props.isTitle && `
+        padding: 8px 8px 4px 8px;
+        text-align: left;
+        font-size: 12px;
+        white-space: nowrap;
+        color: var(--font-lighter);
+        cursor: default;
+
+        &:hover {
+            background-color: var(--white-color);
         }
     `}
 `;
@@ -127,7 +144,7 @@ function InputOption(props) {
     const {
         isHidden, className,
         hasValue, forValue,
-        hasCreate, forCreate, isOnlyOption,
+        hasCreate, forCreate, isOnlyOption, isTitle, leftSpace,
         icon, content, message, description, inlineDescription,
         isSelected, hasChecks, isChecked, onMouseDown,
         direction, onClose, children,
@@ -160,13 +177,16 @@ function InputOption(props) {
             hasCreate={hasCreate}
             forCreate={forCreate}
             isOnlyOption={isOnlyOption}
-            onMouseDown={onMouseDown}
+            isTitle={isTitle}
+            leftSpace={leftSpace}
+            onMouseDown={isTitle ? undefined : onMouseDown}
             onMouseEnter={() => setMenuOpen(true)}
             onMouseLeave={() => setMenuOpen(false)}
         >
             <Content
                 inlineDescription={inlineDescription}
                 isSelected={isSelected}
+                isTitle={isTitle}
             >
                 <Option>
                     <Icon
@@ -217,6 +237,8 @@ InputOption.propTypes = {
     hasCreate         : PropTypes.bool,
     forCreate         : PropTypes.bool,
     isOnlyOption      : PropTypes.bool,
+    isTitle           : PropTypes.bool,
+    leftSpace         : PropTypes.bool,
     icon              : PropTypes.string,
     content           : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     message           : PropTypes.string,
@@ -242,6 +264,8 @@ InputOption.defaultProps = {
     hasCreate    : false,
     forCreate    : false,
     isOnlyOption : false,
+    isTitle      : false,
+    leftSpace    : false,
 };
 
 export default InputOption;

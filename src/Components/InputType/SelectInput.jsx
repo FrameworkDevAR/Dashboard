@@ -111,6 +111,7 @@ function SelectInput(props) {
                 message     : NLS.get(noneText),
                 text        : "",
                 description : "",
+                isTitle     : false,
             });
         }
         if (withCustom && customFirst) {
@@ -120,6 +121,7 @@ function SelectInput(props) {
                 message     : NLS.get(customText  || "GENERAL_CUSTOM"),
                 text        : "",
                 description : "",
+                isTitle     : false,
             });
         }
         for (const item of items) {
@@ -127,7 +129,7 @@ function SelectInput(props) {
             if (typeof item === "string") {
                 itemData = { key : item, value : item };
             }
-            const { key, value, description } = itemData;
+            const { key, value, description, isTitle } = itemData;
 
             result.push({
                 key         : `item-${key}`,
@@ -135,6 +137,7 @@ function SelectInput(props) {
                 message     : NLS.get(value),
                 text        : "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
+                isTitle     : Boolean(isTitle),
             });
         }
         for (const { key, value, description } of extraItems) {
@@ -144,6 +147,7 @@ function SelectInput(props) {
                 message     : NLS.get(value),
                 text        : "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
+                isTitle     : false,
             });
         }
         if (withCustom && !customFirst) {
@@ -153,6 +157,7 @@ function SelectInput(props) {
                 message     : NLS.get(customText || "GENERAL_CUSTOM"),
                 text        : "",
                 description : "",
+                isTitle     : false,
             });
         }
         return result;
@@ -162,8 +167,21 @@ function SelectInput(props) {
     const filteredOptions = React.useMemo(() => {
         let result = [ ...optionList ];
         if (filter) {
-            result = Utils.parseSearchResult(result, filter, "message");
+            const matches = Utils.parseSearchResult(optionList.filter(({ isTitle }) => !isTitle), filter, "message");
+            result = [];
+            for (const option of optionList) {
+                const match = option.isTitle ? option : matches.find(({ key }) => key === option.key);
+                if (match) {
+                    result.push(match);
+                }
+            }
         }
+
+        // Remove the Titles that ended without Options
+        result = result.filter((option, index) => {
+            return !option.isTitle || (result[index + 1] && !result[index + 1].isTitle);
+        });
+
         if (hasCreate) {
             const text   = NLS.get(createOption);
             result.push({
@@ -172,6 +190,7 @@ function SelectInput(props) {
                 message     : filter ? `${text} "${filter}"` : text,
                 text        : "",
                 description : "",
+                isTitle     : false,
             });
         }
         return result;
@@ -191,7 +210,7 @@ function SelectInput(props) {
         if (allowMultiple) {
             const valueList = [];
             for (const item of optionList) {
-                if (values.includes(item.value)) {
+                if (!item.isTitle && values.includes(item.value)) {
                     valueList.push(NLS.get(item.message));
                 }
             }
@@ -204,7 +223,7 @@ function SelectInput(props) {
         let value = "";
         let desc  = "";
         for (const item of optionList) {
-            if (String(item.value) === valueKey) {
+            if (!item.isTitle && String(item.value) === valueKey) {
                 value = item.message;
                 desc  = item.description;
                 break;
@@ -331,6 +350,24 @@ function SelectInput(props) {
         return true;
     };
 
+    // Returns the closest Index that is not a Title
+    const getOptionIndex = (index, keyCode) => {
+        const goesBack = [ KeyCode.DOM_VK_UP, KeyCode.DOM_VK_PAGE_UP, KeyCode.DOM_VK_END ].includes(keyCode);
+        let   result   = index;
+
+        for (let i = 0; i < filteredOptions.length; i++) {
+            if (!filteredOptions[result]?.isTitle) {
+                break;
+            }
+            if (goesBack) {
+                result = result - 1 < 0 ? filteredOptions.length - 1 : result - 1;
+            } else {
+                result = (result + 1) % filteredOptions.length;
+            }
+        }
+        return result;
+    };
+
     // Handles the Key Down
     const handleKeyDown = (e) => {
         if (Utils.isSpecialKey(e.keyCode)) {
@@ -341,7 +378,7 @@ function SelectInput(props) {
         }
 
         const [ newIndex, handled ] = Utils.handleKeyNavigation(e.keyCode, selectedIdxRef.current, filteredOptions.length);
-        selectedIdxRef.current = newIndex;
+        selectedIdxRef.current = getOptionIndex(newIndex, e.keyCode);
         if (handled) {
             e.preventDefault();
         } else {
@@ -378,7 +415,7 @@ function SelectInput(props) {
             }
 
             if (!selectedValRef.current) {
-                selectedValRef.current = filteredOptions[0]?.value ?? "";
+                selectedValRef.current = filteredOptions.find(({ isTitle }) => !isTitle)?.value ?? "";
             }
             if (allowMultiple && selectedValRef.current) {
                 setValues(selectedValRef.current);
@@ -409,6 +446,7 @@ function SelectInput(props) {
     const showDisabled   = Boolean(isDisabled || (emptyText && optionList.length === 0));
     const hasDescription = Boolean(!showOptions && showDescription && optionDesc);
     const isOnlyOption   = Boolean(filteredOptions.length === 1);
+    const hasTitles      = filteredOptions.some(({ isTitle }) => isTitle);
 
 
     // Do the Render
@@ -468,19 +506,21 @@ function SelectInput(props) {
             maxHeight={style.maxHeight}
             opacity={style.opacity}
         >
-            {filteredOptions.map(({ key, value, text, message, description }, index) => <InputOption
+            {filteredOptions.map(({ key, value, text, message, description, isTitle }, index) => <InputOption
                 key={key}
                 className={`input-option-${index}`}
                 hasCreate={hasCreate}
                 forCreate={value === "__create__"}
                 isOnlyOption={isOnlyOption}
+                isTitle={isTitle}
+                leftSpace={hasTitles && !isTitle}
                 content={text || message}
                 description={description}
                 inlineDescription={inlineDescription}
                 isChecked={values.includes(value)}
                 isSelected={selectedIdxRef.current === index}
                 onMouseDown={(e) => handleSelect(e, value)}
-                hasChecks={allowMultiple}
+                hasChecks={allowMultiple && !isTitle}
             />)}
         </InputOptions>}
     </InputContent>;
