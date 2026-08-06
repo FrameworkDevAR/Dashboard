@@ -40,7 +40,7 @@ function InputField(props) {
         label, icon, postIcon, prefixText, suffixText, value,
         error, helperText, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
-        autoFocus, withLabel, shrinkLabel, errorBackground,
+        autoFocus, withLabel, shrinkLabel, bigLabel, errorBackground,
         suggestID, hasClear, forceClear, hideClear, onClear,
         hasCopy, copyValue, onCopy,
     } = props;
@@ -147,6 +147,7 @@ function InputField(props) {
         width={width}
         fullWidth={fullWidth}
         hasError={hasError}
+        bigLabel={bigLabel}
     >
         {hasLabel && <InputLabel
             className="inputfield-label"
@@ -154,6 +155,7 @@ function InputField(props) {
             withTransform={withTransform}
             withValue={withValue}
             isFocused={isFocused}
+            isBigger={bigLabel}
             message={label}
         />}
         <FieldContent ref={containerRef}>
@@ -260,6 +262,7 @@ InputField.propTypes = {
     minWidth          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     fullWidth         : PropTypes.bool,
     shrinkLabel       : PropTypes.bool,
+    bigLabel          : PropTypes.bool,
     withLabel         : PropTypes.bool,
     withBorder        : PropTypes.bool,
     dashedBorder      : PropTypes.bool,
@@ -319,6 +322,7 @@ InputField.defaultProps = {
     suggestParams   : {},
     fullWidth       : false,
     shrinkLabel     : false,
+    bigLabel        : false,
     isSmall         : false,
     errorBackground : false,
     withCustom      : false,

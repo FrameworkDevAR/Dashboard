@@ -8,7 +8,7 @@ import NLS                  from "../../Core/NLS";
 
 
 // Styles
-const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused }) => ({ isRequired, withTransform, withValue, isFocused }))`
+const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused, isBigger }) => ({ isRequired, withTransform, withValue, isFocused, isBigger }))`
     box-sizing: border-box;
     position: absolute;
     top: 6px;
@@ -44,6 +44,9 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused 
     ${(props) => props.isFocused && `
         color: var(--input-label-focus);
     `}
+    ${(props) => props.isBigger && `
+        font-size: 14px;
+    `}
 `;
 
 
@@ -56,7 +59,7 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused 
 function InputLabel(props) {
     const {
         className, isRequired, withTransform, withValue,
-        isFocused, message,
+        isFocused, isBigger, message,
     } = props;
 
 
@@ -67,6 +70,7 @@ function InputLabel(props) {
         withTransform={withTransform}
         withValue={withValue}
         isFocused={isFocused}
+        isBigger={isBigger}
     >
         {NLS.get(message)}
     </Label>;
@@ -82,6 +86,7 @@ InputLabel.propTypes = {
     withTransform : PropTypes.bool,
     withValue     : PropTypes.bool,
     isFocused     : PropTypes.bool,
+    isBigger      : PropTypes.bool,
     message       : PropTypes.string.isRequired,
 };
 
@@ -95,6 +100,7 @@ InputLabel.defaultProps = {
     withTransform : false,
     withValue     : false,
     isFocused     : false,
+    isBigger      : false,
 };
 
 export default InputLabel;

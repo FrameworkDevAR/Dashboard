@@ -5,7 +5,7 @@ import Styled               from "styled-components";
 
 
 // Styles
-const Container = Styled.div.attrs(({ width, fullWidth, hasError }) => ({ width, fullWidth, hasError }))`
+const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel }) => ({ width, fullWidth, hasError, bigLabel }))`
     --input-border: var(--input-border-color);
     position: relative;
     display: block;
@@ -21,6 +21,10 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError }) => ({ width,
         --input-border: var(--error-color);
         --input-color-label: var(--error-color);
     `}
+
+    ${(props) => props.bigLabel && `
+        --input-label: 28px;
+    `}
 `;
 
 
@@ -31,13 +35,14 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError }) => ({ width,
  * @returns {React.ReactElement}
  */
 function InputContainer(props) {
-    const { className, width, fullWidth, hasError, children } = props;
+    const { className, width, fullWidth, hasError, bigLabel, children } = props;
 
     return <Container
         className={className}
         width={width}
         fullWidth={fullWidth}
         hasError={hasError}
+        bigLabel={bigLabel}
     >
         {children}
     </Container>;
@@ -52,6 +57,7 @@ InputContainer.propTypes = {
     width     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     fullWidth : PropTypes.bool,
     hasError  : PropTypes.bool,
+    bigLabel  : PropTypes.bool,
     children  : PropTypes.any,
 };
 
