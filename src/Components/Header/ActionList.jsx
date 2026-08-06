@@ -44,7 +44,7 @@ const Container = Styled.ul`
 function ActionList(props) {
     const {
         className, data, onAction, createText, useAdd, useAssign,
-        hasFilters, withImport, withExport, isExporting, children,
+        hasFilters, withImport, withExport, isExporting, itemsFirst, children,
     } = props;
 
 
@@ -63,6 +63,7 @@ function ActionList(props) {
         return <React.Fragment />;
     }
     return <Container className={className}>
+        {itemsFirst && items}
         {canCreate && <ActionItem
             action="CREATE"
             message={createName}
@@ -82,7 +83,7 @@ function ActionList(props) {
             action="IMPORT"
             onAction={onAction}
         />}
-        {items}
+        {!itemsFirst && items}
     </Container>;
 }
 
@@ -101,6 +102,7 @@ ActionList.propTypes = {
     withImport  : PropTypes.bool,
     withExport  : PropTypes.bool,
     isExporting : PropTypes.bool,
+    itemsFirst  : PropTypes.bool,
     children    : PropTypes.any,
 };
 
