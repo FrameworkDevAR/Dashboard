@@ -361,7 +361,7 @@ function FieldInput(props) {
                 withRemove={canRemove}
                 withError={!!getError(index)}
                 withTitle={withTitle}
-                withLine={withLine}
+                withLine={withLine && index < partsRef.current.length - 1}
             >
                 {canSort && <Sort>
                     <Icon
@@ -413,6 +413,7 @@ function FieldInput(props) {
                                 onPaste={(e) => handlePaste(item, index, item.name, e)}
                                 onMedia={() => item.onMedia?.(index, item.name)}
                                 onCreate={item.onCreate ? (value) => item.onCreate(value, index) : undefined}
+                                onCustom={item.onCustom ? (value) => item.onCustom(value, index) : undefined}
                                 withLabel={!!item.label || (!withTitle && index === 0)}
                                 isSmall={!item.label && (withTitle || index > 0)}
                                 fullWidth

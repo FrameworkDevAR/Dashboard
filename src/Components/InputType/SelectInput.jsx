@@ -72,7 +72,7 @@ function SelectInput(props) {
         defaultText, emptyText, noneText, noneValue,
         withCustom, customFirst, customText, customKey,
         options, extraOptions, descriptions, showDescription, inlineDescription,
-        createOption, onCreate, minWidth, minHeight,
+        createOption, onCreate, customOption, onCustom, minWidth, minHeight,
         onChange, onClear, onFocus, onBlur, onSubmit,
     } = props;
 
@@ -99,6 +99,7 @@ function SelectInput(props) {
     const extraItems = Array.isArray(extraOptions) ? extraOptions : NLS.select(extraOptions);
     const descItems  = Array.isArray(descriptions) ? descriptions : NLS.select(descriptions);
     const hasCreate  = Boolean(createOption && onCreate);
+    const hasCustom  = Boolean(customOption && onCustom && filter);
 
 
     // Get the Options List
@@ -182,6 +183,17 @@ function SelectInput(props) {
             return !option.isTitle || (result[index + 1] && !result[index + 1].isTitle);
         });
 
+        if (hasCustom) {
+            const text   = NLS.get(customOption);
+            result.push({
+                key         : "custom",
+                value       : "__custom__",
+                message     : `${text} "${filter}"`,
+                text        : "",
+                description : "",
+                isTitle     : false,
+            });
+        }
         if (hasCreate) {
             const text   = NLS.get(createOption);
             result.push({
@@ -194,12 +206,12 @@ function SelectInput(props) {
             });
         }
         return result;
-    }, [ JSON.stringify(optionList), filter, hasCreate, filter ]);
+    }, [ JSON.stringify(optionList), filter, hasCreate, hasCustom ]);
 
     // Check if there are Filtered Options
     const hasOptions = React.useMemo(() => {
-        return Boolean(showOptions && (filteredOptions.length || hasCreate));
-    }, [ showOptions, filteredOptions.length, hasCreate ]);
+        return Boolean(showOptions && (filteredOptions.length || hasCreate || hasCustom));
+    }, [ showOptions, filteredOptions.length, hasCreate, hasCustom ]);
 
     // Get the Option Value and Description
     const [ optionValue, optionDesc ] = React.useMemo(() => {
@@ -340,13 +352,19 @@ function SelectInput(props) {
     };
 
     // Handles the Create
+    // The selection is restored, so closing the dialog keeps the current value
     const handleCreate = (value) => {
+        if (value === "__custom__") {
+            onCustom(filter);
+            selectedValRef.current = initialVal;
+            return true;
+        }
         if (value !== "__create__") {
             return false;
         }
 
         onCreate(filter);
-        selectedValRef.current = "";
+        selectedValRef.current = initialVal;
         return true;
     };
 
@@ -561,6 +579,8 @@ SelectInput.propTypes = {
     customText        : PropTypes.string,
     customKey         : PropTypes.string,
     createOption      : PropTypes.string,
+    customOption      : PropTypes.string,
+    onCustom          : PropTypes.func,
     onCreate          : PropTypes.func,
     minWidth          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     minHeight         : PropTypes.number,
