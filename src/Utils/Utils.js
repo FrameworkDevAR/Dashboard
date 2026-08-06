@@ -1072,6 +1072,23 @@ function getVisibleChildren(children) {
 }
 
 /**
+ * Returns the Visible Children with their index in all the Children, so that
+ * hiding or showing a Child does not change the index of the other ones
+ * @param {(Array|any)} children
+ * @returns {Array<[ number, React.ReactElement ]>}
+ */
+function getVisibleEntries(children) {
+    const result = [];
+    for (const [ index, child ] of getChildren(children).entries()) {
+        const has = hasProp(child.props, "isHidden");
+        if ((has && !child.props.isHidden) || !has) {
+            result.push([ index, child ]);
+        }
+    }
+    return result;
+}
+
+/**
  * Returns the Visible Children Props
  * @param {(Array|any)} children
  * @returns {object[]}
@@ -1782,6 +1799,7 @@ export default {
 
     getChildren,
     getVisibleChildren,
+    getVisibleEntries,
     getChildrenProps,
     cloneChildren,
 

@@ -87,7 +87,7 @@ function Content(props) {
             hasTabs = true;
         }
     }
-    for (const [ key, child ] of Utils.getVisibleChildren(children).entries()) {
+    for (const [ key, child ] of Utils.getVisibleEntries(children)) {
         if (typeof child.type !== "string") {
             items.push(React.cloneElement(child, { key, hasFilter, statsAmount, hasTabs }));
         } else {
