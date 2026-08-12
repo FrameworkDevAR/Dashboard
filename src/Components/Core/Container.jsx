@@ -69,7 +69,7 @@ const MainContainer = Styled.div.attrs(({ withTopBar, showingMenu, openingMenu, 
     }
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
-        --main-height: calc(var(--full-height) - var(--topbar-height));
+        --main-height: calc(var(--full-height) - var(--topbar-height) - var(--main-margin));
 
         display: flex;
         flex-direction: column;
