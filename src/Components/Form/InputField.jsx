@@ -50,14 +50,20 @@ function InputField(props) {
     const fieldRef     = React.useRef(null);
     const inputRef     = passedRef || fieldRef;
     const containerRef = React.useRef(null);
+    const blurRef      = React.useRef(null);
 
     // The Current State
-    const [ timer,     setTimer ] = React.useState(null);
     const [ isFocused, setFocus ] = React.useState(false);
 
 
     // The Input got Focus
+    // A pending blur is cancelled, as the Input is focused again
     const handleFocus = (e) => {
+        if (blurRef.current) {
+            window.clearTimeout(blurRef.current);
+            blurRef.current = null;
+        }
+
         setFocus(true);
         if (onFocus) {
             onFocus(e);
@@ -66,13 +72,13 @@ function InputField(props) {
 
     // The Input lost Focus
     const handleBlur = (e) => {
-        setTimer(window.setTimeout(() => {
+        blurRef.current = window.setTimeout(() => {
+            blurRef.current = null;
             setFocus(false);
-            setTimer(null);
             if (onBlur) {
                 onBlur(e);
             }
-        }, 200));
+        }, 200);
     };
 
     // Handles the Change
@@ -115,14 +121,14 @@ function InputField(props) {
         }
     }, []);
 
-    // Clear the Timer
+    // Clear the Blur Timer
     React.useEffect(() => {
         return () => {
-            if (timer) {
-                window.clearTimeout(timer);
+            if (blurRef.current) {
+                window.clearTimeout(blurRef.current);
             }
         };
-    }, [ timer ]);
+    }, []);
 
 
     // Variables

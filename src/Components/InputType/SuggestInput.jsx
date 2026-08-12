@@ -43,25 +43,25 @@ function SuggestInput(props) {
     const optionsRef     = React.useRef(null);
     const selectedIdxRef = React.useRef(-1);
     const timerRef       = React.useRef(null);
+    const blurRef        = React.useRef(null);
 
     // The Current State
     const [ showOptions, setShowOptions ] = React.useState(false);
     const [ suggestions, setSuggestions ] = React.useState([]);
     const [ search,      setSearch      ] = React.useState("");
-    const [ timer,       setTimer       ] = React.useState(null);
     const [ bounds,      setBounds      ] = React.useState({ top : 0, left : 0, width : 0, maxHeight : 0 });
     const [ searching,   setSearching   ] = React.useState(false);
     const [ update,      setUpdate      ] = React.useState(0);
 
 
-    // Clear the Timer
+    // Clear the Blur Timer
     React.useEffect(() => {
         return () => {
-            if (timer) {
-                window.clearTimeout(timer);
+            if (blurRef.current) {
+                window.clearTimeout(blurRef.current);
             }
         };
-    }, [ timer ]);
+    }, []);
 
 
     // Returns true if it should search
@@ -123,7 +123,13 @@ function SuggestInput(props) {
     };
 
     // Handles the Focus
+    // A pending blur is cancelled, as the field is focused again
     const handleFocus = () => {
+        if (blurRef.current) {
+            window.clearTimeout(blurRef.current);
+            blurRef.current = null;
+        }
+
         const node   = containerRef.current.closest(".inputfield-double") || containerRef.current;
         const bounds = node.getBoundingClientRect();
         setBounds({
@@ -138,13 +144,13 @@ function SuggestInput(props) {
 
     // Handles the Blur
     const handleBlur = () => {
-        setTimer(window.setTimeout(() => {
+        blurRef.current = window.setTimeout(() => {
+            blurRef.current = null;
             setShowOptions(false);
             setSearch("");
             setSuggestions([]);
-            setTimer(null);
             onBlur();
-        }, 200));
+        }, 200);
     };
 
     // Handles the Select
