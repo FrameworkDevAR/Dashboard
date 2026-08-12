@@ -36,7 +36,8 @@ function ViewDialog(props) {
         contentRef, open, title, icon, className, isLoading,
         width, isWide, isNarrow, minHeight, fullHeight,
         withSpacing, bigSpacing, zIndex,
-        hideFooter, secondary, onSecondary, secondaryLoading,
+        hideFooter, primary, primaryVariant, onSubmit,
+        secondary, onSecondary, secondaryLoading,
         tertiary, onTertiary,
         cancel, onClose, children,
     } = props;
@@ -66,6 +67,9 @@ function ViewDialog(props) {
         </Body>
         <DialogFooter
             isHidden={hideFooter}
+            primary={primary}
+            primaryVariant={primaryVariant}
+            onSubmit={onSubmit}
             secondary={secondary}
             onSecondary={onSecondary}
             secondaryLoading={secondaryLoading}
@@ -81,30 +85,33 @@ function ViewDialog(props) {
  * @type {object} propTypes
  */
 ViewDialog.propTypes = {
-    contentRef  : PropTypes.any,
-    open        : PropTypes.bool.isRequired,
-    title       : PropTypes.string.isRequired,
-    icon        : PropTypes.string,
-    className   : PropTypes.string,
-    isLoading   : PropTypes.bool,
-    width       : PropTypes.number,
-    isWide      : PropTypes.bool,
-    isNarrow    : PropTypes.bool,
-    minHeight   : PropTypes.number,
-    fullHeight  : PropTypes.bool,
-    lightHeader : PropTypes.bool,
-    withSpacing : PropTypes.bool,
-    bigSpacing  : PropTypes.bool,
-    zIndex      : PropTypes.number,
-    hideFooter  : PropTypes.bool,
-    secondary   : PropTypes.string,
+    contentRef       : PropTypes.any,
+    open             : PropTypes.bool.isRequired,
+    title            : PropTypes.string.isRequired,
+    icon             : PropTypes.string,
+    className        : PropTypes.string,
+    isLoading        : PropTypes.bool,
+    width            : PropTypes.number,
+    isWide           : PropTypes.bool,
+    isNarrow         : PropTypes.bool,
+    minHeight        : PropTypes.number,
+    fullHeight       : PropTypes.bool,
+    lightHeader      : PropTypes.bool,
+    withSpacing      : PropTypes.bool,
+    bigSpacing       : PropTypes.bool,
+    zIndex           : PropTypes.number,
+    hideFooter       : PropTypes.bool,
+    primary          : PropTypes.string,
+    primaryVariant   : PropTypes.string,
+    onSubmit         : PropTypes.func,
+    secondary        : PropTypes.string,
     secondaryLoading : PropTypes.bool,
-    tertiary    : PropTypes.string,
-    onSecondary : PropTypes.func,
-    onTertiary  : PropTypes.func,
-    cancel      : PropTypes.string,
-    onClose     : PropTypes.func.isRequired,
-    children    : PropTypes.any,
+    tertiary         : PropTypes.string,
+    onSecondary      : PropTypes.func,
+    onTertiary       : PropTypes.func,
+    cancel           : PropTypes.string,
+    onClose          : PropTypes.func.isRequired,
+    children         : PropTypes.any,
 };
 
 /**
