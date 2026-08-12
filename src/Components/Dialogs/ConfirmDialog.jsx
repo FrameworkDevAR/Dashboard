@@ -9,6 +9,7 @@ import NLS                  from "../../Core/NLS";
 import Dialog               from "../Dialog/Dialog";
 import DialogHeader         from "../Dialog/DialogHeader";
 import DialogBody           from "../Dialog/DialogBody";
+import DialogResult         from "../Dialog/DialogResult";
 import DialogFooter         from "../Dialog/DialogFooter";
 import Html                 from "../Common/Html";
 
@@ -37,7 +38,8 @@ const Children = Styled.div`
 function ConfirmDialog(props) {
     const {
         open, icon, title, message, content, isLoading, isWide,
-        bigSpacing, primary, primaryVariant, cancel, onSubmit, onClose, children,
+        bigSpacing, primary, primaryVariant, cancel, result,
+        onSubmit, onClose, children,
     } = props;
 
 
@@ -55,8 +57,11 @@ function ConfirmDialog(props) {
         width={isWide ? 500 : null}
     >
         <DialogHeader message={title} icon={icon} />
-        <DialogBody bigSpacing={bigSpacing} withSpacing>
-            <Content variant="h3">{body}</Content>
+        <DialogBody bigSpacing={bigSpacing} withSpacing={!result}>
+            {result ? <DialogResult
+                variant={result}
+                message={body}
+            /> : <Content variant="h3">{body}</Content>}
             {!!children && <Children>{children}</Children>}
         </DialogBody>
         <DialogFooter
@@ -82,6 +87,7 @@ ConfirmDialog.propTypes = {
     primary        : PropTypes.string,
     primaryVariant : PropTypes.string,
     cancel         : PropTypes.string,
+    result         : PropTypes.string,
     isLoading      : PropTypes.bool,
     bigSpacing     : PropTypes.bool,
     isWide         : PropTypes.bool,
