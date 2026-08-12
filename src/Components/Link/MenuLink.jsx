@@ -84,6 +84,11 @@ const LightLink = Styled(NavLink)`
     ${(props) => props.isSelected && `
         color: var(--link-selected-color);
         background-color: var(--link-selected-bg);
+
+        &:hover {
+            color: var(--link-selected-color);
+            background-color: var(--link-selected-bg);
+        }
     `}
     ${(props) => props.isDisabled && `
         cursor: not-allowed;
@@ -101,6 +106,11 @@ const DarkLink = Styled(NavLink)`
     ${(props) => props.isSelected && `
         color: white;
         background-color: var(--primary-color);
+
+        &:hover {
+            color: white;
+            background-color: var(--primary-color);
+        }
     `}
     ${(props) => props.isDisabled && `
         cursor: not-allowed;
