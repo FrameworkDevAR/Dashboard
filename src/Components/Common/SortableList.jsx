@@ -87,7 +87,7 @@ function SortableList(props) {
                 icon="drag"
                 cursor="grab"
                 onMouseDown={(e) => handleGrab(e, id, index)}
-                size="14"
+                size="16"
             />
             {withVisibility ? <CheckboxInput
                 name="visibility"
@@ -96,9 +96,10 @@ function SortableList(props) {
                 onChange={(name, isChecked) => onVisibility(index, isChecked)}
             /> : <Name>{name}</Name>}
             {withVisibility && <Icon
-                icon={isVisible ? "visible" : "hidden"}
+                icon={isVisible ? "view" : "hide"}
                 cursor="pointer"
                 onClick={() => onVisibility(index, !isVisible)}
+                size="16"
             />}
         </Li>)}
     </Ul>;
