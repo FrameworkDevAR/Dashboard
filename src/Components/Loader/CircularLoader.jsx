@@ -7,6 +7,7 @@ import NLS                   from "../../Core/NLS";
 
 // Components
 import Html                  from "../Common/Html";
+import { dotsStyle }         from "./LoaderDots";
 
 // Variants
 const Variant = {
@@ -20,23 +21,6 @@ const Variant = {
 const loader = keyframes`
     0%   { transform: rotate(0deg);   }
     100% { transform: rotate(360deg); }
-`;
-
-const loaderDots = keyframes`
-    0%, 20% {
-        color: transparent;
-        text-shadow: 0.25em 0 0 transparent, 0.5em 0 0 transparent;
-    }
-    40% {
-        color: var(--loader-font-color);
-        text-shadow: 0.25em 0 0 transparent, 0.5em 0 0 transparent;
-    }
-    60% {
-        text-shadow: 0.25em 0 0 var(--loader-font-color), 0.5em 0 0 transparent;
-    }
-    80%, 100% {
-        text-shadow: 0.25em 0 0 var(--loader-font-color), 0.5em 0 0 var(--loader-font-color);
-    }
 `;
 
 // Styles
@@ -101,13 +85,15 @@ const Ring = Styled.div`
 `;
 
 const Text = Styled(Html)`
+    --dots-color: var(--loader-font-color);
+
     padding-top: 32px;
     color: var(--loader-font-color);
 
+    ${dotsStyle}
+
     &::after {
-        content: " .";
         font-size: 1.5em;
-        animation: ${loaderDots} 1s steps(5, end) infinite;
     }
 `;
 
