@@ -23,16 +23,22 @@ const Container = Styled.div.attrs(({ topSpace, bottomSpace }) => ({ topSpace, b
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
 `;
 
-const Circle = Styled.div`
+const Circle = Styled.div.attrs(({ variant }) => ({ variant }))`
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 88px;
     height: 88px;
-    color: var(--error-color);
-    background-color: hsl(0, 62%, 96%);
     border-radius: 50%;
+
+    ${(props) => props.variant === "success" ? `
+        color: var(--success-color);
+        background-color: hsl(136, 52%, 95%);
+    ` : `
+        color: var(--error-color);
+        background-color: hsl(0, 62%, 96%);
+    `}
 `;
 
 const Message = Styled(Html)`
@@ -46,15 +52,19 @@ const Message = Styled(Html)`
 
 
 /**
- * The Dialog Error Component
+ * The Dialog Result Component
  * @param {object} props
  * @returns {React.ReactElement}
  */
-function DialogError(props) {
+function DialogResult(props) {
     const {
-        isHidden, className, icon, message,
+        isHidden, className, variant, icon, message,
         topSpace, bottomSpace,
     } = props;
+
+
+    // Variables
+    const iconName = icon || (variant === "success" ? "completed" : "error");
 
 
     // Do the Render
@@ -66,8 +76,8 @@ function DialogError(props) {
         topSpace={topSpace}
         bottomSpace={bottomSpace}
     >
-        <Circle>
-            <Icon icon={icon} size="44" />
+        <Circle variant={variant}>
+            <Icon icon={iconName} size="44" />
         </Circle>
         <Message
             variant="h3"
@@ -80,9 +90,10 @@ function DialogError(props) {
  * The Property Types
  * @type {object} propTypes
  */
-DialogError.propTypes = {
+DialogResult.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
+    variant     : PropTypes.string,
     icon        : PropTypes.string,
     message     : PropTypes.string,
     topSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
@@ -93,10 +104,10 @@ DialogError.propTypes = {
  * The Default Properties
  * @type {object} defaultProps
  */
-DialogError.defaultProps = {
+DialogResult.defaultProps = {
     isHidden  : false,
     className : "",
-    icon      : "error",
+    variant   : "error",
 };
 
-export default DialogError;
+export default DialogResult;
