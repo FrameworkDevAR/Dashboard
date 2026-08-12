@@ -24,6 +24,7 @@ const Variant = {
     OUTLINED        : "outlined",
     OUTLINED_WHITE  : "outlined-white",
     OUTLINED_ACCENT : "outlined-accent",
+    OUTLINED_ERROR  : "outlined-error",
     MENU            : "menu",
     ICON            : "icon",
 };
@@ -169,7 +170,7 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         case Variant.OUTLINED: return `
             --button-color: var(--primary-color);
             --button-border: var(--primary-border, var(--primary-color));
-            --button-background: transparent;
+            --button-background: var(--content-color);
             --button-hover-color: white;
             --button-hover-border: var(--primary-color);
             --button-hover-background: var(--primary-color);
@@ -179,7 +180,7 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
             &:disabled:focus,
             &:disabled:active {
                 color: var(--darkest-gray);
-                background-color: transparent;
+                background-color: var(--content-color);
             }
         `;
 
@@ -194,9 +195,26 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         case Variant.OUTLINED_ACCENT: return `
             --button-color: var(--accent-color);
             --button-border: var(--accent-color);
-            --button-background: transparent;
+            --button-background: var(--content-color);
             --button-hover-color: white;
             --button-hover-background: var(--accent-color);
+        `;
+
+        case Variant.OUTLINED_ERROR: return `
+            --button-color: var(--error-color);
+            --button-border: var(--error-color);
+            --button-background: var(--content-color);
+            --button-hover-color: white;
+            --button-hover-border: var(--error-color);
+            --button-hover-background: var(--error-color);
+
+            &:disabled,
+            &:disabled:hover,
+            &:disabled:focus,
+            &:disabled:active {
+                color: var(--darkest-gray);
+                background-color: var(--content-color);
+            }
         `;
 
         case Variant.MENU: return `
