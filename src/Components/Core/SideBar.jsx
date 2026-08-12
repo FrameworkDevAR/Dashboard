@@ -106,7 +106,7 @@ const SideAvatar = Styled(Avatar)`
  */
 function SideBar(props) {
     const {
-        className, expandMobile, logo,
+        className, expandMobile, logo, showDevBadge, showNightlyBadge,
         hasSearch, onSearch, hasCreate, onCreate, onClose,
         onLogout, message, avatarUrl, avatarEmail, avatarAvatar, avatarEdition,
         children,
@@ -138,6 +138,8 @@ function SideBar(props) {
         <Div className="sidebar-top">
             <BarLogo
                 logo={logo}
+                showDevBadge={showDevBadge}
+                showNightlyBadge={showNightlyBadge}
                 withLink
             />
             {hasSearch && <BarIcon
@@ -173,23 +175,25 @@ function SideBar(props) {
  * @type {object} propTypes
  */
 SideBar.propTypes = {
-    className     : PropTypes.string,
-    logo          : PropTypes.string,
-    hasSearch     : PropTypes.bool,
-    hasCreate     : PropTypes.bool,
-    onSearch      : PropTypes.func,
-    onCreate      : PropTypes.func,
-    onClose       : PropTypes.func,
-    onLogout      : PropTypes.func,
-    message       : PropTypes.string,
-    avatarUrl     : PropTypes.string,
-    avatarEmail   : PropTypes.string,
-    avatarAvatar  : PropTypes.string,
-    avatarEdition : PropTypes.number,
-    withBorder    : PropTypes.bool,
-    withTopBar    : PropTypes.bool,
-    expandMobile  : PropTypes.bool,
-    children      : PropTypes.any,
+    className        : PropTypes.string,
+    logo             : PropTypes.string,
+    showDevBadge     : PropTypes.bool,
+    showNightlyBadge : PropTypes.bool,
+    hasSearch        : PropTypes.bool,
+    hasCreate        : PropTypes.bool,
+    onSearch         : PropTypes.func,
+    onCreate         : PropTypes.func,
+    onClose          : PropTypes.func,
+    onLogout         : PropTypes.func,
+    message          : PropTypes.string,
+    avatarUrl        : PropTypes.string,
+    avatarEmail      : PropTypes.string,
+    avatarAvatar     : PropTypes.string,
+    avatarEdition    : PropTypes.number,
+    withBorder       : PropTypes.bool,
+    withTopBar       : PropTypes.bool,
+    expandMobile     : PropTypes.bool,
+    children         : PropTypes.any,
 };
 
 /**

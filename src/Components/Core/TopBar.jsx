@@ -104,7 +104,7 @@ const DetailIcon = Styled(BarIcon)`
  */
 function TopBar(props) {
     const {
-        className, withTopBar, withTitle, showDev, logo,
+        className, withTopBar, withTitle, showDev, showDevBadge, showNightlyBadge, logo,
         avatarUrl, avatarEmail, avatarAvatar, avatarEdition,
         showOnline, isOnline, isBusy, showParent, parentTitle, parentName,
         onLogout, menuItems, children,
@@ -132,6 +132,8 @@ function TopBar(props) {
             />
             <BarLogo
                 logo={logo}
+                showDevBadge={showDevBadge}
+                showNightlyBadge={showNightlyBadge}
                 withLink
             />
             {withTitle && <H1>{NLS.get("TITLE")}</H1>}
@@ -145,11 +147,6 @@ function TopBar(props) {
                 icon="logout"
                 onClick={onLogout}
             />}
-            {hasDetails && <DetailIcon
-                icon="details"
-                onClick={openDetails}
-            />}
-
             <TopAvatar
                 avatarUrl={avatarUrl}
                 avatarEmail={avatarEmail}
@@ -163,6 +160,11 @@ function TopBar(props) {
                 parentName={parentName}
                 menuItems={menuItems}
             />
+
+            {hasDetails && <DetailIcon
+                icon="details"
+                onClick={openDetails}
+            />}
         </Content>
     </Container>;
 }
@@ -172,24 +174,26 @@ function TopBar(props) {
  * @type {object} propTypes
  */
 TopBar.propTypes = {
-    className     : PropTypes.string,
-    withTopBar    : PropTypes.bool,
-    withTitle     : PropTypes.bool,
-    showDev       : PropTypes.bool,
-    logo          : PropTypes.string,
-    avatarUrl     : PropTypes.string,
-    avatarEmail   : PropTypes.string,
-    avatarAvatar  : PropTypes.string,
-    avatarEdition : PropTypes.number,
-    showOnline    : PropTypes.bool,
-    isOnline      : PropTypes.bool,
-    isBusy        : PropTypes.bool,
-    showParent    : PropTypes.bool,
-    parentTitle   : PropTypes.string,
-    parentName    : PropTypes.string,
-    onLogout      : PropTypes.func,
-    menuItems     : PropTypes.array,
-    children      : PropTypes.any,
+    className        : PropTypes.string,
+    withTopBar       : PropTypes.bool,
+    withTitle        : PropTypes.bool,
+    showDev          : PropTypes.bool,
+    showDevBadge     : PropTypes.bool,
+    showNightlyBadge : PropTypes.bool,
+    logo             : PropTypes.string,
+    avatarUrl        : PropTypes.string,
+    avatarEmail      : PropTypes.string,
+    avatarAvatar     : PropTypes.string,
+    avatarEdition    : PropTypes.number,
+    showOnline       : PropTypes.bool,
+    isOnline         : PropTypes.bool,
+    isBusy           : PropTypes.bool,
+    showParent       : PropTypes.bool,
+    parentTitle      : PropTypes.string,
+    parentName       : PropTypes.string,
+    onLogout         : PropTypes.func,
+    menuItems        : PropTypes.array,
+    children         : PropTypes.any,
 };
 
 /**
@@ -197,11 +201,13 @@ TopBar.propTypes = {
  * @type {object} defaultProps
  */
 TopBar.defaultProps = {
-    className  : "",
-    showParent : false,
-    withTopBar : false,
-    withTitle  : false,
-    showDev    : false,
+    className        : "",
+    showParent       : false,
+    withTopBar       : false,
+    withTitle        : false,
+    showDev          : false,
+    showDevBadge     : false,
+    showNightlyBadge : false,
 };
 
 export default TopBar;
