@@ -41,7 +41,7 @@ const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
     position: absolute;
     top: 50%;
     right: 4px;
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-small);
     transform: translateY(-50%);
 
     .icon {
