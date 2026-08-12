@@ -5,13 +5,11 @@ import Styled               from "styled-components";
 // Core
 import NLS                  from "../../Core/NLS";
 import Responsive           from "../../Core/Responsive";
-import Store                from "../../Core/Store";
 
 // Components
 import BarLogo              from "../Core/BarLogo";
 import BarIcon              from "../Core/BarIcon";
 import Avatar               from "../Avatar/Avatar";
-import IconLink             from "../Link/IconLink";
 
 
 
@@ -52,8 +50,6 @@ const Container = Styled.nav.attrs(({ expandMobile }) => ({ expandMobile }))`
         }
 
         @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
-            padding-top: 40px !important;
-
             & > div {
                 align-items: flex-start;
             }
@@ -103,21 +99,6 @@ const SideAvatar = Styled(Avatar)`
     margin-top: 6px;
 `;
 
-const CloseIcon = Styled(IconLink)`
-    --link-color: var(--sidebar-icon-color);
-    display: none;
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 1;
-
-    @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
-        display: block;
-    }
-`;
-
-
-
 /**
  * The Side Bar Component
  * @param {object} props
@@ -130,8 +111,6 @@ function SideBar(props) {
         onLogout, message, avatarUrl, avatarEmail, avatarAvatar, avatarEdition,
         children,
     } = props;
-
-    const { closeMenu } = Store.useAction("core");
 
 
     // Handles the Search Click
@@ -156,11 +135,6 @@ function SideBar(props) {
         className={`sidebar ${className}`}
         expandMobile={expandMobile}
     >
-        {expandMobile && <CloseIcon
-            icon="close"
-            onClick={closeMenu}
-            isSmall
-        />}
         <Div className="sidebar-top">
             <BarLogo
                 logo={logo}
