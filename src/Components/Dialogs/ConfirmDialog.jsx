@@ -37,7 +37,7 @@ const Children = Styled.div`
 function ConfirmDialog(props) {
     const {
         open, icon, title, message, content, isLoading, isWide,
-        bigSpacing, primary, primaryVariant, onSubmit, onClose, children,
+        bigSpacing, primary, primaryVariant, cancel, onSubmit, onClose, children,
     } = props;
 
 
@@ -62,6 +62,7 @@ function ConfirmDialog(props) {
         <DialogFooter
             primary={primary}
             primaryVariant={primaryVariant}
+            cancel={cancel}
             onSubmit={onSubmit}
             isDisabled={isLoading}
         />
@@ -80,6 +81,7 @@ ConfirmDialog.propTypes = {
     content        : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     primary        : PropTypes.string,
     primaryVariant : PropTypes.string,
+    cancel         : PropTypes.string,
     isLoading      : PropTypes.bool,
     bigSpacing     : PropTypes.bool,
     isWide         : PropTypes.bool,
