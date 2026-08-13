@@ -121,8 +121,8 @@ function FilterDate(props) {
  */
 FilterDate.propTypes = {
     open      : PropTypes.bool.isRequired,
-    withHour  : PropTypes.bool.isRequired,
-    onlyHour  : PropTypes.bool.isRequired,
+    withHour  : PropTypes.bool,
+    onlyHour  : PropTypes.bool,
     currData  : PropTypes.object.isRequired,
     datesName : PropTypes.string,
     onSubmit  : PropTypes.func.isRequired,
