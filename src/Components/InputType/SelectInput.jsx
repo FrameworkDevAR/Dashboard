@@ -320,9 +320,12 @@ function SelectInput(props) {
     }, [ hasOptions, optionsRef.current ]);
 
     // Handles the Blur
+    // Writing in the filter clears the selected value, so an empty one is not
+    // used, as it would clear the selection when blurring without picking one
     const handleBlur = () => {
         setTimer(window.setTimeout(() => {
-            if (!allowMultiple && selectedValRef.current !== initialVal) {
+            const hasSelected = selectedValRef.current !== "";
+            if (!allowMultiple && hasSelected && selectedValRef.current !== initialVal) {
                 onChange(name, selectedValRef.current);
             }
 
