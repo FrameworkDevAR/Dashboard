@@ -15,7 +15,7 @@ import Badge                from "../Common/Badge";
 
 
 // Styles
-const Container = Styled.div.attrs(({ withGap, isSelected, isDisabled }) => ({ withGap, isSelected, isDisabled }))`
+const Container = Styled.div.attrs(({ isSelected, isDisabled }) => ({ isSelected, isDisabled }))`
     box-sizing: border-box;
     position: relative;
     box-sizing: border-box;
@@ -24,7 +24,7 @@ const Container = Styled.div.attrs(({ withGap, isSelected, isDisabled }) => ({ w
     justify-content: center;
     align-items: center;
     height: var(--tabs-height, 24px);
-    gap: ${(props) => props.withGap ? "6px" : "0"};
+    gap: 6px;
     padding: 0 12px;
     margin: 0 0 4px 0;
     font-size: 14px;
@@ -33,6 +33,10 @@ const Container = Styled.div.attrs(({ withGap, isSelected, isDisabled }) => ({ w
     border-radius: var(--border-radius);
     transition: all 0.2s;
     cursor: pointer;
+
+    .tab-amount {
+        margin-left: 0;
+    }
 
     &:hover {
         background-color: var(--lighter-gray);
@@ -107,7 +111,6 @@ function TabItem(props) {
     const canAction  = Boolean(!isDisabled && onAction);
     const showEdit   = Boolean(canEdit && canAction);
     const showDelete = Boolean(canDelete && canAction);
-    const withGap    = Boolean(icon && message);
 
 
     // Handles the Action
@@ -152,7 +155,6 @@ function TabItem(props) {
     return <Container
         ref={elementRef}
         className={`tab-item tab-item-${id} ${isSelected ? "tab-selected" : ""} ${className}`}
-        withGap={withGap}
         isSelected={isSelected}
         isDisabled={isDisabled}
         onClick={handleClick}
