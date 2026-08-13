@@ -1693,6 +1693,33 @@ function download(source, fileName, signal = null) {
 }
 
 /**
+ * Returns true if the User is in macOS, where the modifier key is the Command
+ * @returns {boolean}
+ */
+function isMacOS() {
+    const platform = window.navigator.userAgentData?.platform || window.navigator.platform || "";
+    return platform.toLowerCase().includes("mac");
+}
+
+/**
+ * Returns the Keys of a Shortcut, to show each one on its own
+ * @param {string} key
+ * @returns {string[]}
+ */
+function getShortcutKeys(key) {
+    return [ isMacOS() ? "⌘" : "Ctrl", key ];
+}
+
+/**
+ * Returns the Text of a Shortcut, to show it in a single line
+ * @param {string} key
+ * @returns {string}
+ */
+function getShortcutText(key) {
+    return isMacOS() ? `⌘${key}` : `Ctrl+${key}`;
+}
+
+/**
  * Prints the given Content
  * @param {string} title
  * @param {string} content
@@ -1831,5 +1858,8 @@ export default {
     isValidFile,
     formatSize,
     download,
+    isMacOS,
+    getShortcutKeys,
+    getShortcutText,
     print,
 };

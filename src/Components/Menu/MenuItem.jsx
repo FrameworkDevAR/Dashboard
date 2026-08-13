@@ -17,6 +17,23 @@ import Html                 from "../Common/Html";
 
 
 // Styles
+const ShortcutKey = Styled.span`
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--font-light);
+    background-color: var(--lighter-gray);
+    border: 1px solid var(--dark-gray);
+    border-radius: var(--border-radius-small);
+    transition: all 0.2s;
+`;
+
 const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace }) => ({ isSelected, isDisabled, isSmall, leftSpace }))`
     display: flex;
     align-items: center;
@@ -36,6 +53,10 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace 
 
     &:hover {
         background-color: var(--light-gray);
+    }
+    &:hover ${ShortcutKey} {
+        background-color: var(--dark-gray);
+        border-color: var(--darker-gray);
     }
 
     ${(props) => props.isSmall && `
@@ -69,6 +90,14 @@ const MenuText = Styled(Html)`
     overflow: hidden;
 `;
 
+const MenuShortcut = Styled.span`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 24px;
+`;
+
 
 
 /**
@@ -78,7 +107,7 @@ const MenuText = Styled(Html)`
  */
 function MenuItem(props) {
     const {
-        className, action, icon, circle, title, message,
+        className, action, icon, circle, title, message, shortcut,
         url, href, target,
         isDisabled, isSelected, isSmall, leftSpace,
         onAction, onClick, dontClose, onClose,
@@ -103,6 +132,9 @@ function MenuItem(props) {
     const hasIcon     = Boolean(icon);
     const hasCircle   = Boolean(circle);
     const hasMenu     = Boolean(children && children.length);
+
+    // Each key of the shortcut goes in its own square
+    const shortcutKeys = shortcut ? Utils.getShortcutKeys(shortcut) : [];
 
 
     // Generates the Content
@@ -173,6 +205,9 @@ function MenuItem(props) {
                 variant="span"
                 content={content}
             />
+            {shortcutKeys.length > 0 && <MenuShortcut>
+                {shortcutKeys.map((key) => <ShortcutKey key={key}>{key}</ShortcutKey>)}
+            </MenuShortcut>}
             <Icon
                 isHidden={!hasMenu}
                 icon="closed"
@@ -205,6 +240,7 @@ MenuItem.propTypes = {
     circle      : PropTypes.string,
     title       : PropTypes.string,
     message     : PropTypes.string,
+    shortcut    : PropTypes.string,
     url         : PropTypes.string,
     href        : PropTypes.string,
     target      : PropTypes.string,

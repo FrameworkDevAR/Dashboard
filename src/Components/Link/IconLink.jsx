@@ -5,7 +5,9 @@ import Styled               from "styled-components";
 // Core
 import { Brightness }       from "../../Core/Variants";
 import Navigate             from "../../Core/Navigate";
+import NLS                  from "../../Core/NLS";
 import Store                from "../../Core/Store";
+import Utils                from "../../Utils/Utils";
 
 // Components
 import Icon                 from "../Common/Icon";
@@ -116,7 +118,7 @@ function IconLink(props) {
     const {
         isHidden, passedRef, variant, className, isDisabled,
         target, icon, isSmall, isTiny, size, withMark,
-        tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
+        tooltip, tooltipVariant, tooltipWidth, tooltipDelay, shortcut,
         onMouseDown, onMouseUp, onTouchEnd,
     } = props;
 
@@ -126,10 +128,15 @@ function IconLink(props) {
     const onClick    = Navigate.useLink(props);
     const { showTooltip, hideTooltip } = Store.useAction("core");
 
+    // The Shortcut is added to the Tooltip, as there is no room for it in the Icon
+    const tooltipText = shortcut
+        ? `${NLS.get(tooltip)} (${Utils.getShortcutText(shortcut)})`
+        : tooltip;
+
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
-            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay);
+            showTooltip(elementRef, tooltipVariant, tooltipText, tooltipWidth, tooltipDelay);
         }
     };
 
@@ -171,6 +178,7 @@ IconLink.propTypes = {
     variant        : PropTypes.string,
     icon           : PropTypes.string,
     tooltip        : PropTypes.string,
+    shortcut       : PropTypes.string,
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
     tooltipDelay   : PropTypes.number,
