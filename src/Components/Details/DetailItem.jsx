@@ -9,13 +9,15 @@ import Store                from "../../Core/Store";
 import Utils                from "../../Utils/Utils";
 
 // Components
+import InputCopy            from "../Input/InputCopy";
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
 
 
 
 // Styles
-const Container = Styled.div.attrs(({ gap, isLink, isSelected }) => ({ gap, isLink, isSelected }))`
+const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle }) => ({ gap, isLink, isSelected, withTitle }))`
+    position: relative;
     display: flex;
     align-items: center;
     padding: 8px;
@@ -25,10 +27,19 @@ const Container = Styled.div.attrs(({ gap, isLink, isSelected }) => ({ gap, isLi
 
     ${(props) => !!props.gap && `gap: ${props.gap}px;`};
     ${(props) => props.isLink && "cursor: pointer;"};
+    ${(props) => props.withTitle && `
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 4px;
+        border-radius: 0;
+        border-bottom: 1px solid var(--border-color-light);
+    `};
 
-    &:hover {
-        background-color: var(--light-gray);
-    }
+    ${(props) => !props.withTitle && `
+        &:hover {
+            background-color: var(--light-gray);
+        }
+    `}
 
     ${(props) => props.isSelected && `
         background-color: var(--light-gray);
@@ -37,6 +48,24 @@ const Container = Styled.div.attrs(({ gap, isLink, isSelected }) => ({ gap, isLi
 
 const DetailIcon = Styled(Icon)`
     padding: 0 8px 0 4px;
+`;
+
+const ItemTitle = Styled.h4`
+    margin: 0 0 2px 0;
+    font-size: inherit;
+    font-weight: bold;
+`;
+
+const DetailCopy = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
+    flex-shrink: 0;
+    margin-left: auto;
+
+    ${(props) => props.isFloating && `
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        margin-left: 0;
+    `}
 `;
 
 
@@ -49,9 +78,10 @@ const DetailIcon = Styled(Icon)`
 function DetailItem(props) {
     const {
         isHidden, className, textColor, gap,
-        message, icon, prefix, showAlways,
+        message, icon, title, prefix, showAlways,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
-        href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected, children,
+        href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected,
+        hasCopy, copyValue, children,
     } = props;
 
     const navigate   = Navigate.useClick(props);
@@ -67,6 +97,11 @@ function DetailItem(props) {
         }
     };
 
+    // Handles the Copy Click, so it does not trigger the Item click
+    const handleCopyClick = (e) => {
+        e.stopPropagation();
+    };
+
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
@@ -76,9 +111,15 @@ function DetailItem(props) {
 
 
     // Get the Content
-    let   content = message ? NLS.get(String(message)) : children;
-    let   isHtml  = message && (content.includes("\n") || content.includes("</b>") || content.includes("</span>"));
-    const isLink  = href || url || onClick || isEmail || isPhone || isWhatsApp;
+    let   content  = message ? NLS.get(String(message)) : children;
+    let   isHtml   = message && (content.includes("\n") || content.includes("</b>") || content.includes("</span>"));
+    const isLink   = href || url || onClick || isEmail || isPhone || isWhatsApp;
+
+    // The Copy uses the Message without the Prefix that is added below
+    const copyText  = message ? NLS.get(String(message)) : "";
+    const showCopy  = Boolean(hasCopy && (copyValue || copyText));
+    const withTitle = Boolean(title);
+    const floatCopy = Boolean(withTitle || copyText.length > 1000 || isHtml);
 
 
     // Nothing to Render
@@ -102,12 +143,23 @@ function DetailItem(props) {
         gap={gap}
         isLink={isLink}
         isSelected={isSelected}
+        withTitle={withTitle}
         onClick={handleClick}
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
         {!!icon && <DetailIcon icon={icon} size="16" />}
+        {withTitle && <ItemTitle>{NLS.get(title)}</ItemTitle>}
         {isHtml ? <Html addBreaks>{content}</Html> : content}
+        {showCopy && <DetailCopy
+            isFloating={floatCopy}
+            onClick={handleCopyClick}
+        >
+            <InputCopy
+                copyValue={copyValue}
+                inputValue={copyText}
+            />
+        </DetailCopy>}
     </Container>;
 }
 
@@ -122,6 +174,7 @@ DetailItem.propTypes = {
     gap            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     message        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     icon           : PropTypes.string,
+    title          : PropTypes.string,
     tooltip        : PropTypes.string,
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
@@ -136,6 +189,8 @@ DetailItem.propTypes = {
     onClick        : PropTypes.func,
     showAlways     : PropTypes.bool,
     isSelected     : PropTypes.bool,
+    hasCopy        : PropTypes.bool,
+    copyValue      : PropTypes.string,
     children       : PropTypes.any,
 };
 
@@ -156,6 +211,7 @@ DetailItem.defaultProps = {
     isPhone        : false,
     isWhatsApp     : false,
     isSelected     : false,
+    hasCopy        : false,
 };
 
 export default DetailItem;
