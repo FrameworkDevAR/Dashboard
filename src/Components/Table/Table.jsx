@@ -129,8 +129,16 @@ function Table(props) {
     const [ menuDir,    setMenuDir    ] = React.useState(null);
     const [ iconHeight, setIconHeight ] = React.useState(0);
     const [ hasScroll,  setHasScroll  ] = React.useState(false);
+    const [ sortField,  setSortField  ] = React.useState("");
     const [ showEdit,   setShowEdit   ] = React.useState(false);
 
+
+    // Handles the Sort, showing a loader in the column and not the main one
+    const handleSort = async (params) => {
+        setSortField(params.orderBy);
+        await fetch(params, false);
+        setSortField("");
+    };
 
     // Handles the Column Edit
     const handleColEdit = (columns) => {
@@ -321,6 +329,7 @@ function Table(props) {
         if (child.type !== TableActionList) {
             items.push(React.cloneElement(child, {
                 key, fetch, sort, columns,
+                handleSort, sortField,
                 hasSorting, hasPaging, hasFooter, notFixed,
                 hasChecks, checked, setChecked,
                 hasCheckAll, isCheckedAll, isCheckedSome, handleCheckAll,
@@ -342,7 +351,7 @@ function Table(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    if (isLoading) {
+    if (isLoading && !sortField) {
         return <Loading
             inDialog={inDialog}
             hasFilter={hasFilter}

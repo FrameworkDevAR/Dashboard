@@ -7,6 +7,7 @@ import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
 
 // Components
+import CircularLoader       from "../Loader/CircularLoader";
 import Icon                 from "../Common/Icon";
 
 
@@ -76,6 +77,13 @@ const Inner = Styled.div.attrs(({ hasSorting }) => ({ hasSorting }))`
     `}
 `;
 
+const SortLoader = Styled(CircularLoader)`
+    --loader-size: 12px;
+    --loader-border-width: 2px;
+
+    margin-left: 4px;
+`;
+
 const Resizer = Styled.div`
     display: none;
     width: 4px;
@@ -98,7 +106,7 @@ const Resizer = Styled.div`
 function TableHeader(props) {
     const {
         isHidden, className, message,
-        fetch, hasSorting, sort, field, noSorting,
+        fetch, handleSort, sortField, hasSorting, sort, field, noSorting,
         colSpan, grow, shrink, width, minWidth, maxWidth,
         align, isSmall, isEditable, handleColWidth, children,
     } = props;
@@ -111,21 +119,41 @@ function TableHeader(props) {
     const moveRef     = React.useRef(0);
 
     // The Current State
-    const [ isDragging, setDragging ] = React.useState(false);
+    const [ isDragging, setDragging   ] = React.useState(false);
+    const [ showLoader, setShowLoader ] = React.useState(false);
 
     // Variables
     const withSorting = hasSorting && !noSorting;
+    const isSorting   = withSorting && sortField === field;
+
+
+    // Show the Sort loader after a delay, so a fast Sort never shows it
+    React.useEffect(() => {
+        if (!isSorting) {
+            setShowLoader(false);
+            return undefined;
+        }
+        const timer = window.setTimeout(() => setShowLoader(true), 300);
+        return () => window.clearTimeout(timer);
+    }, [ isSorting ]);
 
 
     // Handles the Sorting
     const handleClick = () => {
-        if (withSorting) {
-            let params = sort;
-            if (sort.orderBy === field) {
-                params = { ...sort, orderAsc : sort.orderAsc ? 0 : 1 };
-            } else {
-                params = { ...sort, orderBy : field, orderAsc : 1 };
-            }
+        if (!withSorting) {
+            return;
+        }
+
+        let params = sort;
+        if (sort.orderBy === field) {
+            params = { ...sort, orderAsc : sort.orderAsc ? 0 : 1 };
+        } else {
+            params = { ...sort, orderBy : field, orderAsc : 1 };
+        }
+
+        if (handleSort) {
+            handleSort(params);
+        } else if (fetch) {
             fetch(params);
         }
     };
@@ -190,7 +218,10 @@ function TableHeader(props) {
         <Inner onClick={handleClick} hasSorting={withSorting}>
             {message ? NLS.get(message) : children}
         </Inner>
-        {withSorting && sort.orderBy === field ? <Icon
+        {isSorting && showLoader && <SortLoader
+            isTiny
+        />}
+        {withSorting && sortField !== field && sort.orderBy === field ? <Icon
             icon={sort.orderAsc ? "up" : "down"}
             size="12"
         /> : null}
@@ -212,6 +243,8 @@ TableHeader.propTypes = {
     hasSorting     : PropTypes.bool,
     noSorting      : PropTypes.bool,
     sort           : PropTypes.object,
+    handleSort     : PropTypes.func,
+    sortField      : PropTypes.string,
     field          : PropTypes.string,
     className      : PropTypes.string,
     colSpan        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),

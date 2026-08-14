@@ -47,7 +47,7 @@ function useList(slice, type = "", loadOnStart = true) {
         if (withLoader) {
             startLoader();
         }
-        fetch(params);
+        return fetch(params);
     };
 
     // Filters the content after Tab
@@ -55,7 +55,7 @@ function useList(slice, type = "", loadOnStart = true) {
         if (withLoader) {
             startLoader();
         }
-        fetch({ ...data.sort, filter, page : 0, amount, ...extras });
+        return fetch({ ...data.sort, filter, page : 0, amount, ...extras });
     };
 
     // Filters the content after Filter
@@ -65,10 +65,9 @@ function useList(slice, type = "", loadOnStart = true) {
         }
         const params = { ...data.sort, page : 0 };
         if (type) {
-            fetchList(type, elemID, filters, params);
-        } else {
-            fetchList(filters, params);
+            return fetchList(type, elemID, filters, params);
         }
+        return fetchList(filters, params);
     };
 
 

@@ -56,13 +56,14 @@ function TableHead(props) {
     const {
         hasChecks, hasCheckAll, isCheckedAll, isCheckedSome, handleCheckAll,
         hasActions, isEditable, setShowEdit, handleColWidth,
-        hasSorting, sort, fetch, columns, children,
+        hasSorting, sort, fetch, handleSort, sortField, columns, children,
     } = props;
 
 
     // Clone the Children
     const items = Utils.cloneChildren(children, (child, index, realIndex) => ({
-        hasSorting, sort, fetch, isEditable, handleColWidth, ...columns[realIndex],
+        hasSorting, sort, fetch, handleSort, sortField,
+        isEditable, handleColWidth, ...columns[realIndex],
     }));
     if (isEditable) {
         items.sort((a, b) => a.props.position - b.props.position);
@@ -119,6 +120,8 @@ TableHead.propTypes = {
     hasSorting     : PropTypes.bool,
     sort           : PropTypes.object,
     fetch          : PropTypes.func,
+    handleSort     : PropTypes.func,
+    sortField      : PropTypes.string,
     columns        : PropTypes.array,
     children       : PropTypes.any,
 };
