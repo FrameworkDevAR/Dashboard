@@ -10,6 +10,7 @@ import Utils                from "../../Utils/Utils";
 // Components
 import NavigationTitle      from "./NavigationTitle";
 import NavigationBody       from "./NavigationBody";
+import TopTitle             from "../Core/TopTitle";
 import MenuLink             from "../Link/MenuLink";
 import IconLink             from "../Link/IconLink";
 
@@ -125,7 +126,7 @@ const BottomCollapse = Styled(MenuLink)`
 function Navigation(props) {
     const {
         className, message, fallback, subTitle, subCircle, icon, href, noBack,
-        none, add, canAdd, canEdit, canManage, onAction,
+        none, add, canAdd, canEdit, canManage, onAction, withTopTitle,
         isLoading, canCollapse, isCollapsed, onCollapse, children,
     } = props;
 
@@ -207,63 +208,71 @@ function Navigation(props) {
 
 
     // Do the Render
-    return <Container
-        className="navigation-wrapper"
-        isCollapsed={collapsed}
-        bottomCollapse={bottomCollapse}
-    >
-        <Content className={`navigation ${className}`}>
-            <NavigationTitle
-                message={message}
-                fallback={fallback}
-                subTitle={subTitle}
-                subCircle={subCircle}
-                icon={icon}
-                href={href}
-                noBack={noBack}
-                smallNav={collapsed}
-                onlyIcon={!bottomCollapse && collapsed}
-                canAdd={canAdd}
-                canEdit={canEdit}
-                canManage={canManage}
-                onAction={onAction}
-            />
-            <NavigationBody
-                passedRef={bodyRef}
-                isLoading={isLoading}
-                canAdd={canAdd}
-                add={add}
-                none={none}
-                onAction={onAction}
-                smallNav={collapsed}
-            >
-                {children}
-            </NavigationBody>
-
-            {showBottomCollapse && <Footer
-                withShadow={showDivider}
-                isCollapsed={collapsed}
-            >
-                <BottomCollapse
-                    passedRef={elementRef}
-                    variant="light"
-                    message="GENERAL_COLLAPSE_MENU"
-                    icon={collapsed ? "sidebar-open" : "sidebar-close"}
-                    onClick={handleCollapse}
-                    onlyIcon={collapsed}
-                    onMouseEnter={handleTooltip}
-                    onMouseLeave={hideTooltip}
-                    isButton
-                />
-            </Footer>}
-        </Content>
-
-        {showFloatCollapse && <FloatCollapse
-            icon={collapsed ? "next" : "prev"}
-            onClick={handleCollapse}
-            isTiny
+    return <>
+        {withTopTitle && <TopTitle
+            onlyForMenu
+            message={message}
+            icon={icon}
         />}
-    </Container>;
+
+        <Container
+            className="navigation-wrapper"
+            isCollapsed={collapsed}
+            bottomCollapse={bottomCollapse}
+        >
+            <Content className={`navigation ${className}`}>
+                <NavigationTitle
+                    message={message}
+                    fallback={fallback}
+                    subTitle={subTitle}
+                    subCircle={subCircle}
+                    icon={icon}
+                    href={href}
+                    noBack={noBack}
+                    smallNav={collapsed}
+                    onlyIcon={!bottomCollapse && collapsed}
+                    canAdd={canAdd}
+                    canEdit={canEdit}
+                    canManage={canManage}
+                    onAction={onAction}
+                />
+                <NavigationBody
+                    passedRef={bodyRef}
+                    isLoading={isLoading}
+                    canAdd={canAdd}
+                    add={add}
+                    none={none}
+                    onAction={onAction}
+                    smallNav={collapsed}
+                >
+                    {children}
+                </NavigationBody>
+
+                {showBottomCollapse && <Footer
+                    withShadow={showDivider}
+                    isCollapsed={collapsed}
+                >
+                    <BottomCollapse
+                        passedRef={elementRef}
+                        variant="light"
+                        message="GENERAL_COLLAPSE_MENU"
+                        icon={collapsed ? "sidebar-open" : "sidebar-close"}
+                        onClick={handleCollapse}
+                        onlyIcon={collapsed}
+                        onMouseEnter={handleTooltip}
+                        onMouseLeave={hideTooltip}
+                        isButton
+                    />
+                </Footer>}
+            </Content>
+
+            {showFloatCollapse && <FloatCollapse
+                icon={collapsed ? "next" : "prev"}
+                onClick={handleCollapse}
+                isTiny
+            />}
+        </Container>
+    </>;
 }
 
 /**
@@ -271,25 +280,26 @@ function Navigation(props) {
  * @type {object} propTypes
  */
 Navigation.propTypes = {
-    className   : PropTypes.string,
-    message     : PropTypes.string,
-    fallback    : PropTypes.string,
-    subTitle    : PropTypes.string,
-    subCircle   : PropTypes.string,
-    icon        : PropTypes.string,
-    href        : PropTypes.string,
-    none        : PropTypes.string,
-    add         : PropTypes.string,
-    isLoading   : PropTypes.bool,
-    noBack      : PropTypes.bool,
-    canAdd      : PropTypes.bool,
-    canEdit     : PropTypes.bool,
-    canManage   : PropTypes.bool,
-    onAction    : PropTypes.func,
-    canCollapse : PropTypes.bool,
-    isCollapsed : PropTypes.bool,
-    onCollapse  : PropTypes.func,
-    children    : PropTypes.any,
+    className    : PropTypes.string,
+    message      : PropTypes.string,
+    withTopTitle : PropTypes.bool,
+    fallback     : PropTypes.string,
+    subTitle     : PropTypes.string,
+    subCircle    : PropTypes.string,
+    icon         : PropTypes.string,
+    href         : PropTypes.string,
+    none         : PropTypes.string,
+    add          : PropTypes.string,
+    isLoading    : PropTypes.bool,
+    noBack       : PropTypes.bool,
+    canAdd       : PropTypes.bool,
+    canEdit      : PropTypes.bool,
+    canManage    : PropTypes.bool,
+    onAction     : PropTypes.func,
+    canCollapse  : PropTypes.bool,
+    isCollapsed  : PropTypes.bool,
+    onCollapse   : PropTypes.func,
+    children     : PropTypes.any,
 };
 
 /**
