@@ -112,7 +112,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, hasRadius, hasSc
 function Table(props) {
     const {
         isHidden, className, sort, fetch, isLoading, none, hideEmpty,
-        noClick, inDialog, hasFilter, statsAmount, hasTabs, hasAlert,
+        noClick, onRowClick, inDialog, hasFilter, statsAmount, hasTabs, hasAlert,
         noSorting, notFixed, columnData, onColumnEdit,
         checked, setChecked, hasCheckAll, extraSpace, children,
     } = props;
@@ -169,6 +169,10 @@ function Table(props) {
     // Handles the Row Click
     const handleRowClick = (elemID) => {
         if (noClick || menuID !== null || Utils.hasSelection()) {
+            return;
+        }
+        if (onRowClick) {
+            onRowClick(elemID);
             return;
         }
         for (const action of actions) {
@@ -434,6 +438,7 @@ Table.propTypes = {
     hasAlert     : PropTypes.bool,
     noSorting    : PropTypes.bool,
     noClick      : PropTypes.bool,
+    onRowClick   : PropTypes.func,
     notFixed     : PropTypes.bool,
     columnData   : PropTypes.array,
     onColumnEdit : PropTypes.func,
