@@ -37,12 +37,12 @@ const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle }) => (
 
     ${(props) => !props.withTitle && `
         &:hover {
-            background-color: var(--light-gray);
+            background-color: var(--details-hover, var(--light-gray));
         }
     `}
 
     ${(props) => props.isSelected && `
-        background-color: var(--light-gray);
+        background-color: var(--details-selected, var(--light-gray));
     `}
 `;
 
