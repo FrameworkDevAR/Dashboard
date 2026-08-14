@@ -147,6 +147,10 @@ function TopBar(props) {
                 icon="logout"
                 onClick={onLogout}
             />}
+            {hasDetails && <DetailIcon
+                icon="details"
+                onClick={openDetails}
+            />}
             <TopAvatar
                 avatarUrl={avatarUrl}
                 avatarEmail={avatarEmail}
@@ -160,11 +164,6 @@ function TopBar(props) {
                 parentName={parentName}
                 menuItems={menuItems}
             />
-
-            {hasDetails && <DetailIcon
-                icon="details"
-                onClick={openDetails}
-            />}
         </Content>
     </Container>;
 }
