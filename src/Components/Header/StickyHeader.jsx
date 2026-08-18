@@ -2,6 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Core
+import Responsive           from "../../Core/Responsive";
+
 
 
 // Styles
@@ -37,6 +40,10 @@ const Container = Styled.header.attrs(({ isConnected }) => ({ isConnected }))`
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
     `}
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+        padding-bottom: calc(var(--main-padding) / 2);
+    }
 `;
 
 

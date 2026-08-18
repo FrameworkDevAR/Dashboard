@@ -2,6 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Core
+import Responsive           from "../../Core/Responsive";
+
 // Dashboard
 import Header               from "./Header";
 
@@ -16,6 +19,10 @@ const Container = Styled.div`
     gap: var(--main-gap);
     height: var(--header-height);
     padding: var(--main-padding, 16px) var(--main-padding) 0 var(--main-padding);
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+        padding-top: calc(var(--main-padding) / 2);
+    }
 `;
 
 const Grow = Styled.div`
