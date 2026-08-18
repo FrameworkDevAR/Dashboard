@@ -2,16 +2,18 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Utils
+// Core & Utils
+import Responsive           from "../../Core/Responsive";
+import Store                from "../../Core/Store";
 import Utils                from "../../Utils/Utils";
 
 
 
 // Styles
-const Ul = Styled.ul`
+const Ul = Styled.ul.attrs(({ isSmallNav }) => ({ isSmallNav }))`
     list-style: none;
     margin: 0;
-    padding-left: 16px;
+    padding-left: ${(props) => props.isSmallNav ? "0" : "16px"};
     padding-bottom: 8px;
 `;
 
@@ -25,6 +27,10 @@ const Ul = Styled.ul`
 function SubNavigationList(props) {
     const { isHidden, className, onAction, onClose, children } = props;
 
+    const { smallNav } = Store.useState("core");
+    const isForMenu    = Responsive.useIsForMenu();
+    const isSmallNav   = smallNav && !isForMenu;
+
 
     // Clone the Children
     const items = Utils.cloneChildren(children, () => ({
@@ -36,7 +42,7 @@ function SubNavigationList(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Ul className={className}>
+    return <Ul className={className} isSmallNav={isSmallNav}>
         {items}
     </Ul>;
 }

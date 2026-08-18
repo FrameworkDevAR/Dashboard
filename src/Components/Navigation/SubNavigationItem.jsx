@@ -5,6 +5,8 @@ import Styled               from "styled-components";
 // Core
 import Action               from "../../Core/Action";
 import Navigate             from "../../Core/Navigate";
+import Responsive           from "../../Core/Responsive";
+import Store                from "../../Core/Store";
 
 // Components
 import MenuLink             from "../Link/MenuLink";
@@ -68,16 +70,23 @@ const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
 function SubNavigationItem(props) {
     const {
         action, isSelected, message, url, href, emoji, icon, iconColor, afterIcon,
-        amount, badge, onAction, onClick, onClose,
+        amount, badge, onAction, onClick, onClose, noClose,
         hideActions, canEdit, canDelete, elemID, children,
     } = props;
 
 
     // Variables
-    const act     = Action.get(action);
-    const icn     = icon    || act.icon;
-    const cnt     = message || act.message;
-    const menuUrl = Navigate.useMenuUrl(url || "");
+    const act        = Action.get(action);
+    const icn        = icon    || act.icon;
+    const cnt        = message || act.message;
+    const menuUrl    = Navigate.useMenuUrl(url || "");
+    const isForMenu  = Responsive.useIsForMenu();
+    const elementRef = React.useRef(null);
+
+    const { smallNav } = Store.useState("core");
+    const { closeMenu, showTooltip, hideTooltip } = Store.useAction("core");
+
+    const isSmallNav = smallNav && !isForMenu;
 
 
     // Handles the Click
@@ -89,6 +98,9 @@ function SubNavigationItem(props) {
         }
         if (onClose) {
             onClose(e);
+        }
+        if (!noClose) {
+            closeMenu();
         }
         e.preventDefault();
         e.stopPropagation();
@@ -103,15 +115,23 @@ function SubNavigationItem(props) {
         e.preventDefault();
     };
 
+    // Handles the Tooltip
+    const handleTooltip = () => {
+        if (isSmallNav) {
+            showTooltip(elementRef, "right", cnt, 0, 0.2);
+        }
+    };
+
 
     // Variables
-    const hasActions = canEdit || canDelete;
+    const hasActions = !isSmallNav && (canEdit || canDelete);
 
 
     // Do the Render
     return <li>
         <Content hideActions={hideActions}>
             <NavMenu
+                passedRef={elementRef}
                 variant="light"
                 isSelected={isSelected}
                 message={cnt}
@@ -123,6 +143,9 @@ function SubNavigationItem(props) {
                 onClick={handleClick}
                 amount={amount}
                 badge={badge}
+                onlyIcon={isSmallNav}
+                onMouseEnter={handleTooltip}
+                onMouseLeave={hideTooltip}
             />
 
             {hasActions && <NavActions
@@ -166,6 +189,7 @@ SubNavigationItem.propTypes = {
     onAction    : PropTypes.func,
     onClick     : PropTypes.func,
     onClose     : PropTypes.func,
+    noClose     : PropTypes.bool,
     isSelected  : PropTypes.bool,
     hideActions : PropTypes.bool,
     canEdit     : PropTypes.bool,

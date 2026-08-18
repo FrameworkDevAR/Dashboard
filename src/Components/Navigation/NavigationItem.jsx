@@ -27,13 +27,26 @@ const Content = Styled.div.attrs(({ hideActions, isSelected }) => ({ hideActions
     `}
 `;
 
-const NavMenu = Styled(MenuLink)`
+const NavMenu = Styled(MenuLink).attrs(({ isExpanded }) => ({ isExpanded }))`
     --link-icon: 20px;
     --link-color: var(--navigation-color, var(--title-color));
     --link-hover: var(--navigation-hover-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
     --link-selected-bg: var(--navigation-selected-bg, rgba(0, 0, 0, 0.1));
     --link-selected-color: var(--navigation-selected-color, var(--link-color));
+
+    ${(props) => props.isExpanded && "background-color: var(--link-background);"}
+`;
+
+const Children = Styled.div.attrs(({ isOpen }) => ({ isOpen }))`
+    display: grid;
+    grid-template-rows: ${(props) => (props.isOpen ? "1fr" : "0fr")};
+    transition: grid-template-rows 0.2s ease-in-out;
+`;
+
+const ChildrenInside = Styled.div`
+    min-height: 0;
+    overflow: hidden;
 `;
 
 const NavIcon = Styled(IconLink).attrs(({ isSelected }) => ({ isSelected }))`
@@ -145,6 +158,7 @@ function NavigationItem(props) {
                 variant="light"
                 className={className}
                 isSelected={selected}
+                isExpanded={canCollapse && !isCollapsed && !selected}
                 isDisabled={isDisabled}
                 message={message}
                 html={html}
@@ -165,7 +179,7 @@ function NavigationItem(props) {
                 className="nav-actions"
                 hideActions={hideActions}
             >
-                {canCollapse && <NavIcon
+                {(canCollapse && !isSmallNav) && <NavIcon
                     variant="black"
                     isSelected={selected}
                     icon={isCollapsed ? "closed" : "open"}
@@ -194,7 +208,14 @@ function NavigationItem(props) {
                 />}
             </NavActions>}
         </Content>
-        {showChildren && children}
+        {!!children && <Children
+            className={`nav-children ${showChildren ? "nav-open" : ""}`}
+            isOpen={showChildren}
+        >
+            <ChildrenInside>
+                {children}
+            </ChildrenInside>
+        </Children>}
     </li>;
 }
 
