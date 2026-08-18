@@ -59,27 +59,6 @@ const Textarea = Styled.textarea.attrs(({ withLabel }) => ({ withLabel }))`
     }
 `;
 
-const Footer = Styled.footer`
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    background-color: var(--lightest-gray);
-    border-top: 1px dashed var(--input-border-color);
-`;
-
-const Aside = Styled.aside`
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-
-    p {
-        flex-grow: 0;
-    }
-`;
-
 const Text = Styled.p.attrs(({ atMaxLength }) => ({ atMaxLength }))`
     flex-grow: 2;
     margin: 0;
@@ -91,6 +70,30 @@ const Text = Styled.p.attrs(({ atMaxLength }) => ({ atMaxLength }))`
         color: var(--error-color);
         font-weight: bold;
     `}
+`;
+
+const Footer = Styled.footer`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+
+    ${Text} {
+        flex-grow: 0;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+`;
+
+const Aside = Styled.aside`
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+
+    p {
+        flex-grow: 0;
+    }
 `;
 
 
@@ -234,10 +237,10 @@ function TextareaInput(props) {
                 withLabel={withLabel}
             />
             {hasFooter && <Footer className="inputfield-editor">
+                {!isDisabled && children}
                 <Text atMaxLength={atMaxLength}>
                     {NLS.format(counterText, String(characters), maxLength)}
                 </Text>
-                {!isDisabled && children}
             </Footer>}
             {hasAside && <Aside className="inputfield-editor">
                 {!!maxLength && <Text atMaxLength={atMaxLength}>
