@@ -149,6 +149,8 @@ const Content = Styled.div.attrs(({ onlyIcon }) => ({ onlyIcon }))`
     flex: 1;
 
     ${(props) => props.onlyIcon && `
+        justify-content: center;
+
         .link-preicon {
             margin-right: 0;
         }
