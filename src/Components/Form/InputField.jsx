@@ -259,6 +259,8 @@ InputField.propTypes = {
     inlineDescription : PropTypes.bool,
     createOption      : PropTypes.string,
     onCreate          : PropTypes.func,
+    customOption      : PropTypes.string,
+    onCustom          : PropTypes.func,
     showCreate        : PropTypes.bool,
     buttonMessage     : PropTypes.string,
     onButton          : PropTypes.func,
