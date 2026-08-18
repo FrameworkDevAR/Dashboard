@@ -17,7 +17,7 @@ const Container = Styled.div`
 
 const Label = Styled.div`
     flex: none;
-    width: 150px;
+    width: var(--card-label-width, 150px);
     font-size: var(--font-size-small);
     color: var(--font-lighter);
 `;
