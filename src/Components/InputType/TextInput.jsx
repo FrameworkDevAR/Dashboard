@@ -154,7 +154,9 @@ function TextInput(props) {
 
     // Handles the Key Down
     const handleKeyDown = (e) => {
-        if (showOptions) {
+        // Only the Options use the navigation keys, so without them the Input keeps them,
+        // as the date and number inputs change their value with the up and down arrows
+        if (hasOptions) {
             if (Utils.isSpecialKey(e.keyCode)) {
                 return;
             }
