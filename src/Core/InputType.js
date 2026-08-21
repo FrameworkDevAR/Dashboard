@@ -7,6 +7,7 @@ import Utils                from "../Utils/Utils";
 // Input Types
 const BUTTONS  = "buttons";
 const CHECKBOX = "checkbox";
+const CHIPS    = "chips";
 const CHOOSER  = "chooser";
 const COLOR    = "color";
 const DOUBLE   = "double";
@@ -60,7 +61,7 @@ function hasClear(type) {
  */
 function canShrink(type) {
     return ![
-        BUTTONS, DOUBLE, MULTIPLE, FILE, MEDIA,
+        BUTTONS, CHIPS, DOUBLE, MULTIPLE, FILE, MEDIA,
         CHECKBOX, RADIO, RADIOBOX,
         TOGGLE, FIELDS, LIST, COLOR, DATE, TIME,
     ].includes(type);
@@ -169,6 +170,7 @@ export default {
 
     BUTTONS,
     CHECKBOX,
+    CHIPS,
     CHOOSER,
     COLOR,
     DOUBLE,

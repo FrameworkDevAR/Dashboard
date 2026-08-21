@@ -7,6 +7,7 @@ import InputType            from "../../Core/InputType";
 // Components
 import ButtonsInput         from "../InputType/ButtonsInput";
 import CheckboxInput        from "../InputType/CheckboxInput";
+import ChipsInput           from "../InputType/ChipsInput";
 import ChooserInput         from "../InputType/ChooserInput";
 import ColorInput           from "../InputType/ColorInput";
 import DoubleInput          from "../InputType/DoubleInput";
@@ -42,6 +43,8 @@ function Input(props) {
         return <ButtonsInput {...props} />;
     case InputType.CHECKBOX:
         return <CheckboxInput {...props} value="1" isChecked={!!value} />;
+    case InputType.CHIPS:
+        return <ChipsInput {...props} />;
     case InputType.CHOOSER:
         return <ChooserInput {...props} />;
     case InputType.COLOR:
