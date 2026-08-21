@@ -35,15 +35,16 @@ const Section = Styled.section.attrs(({ withDetails, wideDetails, hasTabs, cente
         }
     `};
 
-    ${(props) => props.centered && `
+    ${(props) => props.centered ? `
         display: flex;
         justify-content: center;
         align-items: center;
+        padding-top: var(--main-padding);
+    ` : `
+        @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
+            display: block;
+        }
     `};
-
-    @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
-        display: block;
-    }
 `;
 
 
@@ -87,7 +88,7 @@ function Content(props) {
             hasTabs = true;
         }
     }
-    for (const [ key, child ] of Utils.getVisibleEntries(children)) {
+    for (const [ key, child ] of Utils.getVisibleChildren(children).entries()) {
         if (typeof child.type !== "string") {
             items.push(React.cloneElement(child, { key, hasFilter, statsAmount, hasTabs }));
         } else {
