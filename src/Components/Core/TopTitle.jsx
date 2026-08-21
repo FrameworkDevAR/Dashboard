@@ -37,6 +37,13 @@ const TitleIcon = Styled(Icon)`
     color: var(--navigation-title-color, var(--title-color));
 `;
 
+const Search = Styled.div`
+    display: flex;
+    align-items: center;
+    margin-left: 4px;
+    pointer-events: auto;
+`;
+
 const Title = Styled.h2`
     margin: 0;
     font-family: var(--title-font);
@@ -68,6 +75,7 @@ function TopTitle(props) {
     >
         {!!icon && <TitleIcon icon={icon} />}
         <Title>{NLS.get(message)}</Title>
+        <Search className="top-title-search" />
     </Container>;
 }
 
