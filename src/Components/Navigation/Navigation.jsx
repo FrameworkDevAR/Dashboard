@@ -12,6 +12,7 @@ import NavigationTitle      from "./NavigationTitle";
 import NavigationBody       from "./NavigationBody";
 import TopTitle             from "../Core/TopTitle";
 import MenuLink             from "../Link/MenuLink";
+import ScrollFade           from "../Common/ScrollFade";
 import IconLink             from "../Link/IconLink";
 
 
@@ -59,36 +60,16 @@ const Content = Styled.nav`
     }
 `;
 
-const Footer = Styled.div.attrs(({ withShadow, isCollapsed }) => ({ withShadow, isCollapsed }))`
-    position: relative;
+const Body = Styled(ScrollFade).attrs(({ isCollapsed }) => ({ isCollapsed }))`
+    --fade-color: var(--navigation-background, var(--background-color));
+    --fade-right: ${(props) => props.isCollapsed ? "0px" : "16px"};
+`;
+
+const Footer = Styled.div`
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    border-top: 1px solid transparent;
-
-    &::before {
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: 0;
-        right: ${(props) => props.isCollapsed ? "0" : "16px"};
-        height: 1px;
-        background-color: var(--border-color-light);
-        opacity: ${(props) => props.withShadow ? 1 : 0};
-        transition: opacity 0.2s ease;
-    }
-    &::after {
-        content: "";
-        position: absolute;
-        top: -7px;
-        left: 0;
-        right: ${(props) => props.isCollapsed ? "0" : "16px"};
-        height: 6px;
-        background: linear-gradient(to top, rgba(9, 30, 66, 0.05), transparent);
-        pointer-events: none;
-        opacity: ${(props) => props.withShadow ? 1 : 0};
-        transition: opacity 0.2s ease;
-    }
+    padding-top: 8px;
 `;
 
 const FloatCollapse = Styled(IconLink)`
@@ -138,9 +119,6 @@ function Navigation(props) {
     const elementRef = React.useRef(null);
     const bodyRef    = React.useRef(null);
 
-    // The Current State
-    const [ showDivider, setShowDivider ] = React.useState(false);
-
 
     // Restore the Small Nav on load, unless the collapse is controlled
     React.useEffect(() => {
@@ -160,34 +138,6 @@ function Navigation(props) {
         }
         hideTooltip();
     };
-
-    // Show a divider when the body can scroll further down
-    const updateDivider = () => {
-        const node = bodyRef.current;
-        if (node) {
-            setShowDivider(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
-        }
-    };
-
-
-    React.useEffect(() => {
-        const node = bodyRef.current;
-        if (!node) {
-            return undefined;
-        }
-        node.addEventListener("scroll", updateDivider);
-        const observer = new ResizeObserver(updateDivider);
-        observer.observe(node);
-        return () => {
-            node.removeEventListener("scroll", updateDivider);
-            observer.disconnect();
-        };
-    }, []);
-
-    React.useEffect(() => {
-        updateDivider();
-    });
-
 
     // Handles the Tooltip
     const handleTooltip = () => {
@@ -236,22 +186,24 @@ function Navigation(props) {
                     canManage={canManage}
                     onAction={onAction}
                 />
-                <NavigationBody
+                <Body
                     passedRef={bodyRef}
-                    isLoading={isLoading}
-                    canAdd={canAdd}
-                    add={add}
-                    none={none}
-                    onAction={onAction}
-                    smallNav={collapsed}
-                >
-                    {children}
-                </NavigationBody>
-
-                {showBottomCollapse && <Footer
-                    withShadow={showDivider}
                     isCollapsed={collapsed}
                 >
+                    <NavigationBody
+                        passedRef={bodyRef}
+                        isLoading={isLoading}
+                        canAdd={canAdd}
+                        add={add}
+                        none={none}
+                        onAction={onAction}
+                        smallNav={collapsed}
+                    >
+                        {children}
+                    </NavigationBody>
+                </Body>
+
+                {showBottomCollapse && <Footer>
                     <BottomCollapse
                         passedRef={elementRef}
                         variant="light"

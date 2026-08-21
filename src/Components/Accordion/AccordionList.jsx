@@ -13,7 +13,7 @@ import Utils                from "../../Utils/Utils";
  */
 function AccordionList(props) {
     const {
-        isHidden, className, initial, selected,
+        isHidden, className, passedRef, initial, selected,
         maxWidth, hideAside, noClose, onChange, children,
     } = props;
 
@@ -71,7 +71,7 @@ function AccordionList(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <div className={`accordion ${className}`}>
+    return <div className={`accordion ${className}`} ref={passedRef}>
         {items}
     </div>;
 }
@@ -83,6 +83,7 @@ function AccordionList(props) {
 AccordionList.propTypes = {
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
+    passedRef : PropTypes.object,
     initial   : PropTypes.string,
     selected  : PropTypes.string,
     maxWidth  : PropTypes.number,

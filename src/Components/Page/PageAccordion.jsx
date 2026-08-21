@@ -4,12 +4,14 @@ import Styled               from "styled-components";
 
 // Dashboard
 import AccordionList        from "../Accordion/AccordionList";
+import ScrollFade           from "../Common/ScrollFade";
 
 
 
 // Styles
 const Container = Styled(AccordionList).attrs(({ withSpacing }) => ({ withSpacing }))`
     flex-grow: 2;
+    min-height: 0;
     overflow: auto;
 
     ${(props) => props.withSpacing && "padding: 16px;"}
@@ -29,18 +31,25 @@ function PageAccordion(props) {
     } = props;
 
 
+    // The References
+    const contentRef = React.useRef(null);
+
+
     // Do the Render
-    return <Container
-        initial={initial}
-        selected={selected}
-        onChange={onChange}
-        maxWidth={maxWidth}
-        noClose={noClose}
-        withSpacing={withSpacing}
-        hideAside={hideAside}
-    >
-        {children}
-    </Container>;
+    return <ScrollFade passedRef={contentRef}>
+        <Container
+            passedRef={contentRef}
+            initial={initial}
+            selected={selected}
+            onChange={onChange}
+            maxWidth={maxWidth}
+            noClose={noClose}
+            withSpacing={withSpacing}
+            hideAside={hideAside}
+        >
+            {children}
+        </Container>
+    </ScrollFade>;
 }
 
 /**
