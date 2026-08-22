@@ -53,7 +53,7 @@ const Container = Styled.div.attrs(({ isFocused, isDisabled, isSmall, withBorder
 
     ${(props) => (props.withBorder && props.isFocused) && `
         --input-border: var(--input-border-focus);
-        box-shadow: 0 0 0 3px var(--input-border-shadow, transparent);
+        box-shadow: var(--input-border-shadow, 0 0 0 1px var(--input-border-focus));
         .inputfield {
             --input-border: var(--input-border-focus);
         }
@@ -78,11 +78,12 @@ const InputIcon = Styled(Icon)`
     color: var(--black-color);
 `;
 
-const PostInputIcon = Styled(Icon)`
+const PostInputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     flex-shrink: 0;
-    margin-top: -8px;
     margin-right: -6px;
     color: var(--black-color);
+
+    ${(props) => props.withLabel && "margin-top: -8px;"}
 `;
 
 const Text = Styled.p`
@@ -103,12 +104,12 @@ const InputClear = Styled(IconLink).attrs(({ smallInput, withLabel }) => ({ smal
     `}
 `;
 
-const InputButton = Styled(MenuLink)`
+const InputButton = Styled(MenuLink).attrs(({ withLabel }) => ({ withLabel }))`
     --link-color: var(--primary-color);
     --link-hover: var(--primary-color);
     --link-gap: 2px;
 
-    margin-top: -8px;
+    ${(props) => props.withLabel && "margin-top: -8px;"}
     margin-right: calc(6px - var(--input-horiz-padding));
     margin-left: 4px;
     padding: 2px 6px 2px 2px;
@@ -182,6 +183,7 @@ function InputContent(props) {
         {!!postIcon && <PostInputIcon
             icon={postIcon}
             size="18"
+            withLabel={withLabel}
         />}
 
         {hasClear && <InputClear
@@ -195,6 +197,7 @@ function InputContent(props) {
         />}
         {hasButton && <InputButton
             className="input-button"
+            withLabel={withLabel}
             variant="light"
             icon="add"
             message={buttonMessage}

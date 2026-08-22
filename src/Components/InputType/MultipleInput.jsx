@@ -12,14 +12,17 @@ import CheckboxInput        from "../InputType/CheckboxInput";
 
 
 // Styles
-const Container = Styled.div.attrs(({ columns }) => ({ columns }))`
+const Container = Styled.div.attrs(({ columns, withLabel }) => ({ columns, withLabel }))`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: ${(props) => `repeat(${props.columns}, 1fr)`};
     gap: 8px;
-    margin-top: 8px;
-    margin-bottom: 4px;
     width: 100%;
+
+    ${(props) => props.withLabel && `
+        margin-top: 8px;
+        margin-bottom: 4px;
+    `}
 
     @media (max-width: 400px) {
         display: flex;
@@ -36,7 +39,7 @@ const Container = Styled.div.attrs(({ columns }) => ({ columns }))`
  */
 function MultipleInput(props) {
     const {
-        className, isFocused, isDisabled,
+        className, isFocused, isDisabled, withLabel,
         name, value, columns, getDisabled,
         onChange, onFocus, onBlur,
     } = props;
@@ -92,9 +95,12 @@ function MultipleInput(props) {
         isDisabled={isDisabled}
         withBorder
         withPadding
-        withLabel
+        withLabel={withLabel}
     >
-        <Container columns={columns}>
+        <Container
+            columns={columns}
+            withLabel={withLabel}
+        >
             {items.map(({ key, value }) => <CheckboxInput
                 key={key}
                 name={name}
@@ -118,6 +124,7 @@ MultipleInput.propTypes = {
     className   : PropTypes.string,
     isFocused   : PropTypes.bool,
     isDisabled  : PropTypes.bool,
+    withLabel   : PropTypes.bool,
     name        : PropTypes.string.isRequired,
     value       : PropTypes.any,
     options     : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),

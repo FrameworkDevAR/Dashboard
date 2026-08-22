@@ -97,7 +97,7 @@ const Inside = Styled.div.attrs(({ isLast, hasIcon, hideAside, maxWidth }) => ({
     flex-grow: 2;
     gap: 24px;
     width: ${(props) => props.hideAside ? "100%" : (props.hasIcon ? "calc(100% - 46px)" : "calc(100% - 56px)")};
-    padding: ${(props) => props.hasIcon ? "0 0 0 16px" : "6px 12px 32px 12px"};
+    padding: ${(props) => props.hasIcon ? "0 0 32px 16px" : "6px 12px 32px 12px"};
     transition: 0.3s all;
 
     ${(props) => !props.isLast && "border-bottom: 1px solid var(--border-color-light);"}

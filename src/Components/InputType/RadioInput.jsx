@@ -128,7 +128,7 @@ const Input = Styled(InputBase)`
  */
 function RadioInput(props) {
     const {
-        className, isFocused, isDisabled,
+        className, isFocused, isDisabled, withLabel, noBorder,
         name, value, options, withIcons, iconSize,
         withCustom, customText, columns,
         onChange, onFocus, onBlur,
@@ -182,9 +182,9 @@ function RadioInput(props) {
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
-        withBorder
-        withPadding
-        withLabel
+        withBorder={!noBorder}
+        withPadding={!noBorder}
+        withLabel={withLabel}
     >
         <Container columns={columns}>
             {items.map(({ key, value }) => <Label
@@ -240,6 +240,8 @@ RadioInput.propTypes = {
     className  : PropTypes.string,
     isFocused  : PropTypes.bool,
     isDisabled : PropTypes.bool,
+    withLabel  : PropTypes.bool,
+    noBorder   : PropTypes.bool,
     name       : PropTypes.string.isRequired,
     value      : PropTypes.any,
     options    : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),

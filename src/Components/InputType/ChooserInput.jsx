@@ -30,9 +30,15 @@ const EmptyItem = Styled.li`
     color: var(--darkest-gray);
 `;
 
-const InputIcon = Styled(Icon)`
-    margin-top: -4px;
+const NoneItem = Styled.li`
+    font-size: var(--input-font);
+    color: var(--darkest-gray);
+`;
+
+const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     margin-right: -6px;
+
+    ${(props) => props.withLabel && "margin-top: -4px;"}
 `;
 
 
@@ -44,8 +50,8 @@ const InputIcon = Styled(Icon)`
  */
 function ChooserInput(props) {
     const {
-        inputRef, className, isFocused, isDisabled,
-        id, name, value, placeholder, emptyText, createOption, onCreate,
+        inputRef, className, isFocused, isDisabled, withLabel,
+        id, name, value, placeholder, noValueText, emptyText, createOption, onCreate,
         minHeight, onChange, onClear, onFocus, onBlur,
     } = props;
 
@@ -274,6 +280,7 @@ function ChooserInput(props) {
     const hasOptions   = Boolean(showOptions && filteredOptions.length);
     const isOnlyOption = Boolean(filteredOptions.length === 1);
     const showEmpty    = Boolean(emptyText && !options.length);
+    const showNone     = Boolean(noValueText && !showEmpty && !hasFocus && !chips.length);
 
 
     // Do the Render
@@ -286,7 +293,7 @@ function ChooserInput(props) {
         onClear={onClear}
         withBorder
         withPadding
-        withLabel
+        withLabel={withLabel}
     >
         <ChipList>
             {chips.map(({ key, value }) => <ChipItem
@@ -299,6 +306,10 @@ function ChooserInput(props) {
             {showEmpty && <EmptyItem>
                 {NLS.get(emptyText)}
             </EmptyItem>}
+
+            {showNone && <NoneItem>
+                {NLS.get(noValueText)}
+            </NoneItem>}
 
             {!isDisabled && !showEmpty && <EditItem>
                 <InputBase
@@ -320,6 +331,7 @@ function ChooserInput(props) {
         {!showEmpty && <InputIcon
             icon="expand"
             size="18"
+            withLabel={withLabel}
         />}
 
         {hasOptions && <InputOptions
@@ -353,10 +365,12 @@ ChooserInput.propTypes = {
     className    : PropTypes.string,
     isFocused    : PropTypes.bool,
     isDisabled   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
     id           : PropTypes.string,
     name         : PropTypes.string,
     value        : PropTypes.any,
     placeholder  : PropTypes.string,
+    noValueText  : PropTypes.string,
     emptyText    : PropTypes.string,
     options      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     extraOptions : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
@@ -380,6 +394,7 @@ ChooserInput.defaultProps = {
     isFocused   : false,
     isDisabled  : false,
     placeholder : "",
+    noValueText : "",
     emptyText   : "",
     noneText    : "",
     minHeight   : 100,

@@ -26,8 +26,8 @@ const InputValue = Styled.div`
     text-overflow: ellipsis;
 `;
 
-const InputIcon = Styled(Icon)`
-    margin-top: -4px;
+const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
+    ${(props) => props.withLabel && "margin-top: -4px;"}
     margin-right: -6px;
     transform: rotate(45deg);
 `;
@@ -41,7 +41,7 @@ const InputIcon = Styled(Icon)`
  */
 function MediaInput(props) {
     const {
-        className, icon, postIcon, isFocused, isDisabled,
+        className, icon, postIcon, isFocused, isDisabled, withLabel,
         name, value, placeholder, onlyImages,
         onClick, onChange, onClear,
     } = props;
@@ -72,7 +72,7 @@ function MediaInput(props) {
         onClear={onClear}
         withBorder
         withPadding
-        withLabel
+        withLabel={withLabel}
         withClick
     >
         {multipleFiles && <ChipList>
@@ -91,6 +91,7 @@ function MediaInput(props) {
         <InputIcon
             icon="attachment"
             size="18"
+            withLabel={withLabel}
         />
     </InputContent>;
 }
@@ -105,6 +106,7 @@ MediaInput.propTypes = {
     postIcon    : PropTypes.string,
     isFocused   : PropTypes.bool,
     isDisabled  : PropTypes.bool,
+    withLabel   : PropTypes.bool,
     name        : PropTypes.string.isRequired,
     value       : PropTypes.any,
     placeholder : PropTypes.string,
