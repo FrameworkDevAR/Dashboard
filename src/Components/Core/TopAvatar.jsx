@@ -15,9 +15,15 @@ import Menu                 from "../Menu/Menu";
 const Container = Styled.div.attrs(({ hasMenu, hasContent }) => ({ hasMenu, hasContent }))`
     ${(props) => props.hasMenu && `
         cursor: pointer;
-        transition: background .15s;
+        transition: background .15s, box-shadow .15s;
         :hover {
-            background: hsla(0, 0%, 60%, .12);
+            background: var(--light-gray);
+        }
+    `}
+
+    ${(props) => (props.hasMenu && !props.hasContent) && `
+        :hover {
+            box-shadow: 0 0 0 4px var(--light-gray);
         }
     `}
 

@@ -188,7 +188,7 @@ const EditorStyle = createGlobalStyle`
             border: none;
         }
         .tox-button.tox-button.tox-button:hover {
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: var(--hover-overlay, rgba(0, 0, 0, 0.1));
         }
     }
 

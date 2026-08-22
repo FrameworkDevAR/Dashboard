@@ -77,8 +77,8 @@ const NavLink = Styled(Link).attrs(({ isSmall }) => ({ isSmall }))`
 const LightLink = Styled(NavLink)`
     --link-color: var(--title-color);
     --link-hover: var(--title-color);
-    --link-background: rgba(0, 0, 0, 0.07);
-    --link-selected-bg: rgba(0, 0, 0, 0.07);
+    --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.07));
+    --link-selected-bg: var(--hover-overlay, rgba(0, 0, 0, 0.07));
     --link-selected-color: var(--link-color);
 
     ${(props) => props.isSelected && `

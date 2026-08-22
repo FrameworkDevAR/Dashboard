@@ -13,7 +13,7 @@ import Icon                 from "../Common/Icon";
 const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }) => ({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }))`
     margin: 0;
     color: var(--title-color);
-    background-color: var(--white-color);
+    background-color: var(--menu-background, var(--white-color));
 
     ${(props) => props.leftSpace && `
         margin-left: 16px;
@@ -34,7 +34,7 @@ const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, i
             left: 0;
             width: 100%;
             height: 8px;
-            background: var(--white-color);
+            background: var(--menu-background, var(--white-color));
         }
     `}
     ${(props) => (props.forValue && !props.isOnlyOption) && `
@@ -59,7 +59,7 @@ const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, i
             left: 0;
             width: 100%;
             height: 8px;
-            background: var(--white-color);
+            background: var(--menu-background, var(--white-color));
         }
     `}
     ${(props) => (props.forCreate && !props.isOnlyOption) && `
@@ -106,7 +106,7 @@ const Content = Styled.div.attrs(({ inlineDescription, isSelected, isTitle }) =>
         cursor: default;
 
         &:hover {
-            background-color: var(--white-color);
+            background-color: var(--menu-background, var(--white-color));
         }
     `}
 `;

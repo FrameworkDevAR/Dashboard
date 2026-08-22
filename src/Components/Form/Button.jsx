@@ -38,7 +38,7 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
     --button-background: black;
     --button-hover-color: var(--button-color);
     --button-hover-border: var(--button-border);
-    --button-hover-background: white;
+    --button-hover-background: var(--content-color);
 
     position: relative;
     display: inline-block;

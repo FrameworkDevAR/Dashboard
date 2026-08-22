@@ -1587,7 +1587,7 @@ function isValidColor(value) {
  * @returns {string}
  */
 function getContrastColor(value) {
-    let result = "white";
+    let result = "var(--contrast-light, white)";
     let red    = 0;
     let green  = 0;
     let blue   = 0;
@@ -1604,7 +1604,7 @@ function getContrastColor(value) {
     }
 
     if ((red * 0.299) + (green * 0.587) + (blue * 0.114) > 147) {
-        result = "black";
+        result = "var(--contrast-dark, black)";
     }
     return result;
 }

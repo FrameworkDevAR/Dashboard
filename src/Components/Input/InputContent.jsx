@@ -53,7 +53,7 @@ const Container = Styled.div.attrs(({ isFocused, isDisabled, isSmall, withBorder
 
     ${(props) => (props.withBorder && props.isFocused) && `
         --input-border: var(--input-border-focus);
-        box-shadow: 0 0 0 1px var(--input-border-focus);
+        box-shadow: 0 0 0 3px var(--input-border-shadow, transparent);
         .inputfield {
             --input-border: var(--input-border-focus);
         }
@@ -65,7 +65,7 @@ const Container = Styled.div.attrs(({ isFocused, isDisabled, isSmall, withBorder
     ${(props) => (props.withBorder && props.isDisabled) && `
         --input-border: var(--input-border-disabled);
     `}
-    ${(props) => (props.withBorder && !props.isDisabled) && `
+    ${(props) => (props.withBorder && !props.isDisabled && !props.isFocused) && `
         &:hover, &:hover .inputfield {
             --input-border: var(--input-border-hover);
         }

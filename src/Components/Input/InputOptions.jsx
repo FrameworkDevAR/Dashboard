@@ -28,7 +28,7 @@ const Container = Styled.ul.attrs(({ top, bottom, left, gap, width, minWidth, ma
     margin: 0;
     padding: 8px;
     list-style: none;
-    background-color: var(--white-color);
+    background-color: var(--menu-background, var(--white-color));
     box-shadow: var(--box-shadow);
     border-radius: var(--border-radius-medium);
     z-index: var(--z-input, 3);

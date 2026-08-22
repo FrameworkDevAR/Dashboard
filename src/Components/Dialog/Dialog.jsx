@@ -44,6 +44,7 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
     border: none;
     border-radius: var(--dialog-radius);
     background-color: var(--content-color);
+    box-shadow: var(--dialog-shadow);
     color: var(--black-color);
     transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 

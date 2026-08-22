@@ -66,7 +66,7 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     `}
     ${(props) => props.variant === Brightness.LIGHT && `
         --link-color: var(--primary-color);
-        --link-background: rgba(0, 0, 0, 0.1);
+        --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
     `}
     ${(props) => props.variant === Brightness.DARK && `
         --link-color: white;
@@ -82,11 +82,11 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     `}
     ${(props) => props.variant === Brightness.BLACK && `
         --link-color: var(--black-color);
-        --link-background: rgba(0, 0, 0, 0.1);
+        --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
     `}
     ${(props) => props.variant === Brightness.ERROR && `
         --link-color: var(--error-color);
-        --link-background: rgba(0, 0, 0, 0.1);
+        --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
     `}
 
     ${(props) => props.isDisabled && `
