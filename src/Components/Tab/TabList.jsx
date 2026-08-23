@@ -33,7 +33,7 @@ const Container = Styled.section.attrs(({ inDialog, inDetails, inHeader, centere
         background-color: var(--border-color-light);
     }
 
-    ${(props) => (!props.inDialog && !props.inDetails) && `
+    ${(props) => (!props.inDialog && !props.inDetails && !props.inHeader) && `
         margin-bottom: var(--main-gap);
     `}
 
