@@ -107,6 +107,8 @@ function ColorInput(props) {
                 value={color}
                 isDisabled={isDisabled}
                 onChange={handleChange}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 maxLength={7}
                 maxWidth="80px"
             />
