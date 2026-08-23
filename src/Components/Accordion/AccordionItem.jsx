@@ -2,13 +2,17 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
+// Core & Utils
 import NLS                  from "../../Core/NLS";
+import Utils                from "../../Utils/Utils";
 
 // Components
 import Icon                 from "../Common/Icon";
 
 
+
+// Constants
+const ANIMATION_TIME = 320;
 
 // Styles
 const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled }) => ({ isFirst, isSelected, isDisabled }))`
@@ -95,7 +99,6 @@ const Inside = Styled.div.attrs(({ isLast, hasIcon, hideAside, maxWidth }) => ({
     display: flex;
     flex-direction: column;
     flex-grow: 2;
-    gap: 24px;
     width: ${(props) => props.hideAside ? "100%" : (props.hasIcon ? "calc(100% - 46px)" : "calc(100% - 56px)")};
     padding: ${(props) => props.hasIcon ? "0 0 32px 16px" : "6px 12px 32px 12px"};
     transition: 0.3s all;
@@ -138,12 +141,14 @@ const Div = Styled.div`
     min-width: 0;
 `;
 
-const Arrow = Styled.div`
+const Arrow = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 16px;
+    transform: rotate(${(props) => props.isSelected ? "180deg" : "0deg"});
+    transition: transform 320ms cubic-bezier(0.34, 1.2, 0.4, 1);
 `;
 
 const Title = Styled.h2`
@@ -164,13 +169,32 @@ const Error = Styled.p`
     color: var(--error-text-color);
 `;
 
-const Content = Styled.section.attrs(({ isSelected, withGap }) => ({ isSelected, withGap }))`
+const Content = Styled.section.attrs(({ isSelected }) => ({ isSelected }))`
     grid-area: content;
-    display: ${(props) => props.isSelected ? (props.withGap ? "flex" : "block") : "none"};
+    display: grid;
+    grid-template-rows: ${(props) => props.isSelected ? "1fr" : "0fr"};
+    transition: grid-template-rows ${ANIMATION_TIME}ms cubic-bezier(0.4, 0, 0.2, 1);
+`;
+
+const Clip = Styled.div.attrs(({ isSelected, isExpanded }) => ({ isSelected, isExpanded }))`
+    min-height: 0;
+    overflow: ${(props) => props.isExpanded ? "visible" : "hidden"};
+    visibility: ${(props) => props.isSelected ? "visible" : "hidden"};
+    transition: visibility 0s ${(props) => props.isSelected ? "0s" : `${ANIMATION_TIME}ms`};
+`;
+
+const Inner = Styled.div.attrs(({ isSelected, isExpanded, withGap }) => ({ isSelected, isExpanded, withGap }))`
+    padding-top: var(--accordion-gap, 24px);
+    opacity: ${(props) => props.isSelected ? "1" : "0"};
+    transform: ${(props) => props.isExpanded ? "none" : `translateY(${props.isSelected ? "0" : "-6px"})`};
+    transition:
+        opacity 240ms ease ${(props) => props.isSelected ? "70ms" : "0ms"},
+        transform 300ms cubic-bezier(0.34, 1.2, 0.4, 1);
 
     ${(props) => props.withGap && `
-        gap: var(--main-gap);
+        display: flex;
         flex-direction: column;
+        gap: var(--main-gap);
     `}
 `;
 
@@ -187,6 +211,25 @@ function AccordionItem(props) {
         number, icon, iconColor, withGap, maxWidth, hideAside,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
     } = props;
+
+
+    // The References
+    const timerRef = React.useRef(null);
+
+    // The Current State
+    const [ isExpanded, setExpanded ] = React.useState(isSelected);
+
+
+    // The content is only clipped while it opens and closes, as clipping it
+    // when it is open cuts the menus and the dialogs that it has inside
+    React.useEffect(() => {
+        if (isSelected) {
+            Utils.setTimeout(timerRef, () => setExpanded(true), ANIMATION_TIME);
+        } else {
+            Utils.clearTimeout(timerRef);
+            setExpanded(false);
+        }
+    }, [ isSelected ]);
 
 
     // Variables
@@ -225,15 +268,23 @@ function AccordionItem(props) {
                     </>}
                     {!!errorMessage && <Error>{NLS.get(errorMessage)}</Error>}
                 </Div>
-                <Arrow>
-                    {!isDisabled && <Icon icon={isSelected ? "down" : "up"} />}
+                <Arrow isSelected={isSelected}>
+                    {!isDisabled && <Icon icon="up" />}
                 </Arrow>
             </Header>
-            <Content
-                isSelected={isSelected}
-                withGap={withGap}
-            >
-                {children}
+            <Content isSelected={isSelected}>
+                <Clip
+                    isSelected={isSelected}
+                    isExpanded={isExpanded}
+                >
+                    <Inner
+                        isSelected={isSelected}
+                        isExpanded={isExpanded}
+                        withGap={withGap}
+                    >
+                        {children}
+                    </Inner>
+                </Clip>
             </Content>
         </Inside>
     </Container>;
