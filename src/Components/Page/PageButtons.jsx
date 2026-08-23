@@ -13,29 +13,25 @@ import Button               from "../Form/Button";
  * @returns {React.ReactElement}
  */
 function PageButtons(props) {
-    const { canEdit, isEdit, isDisabled, hideCancel, onSubmit, onDelete, onClose } = props;
+    const { canEdit, isEdit, isDisabled, onSubmit, onDelete } = props;
 
 
     // Do the Render
     return <PageFooter>
         <Button
             isHidden={!canEdit}
-            variant="primary"
+            variant="outlined"
+            icon="save"
             message="GENERAL_SAVE"
             onClick={() => onSubmit()}
             isDisabled={isDisabled}
         />
         <Button
             isHidden={!canEdit || !isEdit}
-            variant="primary"
+            variant="outlined-error"
+            icon="delete"
             message="GENERAL_DELETE"
             onClick={() => onDelete()}
-        />
-        <Button
-            isHidden={hideCancel}
-            variant="cancel"
-            message="GENERAL_CANCEL"
-            onClick={() => onClose()}
         />
     </PageFooter>;
 }
@@ -48,10 +44,8 @@ PageButtons.propTypes = {
     canEdit    : PropTypes.bool,
     isEdit     : PropTypes.bool,
     isDisabled : PropTypes.bool,
-    hideCancel : PropTypes.bool,
     onSubmit   : PropTypes.func.isRequired,
     onDelete   : PropTypes.func,
-    onClose    : PropTypes.func,
 };
 
 /**

@@ -9,9 +9,8 @@ const Container = Styled.footer`
     box-sizing: border-box;
     display: flex;
     justify-content: flex-end;
-    padding: 8px;
+    padding: 8px 0 0;
     gap: 8px;
-    border-top: 1px solid var(--border-color-light);
 `;
 
 

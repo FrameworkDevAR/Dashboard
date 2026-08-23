@@ -202,7 +202,7 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
 
         case Variant.OUTLINED_ERROR: return `
             --button-color: var(--error-color);
-            --button-border: var(--error-color);
+            --button-border: var(--error-border, var(--error-color));
             --button-background: var(--content-color);
             --button-hover-color: white;
             --button-hover-border: var(--error-color);
