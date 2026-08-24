@@ -87,7 +87,9 @@ function SelectInput(props) {
     const containerRef   = React.useRef(null);
     const optionsRef     = React.useRef(null);
     const selectedIdxRef = React.useRef(-1);
-    const selectedValRef = React.useRef("");
+    // It is null when there is nothing selected, as the none option has an
+    // empty value and picking it has to change the value like any other
+    const selectedValRef = React.useRef(null);
 
     // The Current State
     const [ initialVal,  setInitialVal  ] = React.useState("");
@@ -266,10 +268,10 @@ function SelectInput(props) {
     const setSelectedIndex = (value) => {
         if (!allowMultiple) {
             selectedIdxRef.current = filteredOptions.findIndex((option) => String(option.value) === String(value)) ?? -1;
-            selectedValRef.current = filteredOptions.find((option) => String(option.value) === String(value))?.value ?? "";
+            selectedValRef.current = filteredOptions.find((option) => String(option.value) === String(value))?.value ?? null;
         } else {
             selectedIdxRef.current = -1;
-            selectedValRef.current = "";
+            selectedValRef.current = null;
         }
     };
 
@@ -332,7 +334,7 @@ function SelectInput(props) {
     // used, as it would clear the selection when blurring without picking one
     const handleBlur = () => {
         setTimer(window.setTimeout(() => {
-            const hasSelected = selectedValRef.current !== "";
+            const hasSelected = selectedValRef.current !== null;
             if (!allowMultiple && hasSelected && selectedValRef.current !== initialVal) {
                 onChange(name, selectedValRef.current);
             }
@@ -412,11 +414,11 @@ function SelectInput(props) {
             e.preventDefault();
         } else {
             selectedIdxRef.current = 0;
-            selectedValRef.current = "";
+            selectedValRef.current = null;
             return;
         }
 
-        selectedValRef.current = filteredOptions[selectedIdxRef.current]?.value ?? "";
+        selectedValRef.current = filteredOptions[selectedIdxRef.current]?.value ?? null;
         setShowOptions(true);
         scrollToIndex(selectedIdxRef.current, false);
         setUpdate(update + 1);
@@ -443,8 +445,8 @@ function SelectInput(props) {
                 return;
             }
 
-            if (!selectedValRef.current) {
-                selectedValRef.current = filteredOptions.find(({ isTitle }) => !isTitle)?.value ?? "";
+            if (selectedValRef.current === null) {
+                selectedValRef.current = filteredOptions.find(({ isTitle }) => !isTitle)?.value ?? null;
             }
             if (allowMultiple && selectedValRef.current) {
                 setValues(selectedValRef.current);
