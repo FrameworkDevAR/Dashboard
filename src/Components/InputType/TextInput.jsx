@@ -17,11 +17,12 @@ import InputOption          from "../Input/InputOption";
 
 
 // Styles
-const Children = Styled.div`
+const Children = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
     display: flex;
     align-items: center;
-    margin-top: -4px;
     margin-right: -6px;
+
+    ${(props) => props.withLabel && "margin-top: -4px;"}
 `;
 
 const Text = Styled.p.attrs(({ atMaxLength, hasButtons }) => ({ atMaxLength, hasButtons }))`
@@ -258,7 +259,10 @@ function TextInput(props) {
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
         />
-        <Children className="inputfield-children">
+        <Children
+            className="inputfield-children"
+            withLabel={withLabel}
+        >
             {showMaxLength && <Text
                 atMaxLength={atMaxLength}
                 hasButtons={hasButtons}

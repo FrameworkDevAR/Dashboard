@@ -14,9 +14,10 @@ import IconLink             from "../Link/IconLink";
 
 
 // Styles
-const InputIcon = Styled(IconLink)`
-    margin-top: -4px;
+const InputIcon = Styled(IconLink).attrs(({ withLabel }) => ({ withLabel }))`
     margin-right: -6px;
+
+    ${(props) => props.withLabel && "margin-top: -4px;"}
 `;
 
 
@@ -104,6 +105,7 @@ function PasswordInput(props) {
             variant="black"
             icon={showPassword ? "hide" : "view"}
             onClick={() => setPassword(!showPassword)}
+            withLabel={withLabel}
             isSmall
         />
     </InputContent>;
