@@ -13,7 +13,6 @@ import InputContent         from "../Input/InputContent";
 import InputBase            from "../Input/InputBase";
 import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
-import IconLink             from "../Link/IconLink";
 
 
 
@@ -212,7 +211,7 @@ function TextInput(props) {
     const showMaxLength = Boolean(withInsideCnt && maxLength);
     const characters    = String(value || "").length;
     const atMaxLength   = characters > maxLength;
-    const hasButtons    = Boolean((children && children.length) || generateCode);
+    const hasButtons    = Boolean(children && children.length);
 
     const options       = InputType.useOptions(props);
     const hasOptions    = Boolean(showOptions && options.length);
@@ -232,6 +231,9 @@ function TextInput(props) {
         isSmall={isSmall}
         onClick={handleClick}
         onClear={onClear}
+        showButton={generateCode}
+        buttonMessage="GENERAL_GENERATE"
+        onButton={handleGenerateCode}
         withBorder={withBorder}
         withLabel={withLabel}
         withPadding
@@ -264,12 +266,6 @@ function TextInput(props) {
                 {`${characters}/${maxLength}`}
             </Text>}
             {children}
-            {generateCode && <IconLink
-                variant="black"
-                icon="add"
-                onClick={handleGenerateCode}
-                isSmall
-            />}
         </Children>
 
         {hasOptions && <InputOptions

@@ -74,6 +74,9 @@ function PasswordInput(props) {
         isDisabled={isDisabled}
         isSmall={isSmall}
         onClear={onClear}
+        showButton={generateCode}
+        buttonMessage="GENERAL_GENERATE"
+        onButton={handleGenerateCode}
         withBorder={withBorder}
         withLabel={withLabel}
         withPadding
@@ -97,12 +100,6 @@ function PasswordInput(props) {
         />
 
         {children}
-        {generateCode && <InputIcon
-            variant="black"
-            icon="add"
-            onClick={handleGenerateCode}
-            isSmall
-        />}
         <InputIcon
             variant="black"
             icon={showPassword ? "hide" : "view"}
