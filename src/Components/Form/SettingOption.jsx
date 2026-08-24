@@ -85,6 +85,11 @@ const Description = Styled(Html)`
     line-height: 1.4;
 `;
 
+const Helper = Styled(Description)`
+    color: var(--font-lighter);
+    font-style: italic;
+`;
+
 const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }))`
     display: flex;
     flex-wrap: wrap;
@@ -113,7 +118,7 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
 function SettingOption(props) {
     const {
         isHidden, className, isWide, isNarrow,
-        message, description,  toggle,  children,
+        message, description, helperText, toggle, children,
     } = props;
 
 
@@ -177,6 +182,10 @@ function SettingOption(props) {
                     variant="p"
                     message={description}
                 />}
+                {!!helperText && <Helper
+                    variant="p"
+                    message={helperText}
+                />}
             </Header>
             {toggle}
         </Top>
@@ -201,6 +210,7 @@ SettingOption.propTypes = {
     isNarrow    : PropTypes.bool,
     message     : PropTypes.string.isRequired,
     description : PropTypes.string,
+    helperText  : PropTypes.string,
     toggle      : PropTypes.any,
     children    : PropTypes.any,
 };
