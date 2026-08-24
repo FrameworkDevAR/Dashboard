@@ -140,6 +140,13 @@ function IconLink(props) {
         }
     };
 
+    // Handles the Click. The tooltip is hidden, as the link can be removed
+    // with the click and then it never leaves it with the mouse
+    const handleClick = (e) => {
+        hideTooltip();
+        onClick(e);
+    };
+
 
     // Do the Render
     if (isHidden) {
@@ -156,7 +163,7 @@ function IconLink(props) {
         withMark={withMark}
         href={Navigate.getUrl(props)}
         target={target}
-        onClick={onClick}
+        onClick={handleClick}
         onTouchEnd={onTouchEnd}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
