@@ -23,7 +23,7 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
         padding: 32px;
     `}
     ${(props) => props.withSpacing && `
-        padding: 2px var(--dialog-padding);
+        padding: 4px var(--dialog-padding);
     `}
     ${(props) => props.bigSpacing && `
         padding: var(--dialog-padding);
