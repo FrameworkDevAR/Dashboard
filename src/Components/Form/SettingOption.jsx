@@ -49,11 +49,11 @@ const Top = Styled.div`
     gap: 16px;
 `;
 
-const Header = Styled.div`
+const Header = Styled.div.attrs(({ noLabel }) => ({ noLabel }))`
     display: flex;
     flex-direction: column;
     gap: 6px;
-    cursor: pointer;
+    cursor: ${(props) => props.noLabel ? "default" : "pointer"};
 `;
 
 const Titles = Styled.div`
@@ -117,7 +117,7 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
  */
 function SettingOption(props) {
     const {
-        isHidden, className, isWide, isNarrow,
+        isHidden, className, isWide, isNarrow, noLabel,
         message, description, helperText, toggle, children,
     } = props;
 
@@ -143,7 +143,7 @@ function SettingOption(props) {
     // Handles the Header click, which works as the label of the option
     const handleClick = () => {
         const node = containerRef.current;
-        if (!node) {
+        if (noLabel || !node) {
             return;
         }
         const toggleInput = node.querySelector("input[type='checkbox']");
@@ -164,7 +164,7 @@ function SettingOption(props) {
     }
     return <Container className={className} ref={containerRef}>
         <Top>
-            <Header onClick={handleClick}>
+            <Header noLabel={noLabel} onClick={handleClick}>
                 <Titles>
                     <Title>{NLS.get(message)}</Title>
                     <Saving
@@ -208,6 +208,7 @@ SettingOption.propTypes = {
     className   : PropTypes.string,
     isWide      : PropTypes.bool,
     isNarrow    : PropTypes.bool,
+    noLabel     : PropTypes.bool,
     message     : PropTypes.string.isRequired,
     description : PropTypes.string,
     helperText  : PropTypes.string,
