@@ -71,11 +71,19 @@ const Result = Styled(Icon).attrs(({ isError }) => ({ isError }))`
     color: ${(props) => props.isError ? "var(--error-color)" : "var(--success-color)"};
 `;
 
-const Title = Styled.h4`
+const Title = Styled.h4.attrs(({ isRequired }) => ({ isRequired }))`
     margin: 0;
     color: var(--setting-title-color);
     font-size: var(--setting-title-size);
     font-weight: 500;
+
+    ${(props) => props.isRequired && `
+        &::after {
+            content: "*";
+            margin-left: 4px;
+            color: var(--error-color);
+        }
+    `}
 `;
 
 const Description = Styled(Html)`
@@ -140,6 +148,17 @@ function SettingOption(props) {
     }, [ saving.name, saving.status ]);
 
 
+    // Returns true if any of the given Children is a required Input
+    const hasRequired = (children) => {
+        return React.Children.toArray(children).some((child) => {
+            if (!React.isValidElement(child)) {
+                return false;
+            }
+            // @ts-ignore
+            return Boolean(child.props.isRequired) || hasRequired(child.props.children);
+        });
+    };
+
     // Handles the Header click, which works as the label of the option
     const handleClick = () => {
         const node = containerRef.current;
@@ -166,7 +185,9 @@ function SettingOption(props) {
         <Top>
             <Header noLabel={noLabel} onClick={handleClick}>
                 <Titles>
-                    <Title>{NLS.get(message)}</Title>
+                    <Title isRequired={hasRequired(children)}>
+                        {NLS.get(message)}
+                    </Title>
                     <Saving
                         isHidden={status !== Status.SAVING}
                         variant="primary"
