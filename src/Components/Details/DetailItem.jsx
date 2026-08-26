@@ -78,7 +78,7 @@ const DetailCopy = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
 function DetailItem(props) {
     const {
         isHidden, className, textColor, gap,
-        message, icon, title, prefix, showAlways,
+        message, icon, title, prefix, prefixLine, showAlways,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
         href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected,
         hasCopy, copyValue, children,
@@ -131,7 +131,8 @@ function DetailItem(props) {
         content = "";
     }
     if (!children && prefix) {
-        content = `<b>${NLS.get(prefix)}</b>: ${content}`;
+        // The Prefix can be shown in its own line, and then it has no colon
+        content = prefixLine ? `<b>${NLS.get(prefix)}</b>\n${content}` : `<b>${NLS.get(prefix)}</b>: ${content}`;
         isHtml  = true;
     }
 
@@ -180,6 +181,7 @@ DetailItem.propTypes = {
     tooltipWidth   : PropTypes.number,
     tooltipDelay   : PropTypes.number,
     prefix         : PropTypes.string,
+    prefixLine     : PropTypes.bool,
     href           : PropTypes.string,
     url            : PropTypes.string,
     target         : PropTypes.string,
