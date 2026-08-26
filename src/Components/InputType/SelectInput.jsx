@@ -31,9 +31,9 @@ const Inside = Styled.div.attrs(({ inlineDescription }) => ({ inlineDescription 
     `}
 `;
 
-const Input = Styled(InputBase).attrs(({ isDisabled, isNone, inlineDescription }) => ({ isDisabled, isNone, inlineDescription }))`
+const Input = Styled(InputBase).attrs(({ isDisabled, isPlaceholder, inlineDescription }) => ({ isDisabled, isPlaceholder, inlineDescription }))`
     ${(props) => !props.isDisabled && "cursor: pointer;"}
-    ${(props) => props.isNone && `
+    ${(props) => props.isPlaceholder && `
         && {
             color: var(--darkest-gray);
         }
@@ -220,9 +220,10 @@ function SelectInput(props) {
         return Boolean(showOptions && (filteredOptions.length || hasCreate || hasCustom));
     }, [ showOptions, filteredOptions.length, hasCreate, hasCustom ]);
 
-    // Get the Option Value and Description. The text of the none option is
-    // shown as a placeholder, as it means that nothing was selected
-    const [ optionValue, optionDesc, isNoneValue ] = React.useMemo(() => {
+    // Get the Option Value and Description. The empty and default texts are
+    // shown as a placeholder, as they mean that nothing was selected, while the
+    // none option is a value of its own that can be picked like any other
+    const [ optionValue, optionDesc, isPlaceholder ] = React.useMemo(() => {
         if (optionList.length === 0 && emptyText) {
             return [ NLS.get(emptyText), "", true ];
         }
@@ -240,18 +241,16 @@ function SelectInput(props) {
             return [ valueList.join(", "), "", false ];
         }
 
-        let value  = "";
-        let desc   = "";
-        let isNone = false;
+        let value = "";
+        let desc  = "";
         for (const item of optionList) {
             if (!item.isTitle && String(item.value) === valueKey) {
-                value  = item.message;
-                desc   = item.description;
-                isNone = item.key === "none";
+                value = item.message;
+                desc  = item.description;
                 break;
             }
         }
-        return [ NLS.get(value), NLS.get(desc), isNone ];
+        return [ NLS.get(value), NLS.get(desc), false ];
     }, [ valueKey, JSON.stringify(optionList), allowMultiple, defaultText, emptyText ]);
 
 
@@ -508,7 +507,7 @@ function SelectInput(props) {
                 value={showOptions ? filter : optionValue}
                 placeholder={placeholder}
                 isDisabled={showDisabled}
-                isNone={isNoneValue && !showOptions}
+                isPlaceholder={isPlaceholder && !showOptions}
                 onInput={handleInput}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
