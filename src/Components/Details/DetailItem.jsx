@@ -12,6 +12,7 @@ import Utils                from "../../Utils/Utils";
 import InputCopy            from "../Input/InputCopy";
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
+import PillYesNo            from "../Pill/PillYesNo";
 
 
 
@@ -50,6 +51,12 @@ const DetailIcon = Styled(Icon)`
     padding: 0 8px 0 4px;
 `;
 
+const Text = Styled.span`
+    flex-grow: 2;
+    min-width: 0;
+    font-weight: 600;
+`;
+
 const ItemTitle = Styled.h4`
     margin: 0 0 2px 0;
     font-size: inherit;
@@ -78,7 +85,7 @@ const DetailCopy = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
 function DetailItem(props) {
     const {
         isHidden, className, textColor, gap,
-        message, icon, title, prefix, prefixLine, showAlways,
+        message, icon, title, prefix, prefixLine, yesNo, showAlways,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
         href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected,
         hasCopy, copyValue, children,
@@ -114,6 +121,7 @@ function DetailItem(props) {
     let   content  = message ? NLS.get(String(message)) : children;
     let   isHtml   = message && (content.includes("\n") || content.includes("</b>") || content.includes("</span>"));
     const isLink   = href || url || onClick || isEmail || isPhone || isWhatsApp;
+    const hasYesNo = yesNo !== undefined;
 
     // The Copy uses the Message without the Prefix that is added below
     const copyText  = message ? NLS.get(String(message)) : "";
@@ -130,7 +138,7 @@ function DetailItem(props) {
     if (showAlways && !message && !children) {
         content = "";
     }
-    if (!children && prefix) {
+    if (!children && prefix && !hasYesNo) {
         // The Prefix can be shown in its own line, and then it has no colon
         content = prefixLine ? `<b>${NLS.get(prefix)}</b>\n${content}` : `<b>${NLS.get(prefix)}</b>: ${content}`;
         isHtml  = true;
@@ -141,7 +149,7 @@ function DetailItem(props) {
     return <Container
         ref={elementRef}
         className={textColor ? `text-${textColor} ${className}` : className}
-        gap={gap}
+        gap={hasYesNo ? "8" : gap}
         isLink={isLink}
         isSelected={isSelected}
         withTitle={withTitle}
@@ -151,7 +159,9 @@ function DetailItem(props) {
     >
         {!!icon && <DetailIcon icon={icon} size="16" />}
         {withTitle && <ItemTitle>{NLS.get(title)}</ItemTitle>}
-        {isHtml ? <Html addBreaks>{content}</Html> : content}
+        {hasYesNo && <Text>{content}</Text>}
+        {!hasYesNo && (isHtml ? <Html addBreaks>{content}</Html> : content)}
+        {hasYesNo && <PillYesNo value={yesNo} />}
         {showCopy && <DetailCopy
             isFloating={floatCopy}
             onClick={handleCopyClick}
@@ -182,6 +192,7 @@ DetailItem.propTypes = {
     tooltipDelay   : PropTypes.number,
     prefix         : PropTypes.string,
     prefixLine     : PropTypes.bool,
+    yesNo          : PropTypes.oneOfType([ PropTypes.bool, PropTypes.number, PropTypes.string ]),
     href           : PropTypes.string,
     url            : PropTypes.string,
     target         : PropTypes.string,
