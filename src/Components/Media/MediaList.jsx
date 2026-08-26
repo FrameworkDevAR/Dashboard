@@ -7,6 +7,7 @@ import Action               from "../../Core/Action";
 import Utils                from "../../Utils/Utils";
 
 // Components
+import NLS                  from "../../Core/NLS";
 import NoneAvailable        from "../Common/NoneAvailable";
 import CircularLoader       from "../Loader/CircularLoader";
 import Breadcrumb           from "../Header/Breadcrumb";
@@ -15,7 +16,7 @@ import MediaItem            from "../Media/MediaItem";
 
 
 // Styles
-const Container = Styled.div.attrs(({ inDialog, withSpace, isLoading }) => ({ inDialog, withSpace, isLoading }))`
+const Container = Styled.div.attrs(({ inDialog, withSpace, isCentered }) => ({ inDialog, withSpace, isCentered }))`
     color: var(--media-main-color);
 
     ${(props) => props.inDialog && `
@@ -23,7 +24,8 @@ const Container = Styled.div.attrs(({ inDialog, withSpace, isLoading }) => ({ in
     `}
     ${(props) => props.withSpace && "padding-top: 24px;"}
 
-    ${(props) => props.isLoading && `
+    ${(props) => props.isCentered && `
+        flex-grow: 1;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -50,7 +52,7 @@ function MediaList(props) {
     const {
         className, isLoading, onAction, onDrop,
         canEdit, canSelect, canDrag, inDialog, withSpace,
-        selectedPath, selectedPaths, items, path,
+        selectedPath, selectedPaths, items, path, none,
     } = props;
 
 
@@ -66,12 +68,24 @@ function MediaList(props) {
     const [ posY,       setPosY       ] = React.useState(0);
     const [ width,      setWidth      ] = React.useState(0);
     const [ requestRAF, setRequestRAF ] = React.useState(false);
+    const [ openPath,   setOpenPath   ] = React.useState("");
 
     // Variables
-    const showLoader = isLoading;
+    const showLoader = Boolean(isLoading && !items.length);
     const showNone   = Boolean(!isLoading && !items.length);
-    const showItems  = Boolean(!isLoading && items.length);
+    const showItems  = Boolean(items.length);
+    const amount     = items.filter((elem) => !elem.isBack).length;
 
+
+    // Handles the Action, keeping the Directory that is being opened
+    const handleAction = (action, elem, e) => {
+        if (action.isSelect && (elem.isDir || elem.isBack)) {
+            setOpenPath(elem.path);
+        }
+        if (onAction) {
+            onAction(action, elem, e);
+        }
+    };
 
     // Handles the Breadcrumb links
     const handleBreadcrumb = (href) => {
@@ -185,6 +199,13 @@ function MediaList(props) {
         return false;
     };
 
+    // The Directory stops loading when the content is fetched
+    React.useEffect(() => {
+        if (!isLoading) {
+            setOpenPath("");
+        }
+    }, [ isLoading ]);
+
     // Adds the Listeners
     React.useEffect(() => {
         window.addEventListener("mousemove", handleDrag);
@@ -212,12 +233,16 @@ function MediaList(props) {
         className={className}
         inDialog={inDialog}
         withSpace={withSpace}
-        isLoading={showLoader}
+        isCentered={showLoader || showNone}
     >
         {showLoader && <CircularLoader />}
-        {showNone   && <NoneAvailable message="MEDIA_NONE_AVAILABLE" />}
+        {showNone   && (none || <NoneAvailable message="MEDIA_NONE_AVAILABLE" />)}
         {showItems  && <>
-            <Breadcrumb route={path} onClick={handleBreadcrumb} />
+            <Breadcrumb
+                route={path}
+                amount={NLS.pluralize("MEDIA_AMOUNT", amount)}
+                onClick={handleBreadcrumb}
+            />
             <Section>
                 {items.map((elem, index) => {
                     const isCurrent = isMoving && index === dragIndex;
@@ -228,7 +253,8 @@ function MediaList(props) {
                         style={isCurrent ? style : null}
                         isSelected={isSelected(elem)}
                         hasActions={!isCurrent && canEdit && !elem.isBack}
-                        onAction={onAction}
+                        isLoading={isLoading && openPath === elem.path}
+                        onAction={handleAction}
                         onMouseDown={(e) => handleGrab(e, elem, index)}
                     />;
                 })}
@@ -255,6 +281,7 @@ MediaList.propTypes = {
     selectedPaths : PropTypes.arrayOf(PropTypes.string),
     items         : PropTypes.array,
     path          : PropTypes.string,
+    none          : PropTypes.any,
 };
 
 /**

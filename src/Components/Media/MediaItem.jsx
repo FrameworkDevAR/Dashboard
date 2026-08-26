@@ -2,27 +2,41 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
+// Core & Utils
 import Action               from "../../Core/Action";
+import NLS                  from "../../Core/NLS";
+import Utils                from "../../Utils/Utils";
 
 // Components
 import Icon                 from "../Common/Icon";
 import IconLink             from "../Link/IconLink";
+import CircularLoader       from "../Loader/CircularLoader";
 
 
 
 // Styles
 const Div = Styled.div.attrs(({ isSelected, hasActions }) => ({ isSelected, hasActions }))`
     position: relative;
+    display: flex;
+    flex-direction: column;
     border: var(--media-border-width) solid var(--media-border-color);
     border-radius: var(--media-border-radius, var(--border-radius));
     background-color: var(--media-background, var(--white-color));
     overflow: hidden;
     cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: var(--border-color-medium);
+        box-shadow: 0 2px 8px rgba(9, 30, 66, 0.08);
+    }
+    &:hover img {
+        transform: scale(1.04);
+    }
 
     ${(props) => props.isSelected && `
         border-color: var(--primary-color);
-        outline: 1px solid var(--primary-color);
+        box-shadow: 0 0 0 1px var(--primary-color);
     `}
 
     ${(props) => props.hasActions && `
@@ -39,6 +53,7 @@ const MediaElem = Styled.div.attrs(({ isTransparent }) => ({ isTransparent }))`
     align-items: center;
     width: 100%;
     height: 100px;
+    background-color: var(--media-elem-background);
     border-bottom: none;
     overflow: hidden;
 
@@ -61,16 +76,29 @@ const MediaElem = Styled.div.attrs(({ isTransparent }) => ({ isTransparent }))`
 
 const MediaName = Styled.div`
     position: relative;
-    padding: 6px;
+    padding: 7px 8px;
     text-align: center;
+    font-size: 12px;
+    color: var(--font-light);
+    background-color: var(--media-name-color);
+    border-top: var(--media-border-width) solid var(--media-border-color);
+    transition: all 0.2s;
+    z-index: 1;
+`;
+
+const Name = Styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    font-size: 12px;
-    color: var(--black-color);
-    background-color: var(--media-name-color);
-    transition: all 0.2s;
-    z-index: 1;
+`;
+
+const MediaInfo = Styled.div`
+    padding-top: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--font-lightest);
 `;
 
 const MediaActions = Styled.div`
@@ -78,15 +106,21 @@ const MediaActions = Styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    padding-top: 4px;
+    padding-top: 2px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     background-color: var(--media-actions-color);
+    border-top: var(--media-border-width) solid var(--media-border-color);
 `;
 
 const Image = Styled.img`
     pointer-events: none;
+    transition: transform 0.2s;
+`;
+
+const Loading = Styled(CircularLoader)`
+    padding: 0;
 `;
 
 
@@ -97,10 +131,13 @@ const Image = Styled.img`
  * @returns {React.ReactElement}
  */
 function MediaItem(props) {
-    const { isSelected, hasActions, onAction, elem, className, style, onMouseDown } = props;
-    const { isFile, isImage, isTransparent, icon, source, thumb, name             } = elem;
+    const { isSelected, hasActions, isLoading, onAction, elem, className, style, onMouseDown } = props;
+    const { isFile, isImage, isTransparent, icon, source, thumb, name, isDir, isBack, size, total } = elem;
 
     // Variables
+    // The Directories show what they have inside and the Files their size
+    const info   = isDir ? (total !== undefined ? NLS.pluralize("MEDIA_AMOUNT", total) : "") :
+        (size !== undefined ? Utils.formatSize(size) : "");
     const select = Action.get("SELECT");
     const view   = Action.get("VIEW");
     const edit   = Action.get("EDIT");
@@ -129,7 +166,7 @@ function MediaItem(props) {
             className="media-icon"
             onMouseDown={onMouseDown}
         >
-            <Icon icon={icon} size="48" />
+            {isLoading ? <Loading variant="primary" isSmall /> : <Icon icon={icon} size="48" />}
         </MediaElem>}
 
         {isImage && <MediaElem
@@ -141,7 +178,8 @@ function MediaItem(props) {
         </MediaElem>}
 
         <MediaName className="media-name">
-            {name}
+            <Name>{name}</Name>
+            {!isBack && !!info && <MediaInfo>{info}</MediaInfo>}
         </MediaName>
 
         {hasActions && <MediaActions className="media-actions">
@@ -171,6 +209,7 @@ function MediaItem(props) {
 MediaItem.propTypes = {
     isSelected  : PropTypes.bool,
     hasActions  : PropTypes.bool,
+    isLoading   : PropTypes.bool,
     elem        : PropTypes.object,
     className   : PropTypes.string,
     style       : PropTypes.object,
