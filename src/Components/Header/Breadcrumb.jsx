@@ -2,8 +2,13 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Core
+import NLS                  from "../../Core/NLS";
+
 // Components
 import HyperLink            from "../Link/HyperLink";
+import Icon                 from "../Common/Icon";
+import Pill                 from "../Pill/Pill";
 
 
 
@@ -12,62 +17,46 @@ const Ul = Styled.ul`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    width: 100%;
+    gap: 2px;
     margin: 0;
     padding: 0;
     list-style: none;
+    font-size: var(--font-size-small);
 `;
 
 const Li = Styled.li`
     display: flex;
     align-items: center;
-    font-size: 10px;
-    text-transform: uppercase;
-    margin-right: 4px;
+    gap: 2px;
+`;
 
-    &:first-child > a {
-        border-top-left-radius: var(--border-radius);
-        border-bottom-left-radius: var(--border-radius);
-    }
-    &:first-child > a::before {
-        display: none;
-    }
+const Separator = Styled(Icon)`
+    font-size: 14px;
+    color: var(--font-lightest);
 `;
 
 const Link = Styled(HyperLink)`
-    position: relative;
     display: block;
-    padding: 0 5px 0 15px;
-    height: 16px;
-    line-height: 16px;
-    color: var(--title-color);
-    background: var(--lighter-gray);
-    transition: all 0.2s ease-in-out;
-
-    &::after,
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        border-style: solid;
-        border-width: 8px 0 8px 8px;
-        border-color: transparent transparent transparent var(--content-color);
-        transition: all 0.2s ease-in-out;
-    }
-    &::after {
-        right: -8px;
-        left: auto;
-        z-index: 1;
-        border-left-color: var(--lighter-gray);
-    }
+    padding: 2px 6px;
+    color: var(--font-lighter);
+    border-radius: var(--border-radius-small);
+    transition: all 0.2s;
 
     &:hover {
-        background: var(--dark-gray);
         color: var(--title-color);
+        background: var(--lighter-gray);
     }
-    &:hover::after {
-        border-left-color: var(--dark-gray);
-    }
+`;
+
+const Current = Styled.span`
+    padding: 2px 6px;
+    color: var(--title-color);
+    font-weight: 500;
+`;
+
+const Amount = Styled(Pill)`
+    margin-left: auto;
 `;
 
 
@@ -78,7 +67,7 @@ const Link = Styled(HyperLink)`
  * @returns {React.ReactElement}
  */
 function Breadcrumb(props) {
-    const { className, route, onClick } = props;
+    const { className, route, amount, onClick } = props;
 
     if (!route) {
         return <React.Fragment />;
@@ -110,14 +99,18 @@ function Breadcrumb(props) {
     }
 
     return <Ul className={className}>
-        {items.map(({ key, href, message }) => <Li key={key}>
-            <Link
+        {items.map(({ key, href, message }, index) => <Li key={key}>
+            {index > 0 && <Separator icon="next" />}
+            {index === items.length - 1 ? <Current>
+                {NLS.get(message)}
+            </Current> : <Link
                 variant="none"
                 href={onClick ? "#" : href}
                 onClick={(e) => handleClick(e, href)}
                 message={message}
-            />
+            />}
         </Li>)}
+        {!!amount && <Amount message={amount} />}
     </Ul>;
 }
 
@@ -128,6 +121,7 @@ function Breadcrumb(props) {
 Breadcrumb.propTypes = {
     className : PropTypes.string,
     route     : PropTypes.string,
+    amount    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onClick   : PropTypes.func,
 };
 
