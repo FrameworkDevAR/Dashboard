@@ -106,15 +106,20 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
     };
 
 
-    // Handles the Input Change
+    // Handles the Input Change. The name can be an object to set more than two fields,
+    // as every call replaces the data and the ones in the same tick would be lost
     const handleChange = (name, value, secondName, secondValue) => {
-        const fields = { [name] : value };
-        if (secondName) {
+        const hasFields = typeof name === "object";
+        const fields    = hasFields ? { ...name } : { [name] : value };
+        if (!hasFields && secondName) {
             fields[secondName] = secondValue;
         }
 
         setData(fields);
-        const removeErrors = { [name] : "" };
+        const removeErrors = {};
+        for (const key of Object.keys(fields)) {
+            removeErrors[key] = "";
+        }
 
         // Handle the Errors of a Field input
         try {
