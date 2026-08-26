@@ -64,11 +64,11 @@ const PillBadge = Styled(Badge)`
 
 
 /**
- * The Pill Item Component
+ * The Pill Tab Component
  * @param {object} props
  * @returns {React.ReactElement}
  */
-function PillItem(props) {
+function PillTab(props) {
     const {
         isHidden, className, icon, message, badge,
         url, value, index, selected, isDisabled, onClick,
@@ -93,7 +93,7 @@ function PillItem(props) {
         return <React.Fragment />;
     }
     return <Container
-        className={`pill-item pill-item-${id} ${isSelected ? "pill-selected" : ""} ${className}`}
+        className={`pill-tab pill-tab-${id} ${isSelected ? "pill-tab-selected" : ""} ${className}`}
         isSelected={isSelected}
         isDisabled={isDisabled}
         onClick={handleClick}
@@ -108,7 +108,7 @@ function PillItem(props) {
  * The Property Types
  * @type {object} propTypes
  */
-PillItem.propTypes = {
+PillTab.propTypes = {
     isHidden   : PropTypes.bool,
     className  : PropTypes.string,
     icon       : PropTypes.string,
@@ -126,11 +126,11 @@ PillItem.propTypes = {
  * The Default Properties
  * @type {object} defaultProps
  */
-PillItem.defaultProps = {
+PillTab.defaultProps = {
     isHidden   : false,
     className  : "",
     index      : 0,
     isDisabled : false,
 };
 
-export default PillItem;
+export default PillTab;

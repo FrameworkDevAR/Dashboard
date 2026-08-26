@@ -46,11 +46,11 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
 
 
 /**
- * The Pill List Component
+ * The Pill Tabs Component
  * @param {object} props
  * @returns {React.ReactElement}
  */
-function PillList(props) {
+function PillTabs(props) {
     const {
         isHidden, className, fillWidth, isCentered, topSpace, bottomSpace,
         selected, onClick, children,
@@ -79,7 +79,7 @@ function PillList(props) {
         }
 
         const update = () => {
-            const item = node.querySelector(".pill-selected");
+            const item = node.querySelector(".pill-tab-selected");
             if (item && item.offsetWidth) {
                 setBounds({ left : item.offsetLeft, width : item.offsetWidth });
             }
@@ -116,7 +116,7 @@ function PillList(props) {
  * The Property Types
  * @type {object} propTypes
  */
-PillList.propTypes = {
+PillTabs.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
     fillWidth   : PropTypes.bool,
@@ -132,11 +132,11 @@ PillList.propTypes = {
  * The Default Properties
  * @type {object} defaultProps
  */
-PillList.defaultProps = {
+PillTabs.defaultProps = {
     isHidden   : false,
     className  : "",
     fillWidth  : false,
     isCentered : false,
 };
 
-export default PillList;
+export default PillTabs;
