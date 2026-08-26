@@ -41,16 +41,16 @@ const Content = Styled.div`
     gap: 6px;
 `;
 
-const Item = Styled.div.attrs(({ withError, isDisabled, canSort, canRemove }) => ({ withError, isDisabled, canSort, canRemove }))`
+const Item = Styled.div.attrs(({ withError, withStates, isDisabled, canSort, canRemove }) => ({ withError, withStates, isDisabled, canSort, canRemove }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 4px;
     width: 100%;
     min-height: 36px;
-    padding: 6px 12px 6px 12px;
-    border: 1px solid var(--input-border-color);
-    border-radius: var(--border-radius);
+    padding: 4px 12px;
+    border: 1px solid var(--item-border, var(--input-border-color));
+    border-radius: var(--input-border-radius);
     background-color: var(--content-color);
 
     .inputfield-children {
@@ -59,12 +59,22 @@ const Item = Styled.div.attrs(({ withError, isDisabled, canSort, canRemove }) =>
     }
 
     ${(props) => props.withError && `
+        --item-border: var(--error-color);
         .inputfield {
             --input-border: var(--error-color);
         }
     `}
+    ${(props) => (props.withStates && !props.isDisabled) && `
+        &:hover {
+            --item-border: var(--input-border-hover);
+        }
+        &:focus-within {
+            --item-border: var(--input-border-focus);
+            box-shadow: var(--input-border-shadow);
+        }
+    `}
     ${(props) => props.isDisabled && `
-        border-color: var(--input-border-disabled);
+        --item-border: var(--input-border-disabled);
         .inputfield-children {
             margin-right: 0;
         }
@@ -313,6 +323,7 @@ function ListInput(props) {
                     key={index}
                     className="inputfield-container"
                     withError={!!getError(index)}
+                    withStates={!withBorder}
                     isDisabled={isDisabled}
                     canSort={canSort}
                     canRemove={canRemove}
@@ -362,7 +373,7 @@ function ListInput(props) {
                         variant="error"
                         icon="delete"
                         onClick={() => handleRemove(index)}
-                        isTiny
+                        isSmall
                     />
                 </Item>)}
             </Content>
@@ -370,6 +381,7 @@ function ListInput(props) {
             <Button
                 isHidden={!canAdd}
                 variant="outlined"
+                icon="add"
                 message={addButton}
                 onClick={handleAdd}
                 isSmall
