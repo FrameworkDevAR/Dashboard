@@ -207,7 +207,9 @@ function SuggestInput(props) {
         case KeyCode.DOM_VK_RETURN:
             if (filteredOptions[selectedIdxRef.current]) {
                 const elem = filteredOptions[selectedIdxRef.current];
-                selectElem(elem.id, elem.title, elem);
+                if (!handleCreate(elem.id)) {
+                    selectElem(elem.id, elem.title, elem);
+                }
             }
             break;
 
