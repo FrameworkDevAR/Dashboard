@@ -31,8 +31,8 @@ const Div = Styled.div.attrs(({ isOpen, isClosing, zIndex }) => ({ isOpen, isClo
     justify-content: center;
     align-items: center;
     background-color: var(--drop-color);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: var(--drop-blur);
+    backdrop-filter: var(--drop-blur);
     z-index: ${(props) => props.zIndex ? props.zIndex : "var(--z-backdrop)"};
 
     ${(props) => props.isClosing ?
