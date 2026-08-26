@@ -8,6 +8,7 @@ import Utils                from "../../Utils/Utils";
 
 // Components
 import DragDrop             from "./DragDrop";
+import Icon                 from "../Common/Icon";
 import Button               from "../Form/Button";
 import PromptDialog         from "../Dialogs/PromptDialog";
 
@@ -15,26 +16,56 @@ import PromptDialog         from "../Dialogs/PromptDialog";
 
 // Styles
 const Container = Styled.div`
-    background-color: var(--dropzone-background);
-    border-radius: var(--dropzone-border-radius, var(--border-radius));
-    text-align: center;
-    padding: var(--main-padding);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 12px 16px;
     color: var(--black-color);
+    background-color: var(--dropzone-background);
+    border: 1px dashed var(--dropzone-border-color);
+    border-radius: var(--dropzone-border-radius, var(--border-radius));
+    transition: border-color 0.2s;
+
+    &:hover {
+        border-color: var(--primary-color);
+    }
+`;
+
+const Content = Styled.div`
+    display: flex;
+    align-items: center;
+    flex-grow: 2;
+    gap: 10px;
+    min-width: 0;
+`;
+
+const UploadIcon = Styled(Icon)`
+    flex-shrink: 0;
+    font-size: 26px;
+    color: var(--primary-color);
 `;
 
 const Buttons = Styled.div`
     display: flex;
     justify-content: center;
+    flex-shrink: 0;
     gap: 8px;
     flex-wrap: wrap;
 `;
 
 const Title = Styled.h3`
     margin: 0;
+    font-size: var(--font-size);
+    font-weight: 600;
 `;
 
 const Text = Styled.p`
-    margin: 8px 0;
+    margin: 2px 0 0;
+    color: var(--font-lighter);
+    font-size: var(--font-size-small);
 `;
 
 const Input = Styled.input`
@@ -133,8 +164,15 @@ function DropZone(props) {
         />
 
         <Container className="dropzone-upload">
-            <Title>{NLS.get(`${prefix}TITLE`)}</Title>
-            <Text>{NLS.get("DROPZONE_OR")}</Text>
+            <Content>
+                <UploadIcon icon="upload" />
+                <div>
+                    <Title>{NLS.get(`${prefix}TITLE`)}</Title>
+                    {!!Number(maxSize) && <Text>
+                        {NLS.format("DROPZONE_MAX_SIZE", String(maxSize))}
+                    </Text>}
+                </div>
+            </Content>
             <Buttons>
                 <Button
                     variant="outlined"
