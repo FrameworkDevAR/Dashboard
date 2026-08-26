@@ -51,17 +51,28 @@ function ScrollFade(props) {
     const [ topSpace,   setTopSpace   ] = React.useState(0);
 
 
+    // Returns the height of the first sticky element, which can be the first
+    // child or the one inside it, as in a Table with a sticky head
+    const getStickyHeight = (node) => {
+        let child = node.firstElementChild;
+        for (let index = 0; child && index < 2; index += 1) {
+            if (window.getComputedStyle(child).position === "sticky") {
+                return child.offsetHeight;
+            }
+            child = child.firstElementChild;
+        }
+        return 0;
+    };
+
     // Shows a fade on each side that the content can be scrolled to. The top
-    // fade starts under the first child when it is sticky, so it stays visible
+    // fade starts under the sticky header, if there is one, so it stays visible
     const updateFades = () => {
         const node = passedRef.current;
         if (!node) {
             return;
         }
-        const child = node.firstElementChild;
-        const isSticky = child && window.getComputedStyle(child).position === "sticky";
 
-        setTopSpace(isSticky ? child.offsetHeight : 0);
+        setTopSpace(getStickyHeight(node));
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };

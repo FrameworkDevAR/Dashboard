@@ -142,7 +142,7 @@ const TRow = Styled.tr.attrs(({ hasHover, hasChecks, hasActions, isEditable, isS
 function TableRowCnt(props) {
     const {
         className, hasHover, hasChecks, hasActions,
-        isEditable, isSelected, onClick, onContextMenu, children,
+        isEditable, isSelected, onClick, onContextMenu, onMouseDown, children,
     } = props;
 
 
@@ -156,6 +156,7 @@ function TableRowCnt(props) {
         isSelected={isSelected}
         onClick={onClick}
         onContextMenu={onContextMenu}
+        onMouseDown={onMouseDown}
     >
         {children}
     </TRow>;
@@ -174,6 +175,7 @@ TableRowCnt.propTypes = {
     isSelected    : PropTypes.bool,
     onClick       : PropTypes.func,
     onContextMenu : PropTypes.func,
+    onMouseDown   : PropTypes.func,
     children      : PropTypes.any,
 };
 

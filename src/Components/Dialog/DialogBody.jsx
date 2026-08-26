@@ -9,6 +9,8 @@ import CircularLoader       from "../Loader/CircularLoader";
 
 // Styles
 const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, fullHeight, hideFooter, noOverflow }))`
+    --dialog-content: var(--dialog-body);
+
     box-sizing: border-box;
     flex-grow: 2;
     max-height: var(--dialog-body);
@@ -21,12 +23,15 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
     `}
     ${(props) => props.isLoading && `
         padding: 32px;
+        --dialog-content: calc(var(--dialog-body) - 2 * 32px);
     `}
     ${(props) => props.withSpacing && `
         padding: 4px var(--dialog-padding);
+        --dialog-content: calc(var(--dialog-body) - 2 * 4px);
     `}
     ${(props) => props.bigSpacing && `
         padding: var(--dialog-padding);
+        --dialog-content: calc(var(--dialog-body) - 2 * var(--dialog-padding));
     `}
     ${(props) => props.minHeight && `
         min-height: min(var(--dialog-body), ${props.minHeight}px);

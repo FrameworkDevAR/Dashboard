@@ -19,13 +19,14 @@ import Menu                 from "../Menu/Menu";
 import MenuItem             from "../Menu/MenuItem";
 import NoneAvailable        from "../Common/NoneAvailable";
 import CircularLoader       from "../Loader/CircularLoader";
+import ScrollFade           from "../Common/ScrollFade";
 
 
 
 // Styles
 const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasChecks, hasActions, notFixed, isEditable, extraSpace }) => ({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasChecks, hasActions, notFixed, isEditable, extraSpace }))`
     ${(props) => props.inDialog ? `
-        --table-height: calc(var(--dialog-body) - 2 * var(--main-padding) - 2px);
+        --table-height: calc(var(--dialog-content, var(--dialog-body)) - 2px);
     ` : `
         --table-height: calc(var(--main-height) - var(--main-padding) - var(--header-height) - 2px);
     `}
@@ -112,7 +113,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, hasRadius, hasSc
 function Table(props) {
     const {
         isHidden, className, sort, fetch, isLoading, none, hideEmpty,
-        noClick, onRowClick, inDialog, hasFilter, statsAmount, hasTabs, hasAlert,
+        noClick, onRowClick, inDialog, hasFade, hasFilter, statsAmount, hasTabs, hasAlert,
         noSorting, notFixed, columnData, onColumnEdit,
         checked, setChecked, hasCheckAll, extraSpace, children,
     } = props;
@@ -175,12 +176,12 @@ function Table(props) {
     };
 
     // Handles the Row Click
-    const handleRowClick = (elemID) => {
+    const handleRowClick = (elemID, e) => {
         if (noClick || menuID !== null || Utils.hasSelection()) {
             return;
         }
         if (onRowClick) {
-            onRowClick(elemID);
+            onRowClick(elemID, e);
             return;
         }
         for (const action of actions) {
@@ -376,31 +377,33 @@ function Table(props) {
     if (!hasContent && hideEmpty) {
         return <React.Fragment />;
     }
-    return <>
-        <Wrapper
-            ref={tableRef}
-            inDialog={inDialog}
-            hasFilter={hasFilter}
-            statsAmount={statsAmount}
-            hasTabs={hasTabs}
-            hasAlert={hasAlert}
-            hasPaging={hasPaging}
-            hasChecks={hasChecks}
-            hasActions={hasActions}
-            notFixed={notFixed}
+    const content = <Wrapper
+        ref={tableRef}
+        inDialog={inDialog}
+        hasFilter={hasFilter}
+        statsAmount={statsAmount}
+        hasTabs={hasTabs}
+        hasAlert={hasAlert}
+        hasPaging={hasPaging}
+        hasChecks={hasChecks}
+        hasActions={hasActions}
+        notFixed={notFixed}
+        isEditable={isEditable}
+        extraSpace={extraSpace}
+    >
+        <Container
+            className={className}
             isEditable={isEditable}
-            extraSpace={extraSpace}
+            totalWidth={totalWidth}
+            hasRadius={hasRadius}
+            hasScroll={hasScroll}
         >
-            <Container
-                className={className}
-                isEditable={isEditable}
-                totalWidth={totalWidth}
-                hasRadius={hasRadius}
-                hasScroll={hasScroll}
-            >
-                {items}
-            </Container>
-        </Wrapper>
+            {items}
+        </Container>
+    </Wrapper>;
+
+    return <>
+        {hasFade ? <ScrollFade passedRef={tableRef}>{content}</ScrollFade> : content}
 
         <Menu
             containerRef={tableRef}
@@ -441,6 +444,7 @@ Table.propTypes = {
     hideEmpty    : PropTypes.bool,
     isLoading    : PropTypes.bool,
     inDialog     : PropTypes.bool,
+    hasFade      : PropTypes.bool,
     hasFilter    : PropTypes.bool,
     statsAmount  : PropTypes.number,
     hasTabs      : PropTypes.bool,
@@ -469,6 +473,7 @@ Table.defaultProps = {
     none        : "",
     hideEmpty   : false,
     isLoading   : false,
+    hasFade     : false,
     hasFilter   : false,
     statsAmount : 0,
     hasTabs     : false,

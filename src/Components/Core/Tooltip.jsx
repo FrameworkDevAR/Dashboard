@@ -22,7 +22,7 @@ const open = keyframes`
 `;
 
 // Styles
-const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, delay, hasBreaks }) => ({ variant, top, left, width, maxWidth, toLeft, delay, hasBreaks }))`
+const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks }) => ({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks }))`
     box-sizing: border-box;
     position: fixed;
     top: ${(props) => `${props.top}px`};
@@ -73,7 +73,7 @@ const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toL
 
         ${(props) => props.variant === "bottom" && `
             top: -6px;
-            ${props.toLeft ? "right: calc(6px + var(--border-radius) / 2);" : "left: calc(50% - 6px);"}
+            ${props.toLeft ? `right: ${props.arrow}px;` : "left: calc(50% - 6px);"}
             border-color: transparent transparent var(--tooltip-background) transparent;
         `}
 
@@ -119,6 +119,7 @@ function Tooltip() {
     let   left   = bounds.left;
     let   width  = 0;
     let   toLeft = false;
+    let   arrow  = 0;
 
 
     // Nothing to Show
@@ -142,6 +143,7 @@ function Tooltip() {
             left   = bounds.left - Number(maxWidth) / 2 + bounds.width + 6;
             width  = maxWidth;
             toLeft = true;
+            arrow  = bounds.width / 2;
         }
         break;
 
@@ -162,6 +164,7 @@ function Tooltip() {
         width={width}
         maxWidth={maxWidth}
         toLeft={toLeft}
+        arrow={arrow}
         delay={delay || 1}
         hasBreaks={hasBreaks}
         content={content}

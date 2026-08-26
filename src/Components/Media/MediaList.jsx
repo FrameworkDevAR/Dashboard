@@ -4,41 +4,55 @@ import Styled               from "styled-components";
 
 // Utils
 import Action               from "../../Core/Action";
-import Utils                from "../../Utils/Utils";
+import NLS                  from "../../Core/NLS";
+import useMediaDrag         from "../../Hooks/MediaDrag";
 
 // Components
-import NLS                  from "../../Core/NLS";
 import NoneAvailable        from "../Common/NoneAvailable";
 import CircularLoader       from "../Loader/CircularLoader";
 import Breadcrumb           from "../Header/Breadcrumb";
-import MediaItem            from "../Media/MediaItem";
+import MediaGrid            from "../Media/MediaGrid";
+import MediaTable           from "../Media/MediaTable";
+import PillTabs             from "../Pill/PillTabs";
+import PillTab              from "../Pill/PillTab";
 
 
+
+// Constants
+const GAP_SPACE   = 16;
+const CRUMB_SPACE = 28 + GAP_SPACE;
+const DROP_SPACE  = 60 + GAP_SPACE;
+const TIP_SPACE   = 46 + GAP_SPACE;
 
 // Styles
-const Container = Styled.div.attrs(({ inDialog, withSpace, isCentered }) => ({ inDialog, withSpace, isCentered }))`
+const Container = Styled.div.attrs(({ inDialog, isCentered }) => ({ inDialog, isCentered }))`
+    display: flex;
+    flex-direction: column;
+    gap: ${GAP_SPACE}px;
     color: var(--media-main-color);
 
-    ${(props) => props.inDialog && `
-        min-height: calc(130px * 2 + 8px + 16px + 12px);
+    ${(props) => props.inDialog ? `
+        --media-height: calc(var(--dialog-content, var(--dialog-body)) - 2px);
+        min-height: calc(148px * 2 + 12px + 12px + 27px);
+    ` : `
+        --media-height: calc(var(--main-height) - var(--main-padding) - var(--header-height) - 2px);
     `}
-    ${(props) => props.withSpace && "padding-top: 24px;"}
 
     ${(props) => props.isCentered && `
         flex-grow: 1;
-        display: flex;
         justify-content: center;
         align-items: center;
-        padding: 0;
     `}
 `;
 
-const Section = Styled.section`
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    grid-auto-rows: 1fr;
-    gap: 8px;
-    padding-top: 12px;
+const Crumb = Styled(Breadcrumb)`
+    flex-grow: 2;
+`;
+
+const Toolbar = Styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
 `;
 
 
@@ -51,138 +65,74 @@ const Section = Styled.section`
 function MediaList(props) {
     const {
         className, isLoading, onAction, onDrop,
-        canEdit, canSelect, canDrag, inDialog, withSpace,
+        canEdit, canSelect, canDrag, inDialog, withSpace, withTip,
         selectedPath, selectedPaths, items, path, none,
     } = props;
 
 
     // The Current State
-    const [ isDragging, setDragging   ] = React.useState(false);
-    const [ isMoving,   setMoving     ] = React.useState(false);
-    const [ dragIndex,  setDragIndex  ] = React.useState(0);
-    const [ startX,     setStartX     ] = React.useState(0);
-    const [ startY,     setStartY     ] = React.useState(0);
-    const [ diffX,      setDiffX      ] = React.useState(0);
-    const [ diffY,      setDiffY      ] = React.useState(0);
-    const [ posX,       setPosX       ] = React.useState(0);
-    const [ posY,       setPosY       ] = React.useState(0);
-    const [ width,      setWidth      ] = React.useState(0);
-    const [ requestRAF, setRequestRAF ] = React.useState(false);
-    const [ openPath,   setOpenPath   ] = React.useState("");
+    const [ openElem, setOpenElem ] = React.useState(null);
+    const [ view,     setView     ] = React.useState(localStorage.getItem("dashboard-media-view") || "grid");
+    const [ sort,     setSort     ] = React.useState(localStorage.getItem("dashboard-media-sort") || "name");
+
+    // The Back and the Directories are always first, no matter the sort
+    const sortedItems = React.useMemo(() => [ ...items ].sort((a, b) => {
+        if (a.isBack !== b.isBack) {
+            return a.isBack ? -1 : 1;
+        }
+        if (a.isDir !== b.isDir) {
+            return a.isDir ? -1 : 1;
+        }
+        if (sort === "time") {
+            return b.modifiedTime - a.modifiedTime;
+        }
+        return a.name.localeCompare(b.name);
+    }), [ items, sort ]);
 
     // Variables
     const showLoader = Boolean(isLoading && !items.length);
     const showNone   = Boolean(!isLoading && !items.length);
     const showItems  = Boolean(items.length);
     const amount     = items.filter((elem) => !elem.isBack).length;
+    const isGrid     = view === "grid";
+
+    // The items leave the space of the Breadcrumb, the Drop Zone and the Tip
+    const extraSpace = CRUMB_SPACE + (withSpace ? DROP_SPACE : 0) + (withTip ? TIP_SPACE : 0);
+
+
+    // Handles the Drop, the Directory loads while the File is moved
+    const handleDrop = (fromElem, toElem) => {
+        setOpenElem(toElem);
+        onDrop(fromElem, toElem);
+    };
+
+    // The Drag Hook
+    const {
+        isMoving, dragIndex, dropIndex, movedIndex,
+        dragStyle, ghostStyle, handleGrab, resetDrag,
+    } = useMediaDrag(sortedItems, isGrid, canDrag, handleDrop);
 
 
     // Handles the Action, keeping the Directory that is being opened
     const handleAction = (action, elem, e) => {
         if (action.isSelect && (elem.isDir || elem.isBack)) {
-            setOpenPath(elem.path);
+            setOpenElem(elem);
         }
         if (onAction) {
             onAction(action, elem, e);
         }
     };
 
-    // Handles the Breadcrumb links
-    const handleBreadcrumb = (href) => {
-        if (onAction) {
-            const path = href === "/" ? "" : href;
-            onAction(Action.get("VIEW"), { isDir : true, path });
-        }
+    // Handles the View, which is remembered
+    const handleView = (newView) => {
+        setView(newView);
+        localStorage.setItem("dashboard-media-view", newView);
     };
 
-    // Handles the Grab
-    const handleGrab = (e, elem, index) => {
-        if (!canDrag || isDragging || elem.isBack || elem.isDir || e.nativeEvent.which !== 1) {
-            return;
-        }
-        setDragging(true);
-        setRequestRAF(true);
-        setDragIndex(index);
-        setStartX(e.clientX);
-        setStartY(e.clientY);
-    };
-
-    // Handles the Drag
-    const handleDrag = (e) => {
-        if (!isDragging) {
-            return;
-        }
-        if (!isMoving) {
-            startDrag(e);
-            return;
-        }
-        animateDrag(e);
-        if (requestRAF) {
-            setRequestRAF(false);
-        }
-    };
-
-    // Handles the Drag Start
-    const startDrag = (e) => {
-        const currX = e.clientX - startX;
-        const currY = e.clientY - startY;
-        const dist  = currX * currX + currY * currY;
-
-        if (dist <= 25) {
-            return;
-        }
-
-        const node = document.querySelector(`.media-item-${dragIndex}`);
-        if (!node) {
-            return;
-        }
-
-        const bounds = node.getBoundingClientRect();
-
-        setMoving(true);
-        setWidth(bounds.width);
-        setDiffX(startX - bounds.left);
-        setDiffY(startY - bounds.top);
-        setPosX(e.clientX - startX + bounds.left);
-        setPosY(e.clientY - startY + bounds.top);
-    };
-
-    // Handles the Drag Animated
-    const animateDrag = (e) => {
-        setPosX(e.clientX - diffX);
-        setPosY(e.clientY - diffY);
-        setRequestRAF(true);
-
-        e.preventDefault();
-        e.stopPropagation();
-        Utils.unselectAll();
-    };
-
-    // Handles the Drop
-    const handleDrop = (e) => {
-        if (!isDragging) {
-            return;
-        }
-        setDragging(false);
-        if (!isMoving) {
-            return;
-        }
-        setMoving(false);
-
-        for (const [ index, elem ] of items.entries()) {
-            if (elem.isBack || elem.isDir) {
-                const node = document.querySelector(`.media-item-${index}`);
-                if (!node) {
-                    continue;
-                }
-
-                const bounds = node.getBoundingClientRect();
-                if (Utils.inBounds(e.clientX, e.clientY, bounds)) {
-                    onDrop(items[dragIndex], elem);
-                    break;
-                }
-            }
-        }
+    // Handles the Sort, which is remembered
+    const handleSort = (newSort) => {
+        setSort(newSort);
+        localStorage.setItem("dashboard-media-sort", newSort);
     };
 
     // Returns true if the elem is selected
@@ -199,66 +149,97 @@ function MediaList(props) {
         return false;
     };
 
+    // Handles the Breadcrumb links
+    const handleBreadcrumb = (href) => {
+        if (onAction) {
+            const path = href === "/" ? "" : href;
+            onAction(Action.get("VIEW"), { isDir : true, path });
+        }
+    };
+
     // The Directory stops loading when the content is fetched
     React.useEffect(() => {
         if (!isLoading) {
-            setOpenPath("");
+            setOpenElem(null);
+            resetDrag();
         }
-    }, [ isLoading ]);
-
-    // Adds the Listeners
-    React.useEffect(() => {
-        window.addEventListener("mousemove", handleDrag);
-        window.addEventListener("mouseup",   handleDrop);
-        return () => {
-            window.removeEventListener("mousemove", handleDrag);
-            window.removeEventListener("mouseup",   handleDrop);
-        };
-    });
-
-
-    // Calculate some Styles
-    const style = {};
-    if (isMoving) {
-        style.position = "absolute";
-        style.width    = `${width}px`;
-        style.top      = `${posY}px`;
-        style.left     = `${posX}px`;
-        style.zIndex   = 1000;
-    }
+    }, [ isLoading, items ]);
 
 
     // Do the Render
     return <Container
         className={className}
         inDialog={inDialog}
-        withSpace={withSpace}
         isCentered={showLoader || showNone}
     >
         {showLoader && <CircularLoader />}
         {showNone   && (none || <NoneAvailable message="MEDIA_NONE_AVAILABLE" />)}
         {showItems  && <>
-            <Breadcrumb
-                route={path}
-                amount={NLS.pluralize("MEDIA_AMOUNT", amount)}
-                onClick={handleBreadcrumb}
-            />
-            <Section>
-                {items.map((elem, index) => {
-                    const isCurrent = isMoving && index === dragIndex;
-                    return <MediaItem
-                        key={index}
-                        elem={elem}
-                        className={`media-item-${index}`}
-                        style={isCurrent ? style : null}
-                        isSelected={isSelected(elem)}
-                        hasActions={!isCurrent && canEdit && !elem.isBack}
-                        isLoading={isLoading && openPath === elem.path}
-                        onAction={handleAction}
-                        onMouseDown={(e) => handleGrab(e, elem, index)}
-                    />;
-                })}
-            </Section>
+            <Toolbar>
+                <Crumb
+                    route={path}
+                    amount={NLS.pluralize("MEDIA_AMOUNT", amount)}
+                    onClick={handleBreadcrumb}
+                />
+                <PillTabs selected={sort} onClick={handleSort}>
+                    <PillTab
+                        icon="sort-alpha"
+                        value="name"
+                        tooltip="MEDIA_SORT_NAME"
+                        tooltipWidth={140}
+                    />
+                    <PillTab
+                        icon="time"
+                        value="time"
+                        tooltip="MEDIA_SORT_TIME"
+                        tooltipWidth={140}
+                    />
+                </PillTabs>
+                <PillTabs selected={view} onClick={handleView}>
+                    <PillTab
+                        icon="grid"
+                        value="grid"
+                        tooltip="MEDIA_VIEW_GRID"
+                        tooltipWidth={120}
+                    />
+                    <PillTab
+                        icon="list"
+                        value="list"
+                        tooltip="MEDIA_VIEW_LIST"
+                        tooltipWidth={120}
+                    />
+                </PillTabs>
+            </Toolbar>
+
+            {isGrid ? <MediaGrid
+                items={sortedItems}
+                inDialog={inDialog}
+                canEdit={canEdit}
+                extraSpace={extraSpace}
+                isSelected={isSelected}
+                openElem={openElem}
+                isMoving={isMoving}
+                dragIndex={dragIndex}
+                dropIndex={dropIndex}
+                movedIndex={movedIndex}
+                dragStyle={dragStyle}
+                onAction={handleAction}
+                onGrab={handleGrab}
+            /> : <MediaTable
+                items={sortedItems}
+                inDialog={inDialog}
+                canEdit={canEdit}
+                extraSpace={extraSpace}
+                isSelected={isSelected}
+                openElem={openElem}
+                isMoving={isMoving}
+                dragIndex={dragIndex}
+                dropIndex={dropIndex}
+                movedIndex={movedIndex}
+                ghostStyle={ghostStyle}
+                onAction={handleAction}
+                onGrab={handleGrab}
+            />}
         </>}
     </Container>;
 }
@@ -277,6 +258,7 @@ MediaList.propTypes = {
     canDrag       : PropTypes.bool,
     inDialog      : PropTypes.bool,
     withSpace     : PropTypes.bool,
+    withTip       : PropTypes.bool,
     selectedPath  : PropTypes.string,
     selectedPaths : PropTypes.arrayOf(PropTypes.string),
     items         : PropTypes.array,
@@ -296,6 +278,7 @@ MediaList.defaultProps = {
     canDrag   : false,
     inDialog  : false,
     withSpace : true,
+    withTip   : false,
 };
 
 export default MediaList;

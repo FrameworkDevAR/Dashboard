@@ -4,6 +4,7 @@ import Styled               from "styled-components";
 
 // Core
 import NLS                  from "../../Core/NLS";
+import Store                from "../../Core/Store";
 
 // Components
 import Icon                 from "../Common/Icon";
@@ -71,8 +72,15 @@ const PillBadge = Styled(Badge)`
 function PillTab(props) {
     const {
         isHidden, className, icon, message, badge,
+        tooltip, tooltipVariant, tooltipWidth,
         url, value, index, selected, isDisabled, onClick,
     } = props;
+
+
+    // The References
+    const elementRef = React.useRef(null);
+
+    const { showTooltip, hideTooltip } = Store.useAction("core");
 
 
     // Variables
@@ -87,16 +95,26 @@ function PillTab(props) {
         }
     };
 
+    // Handles the Tooltip
+    const handleTooltip = () => {
+        if (tooltip) {
+            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth);
+        }
+    };
+
 
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
     return <Container
+        ref={elementRef}
         className={`pill-tab pill-tab-${id} ${isSelected ? "pill-tab-selected" : ""} ${className}`}
         isSelected={isSelected}
         isDisabled={isDisabled}
         onClick={handleClick}
+        onMouseEnter={handleTooltip}
+        onMouseLeave={hideTooltip}
     >
         {!!icon && <Icon icon={icon} />}
         {!!message && NLS.get(message)}
@@ -114,6 +132,9 @@ PillTab.propTypes = {
     icon       : PropTypes.string,
     message    : PropTypes.string,
     badge      : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    tooltip        : PropTypes.string,
+    tooltipVariant : PropTypes.string,
+    tooltipWidth   : PropTypes.number,
     url        : PropTypes.string,
     value      : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     index      : PropTypes.number,
@@ -127,6 +148,7 @@ PillTab.propTypes = {
  * @type {object} defaultProps
  */
 PillTab.defaultProps = {
+    tooltipVariant : "bottom",
     isHidden   : false,
     className  : "",
     index      : 0,

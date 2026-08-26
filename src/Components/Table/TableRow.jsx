@@ -18,8 +18,9 @@ import CheckboxInput        from "../InputType/CheckboxInput";
  */
 function TableRow(props) {
     const {
-        hasChecks, hasActions, isEditable, isSelected, elemID,
-        handleRowClick, handleMenuOpen, columns, checked, setChecked, children,
+        className, hasChecks, hasActions, isEditable, isSelected, elemID,
+        handleRowClick, handleMenuOpen, columns, checked, setChecked,
+        onMouseDown, children,
     } = props;
 
     // The References
@@ -27,8 +28,8 @@ function TableRow(props) {
 
 
     // Handles the Row Click
-    const handleClick = () => {
-        handleRowClick(elemID);
+    const handleClick = (e) => {
+        handleRowClick(elemID, e);
     };
 
     // Handles the Check
@@ -72,7 +73,9 @@ function TableRow(props) {
 
     // Do the Render
     return <TableRowCnt
+        className={className}
         onClick={handleClick}
+        onMouseDown={onMouseDown}
         onContextMenu={handleContextMenu}
         hasChecks={hasChecks}
         hasActions={hasActions}
@@ -108,12 +111,14 @@ function TableRow(props) {
  * @type {object} propTypes
  */
 TableRow.propTypes = {
+    className      : PropTypes.string,
     hasChecks      : PropTypes.bool,
     hasActions     : PropTypes.bool,
     isEditable     : PropTypes.bool,
     isSelected     : PropTypes.bool,
     elemID         : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     handleRowClick : PropTypes.func,
+    onMouseDown    : PropTypes.func,
     handleMenuOpen : PropTypes.func,
     columns        : PropTypes.array,
     checked        : PropTypes.array,
