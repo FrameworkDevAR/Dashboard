@@ -32,7 +32,6 @@ const Emoji = Styled.div.attrs(({ top, left }) => ({ top, left }))`
     position: absolute;
     top: ${(props) => `${props.top}px`};
     left: ${(props) => `${props.left}px`};
-    box-shadow: var(--box-shadow);
     z-index: var(--z-menu);
 
     aside {
