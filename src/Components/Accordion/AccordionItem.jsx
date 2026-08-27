@@ -8,6 +8,7 @@ import Utils                from "../../Utils/Utils";
 
 // Components
 import Icon                 from "../Common/Icon";
+import Pill                 from "../Pill/Pill";
 
 
 
@@ -208,7 +209,7 @@ const Inner = Styled.div.attrs(({ isSelected, isExpanded, withGap }) => ({ isSel
 function AccordionItem(props) {
     const {
         className, header, message, description, error, errorCount,
-        number, icon, iconColor, withGap, maxWidth, hideAside,
+        badge, badgeVariant, number, icon, iconColor, withGap, maxWidth, hideAside,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
     } = props;
 
@@ -268,6 +269,11 @@ function AccordionItem(props) {
                     </>}
                     {!!errorMessage && <Error>{NLS.get(errorMessage)}</Error>}
                 </Div>
+                {!!badge && <Pill
+                    variant={badgeVariant}
+                    message={badge}
+                    withDot
+                />}
                 <Arrow isSelected={isSelected}>
                     {!isDisabled && <Icon icon="up" />}
                 </Arrow>
@@ -295,26 +301,28 @@ function AccordionItem(props) {
  * @type {object} propTypes
  */
 AccordionItem.propTypes = {
-    isHidden    : PropTypes.bool,
-    className   : PropTypes.string,
-    header      : PropTypes.any,
-    message     : PropTypes.string,
-    description : PropTypes.string,
-    error       : PropTypes.string,
-    errorCount  : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
-    number      : PropTypes.number,
-    icon        : PropTypes.string,
-    iconColor   : PropTypes.string,
-    withGap     : PropTypes.bool,
-    maxWidth    : PropTypes.number,
-    hideAside   : PropTypes.bool,
-    isFirst     : PropTypes.bool,
-    isLast      : PropTypes.bool,
-    isComplete  : PropTypes.bool,
-    isSelected  : PropTypes.bool,
-    isDisabled  : PropTypes.bool,
-    onClick     : PropTypes.func,
-    children    : PropTypes.any,
+    isHidden     : PropTypes.bool,
+    className    : PropTypes.string,
+    header       : PropTypes.any,
+    message      : PropTypes.string,
+    description  : PropTypes.string,
+    error        : PropTypes.string,
+    errorCount   : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    badge        : PropTypes.string,
+    badgeVariant : PropTypes.string,
+    number       : PropTypes.number,
+    icon         : PropTypes.string,
+    iconColor    : PropTypes.string,
+    withGap      : PropTypes.bool,
+    maxWidth     : PropTypes.number,
+    hideAside    : PropTypes.bool,
+    isFirst      : PropTypes.bool,
+    isLast       : PropTypes.bool,
+    isComplete   : PropTypes.bool,
+    isSelected   : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    onClick      : PropTypes.func,
+    children     : PropTypes.any,
 };
 
 /**
@@ -322,18 +330,20 @@ AccordionItem.propTypes = {
  * @type {object} defaultProps
  */
 AccordionItem.defaultProps = {
-    isHidden   : false,
-    className  : "",
-    message    : "",
-    iconColor  : "",
-    errorCount : 0,
-    withGap    : false,
-    maxWidth   : 0,
-    isFirst    : false,
-    isLast     : false,
-    isComplete : false,
-    isSelected : false,
-    isDisabled : false,
+    isHidden     : false,
+    className    : "",
+    message      : "",
+    badge        : "",
+    badgeVariant : "gray",
+    iconColor    : "",
+    errorCount   : 0,
+    withGap      : false,
+    maxWidth     : 0,
+    isFirst      : false,
+    isLast       : false,
+    isComplete   : false,
+    isSelected   : false,
+    isDisabled   : false,
 };
 
 export default AccordionItem;
