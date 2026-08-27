@@ -6,9 +6,18 @@ import Styled               from "styled-components";
 import NLS                  from "../../Core/NLS";
 
 // Components
-import Circle               from "../Common/Circle";
+import Pill                 from "../Pill/Pill";
 
 
+
+// Constants
+const VARIANTS = {
+    green  : "success",
+    yellow : "warning",
+    orange : "warning",
+    red    : "error",
+    blue   : "primary",
+};
 
 // Styles
 const H3 = Styled.h3.attrs(({ withBorder }) => ({ withBorder }))`
@@ -17,7 +26,6 @@ const H3 = Styled.h3.attrs(({ withBorder }) => ({ withBorder }))`
     align-items: center;
     gap: 8px;
     margin: 0;
-    padding-left: var(--main-padding);
     color: var(--darkest-gray);
     font-weight: 400;
     font-size: 15px;
@@ -25,16 +33,12 @@ const H3 = Styled.h3.attrs(({ withBorder }) => ({ withBorder }))`
     overflow: hidden;
 
     ${(props) => props.withBorder && `
+        padding-left: var(--main-padding);
         border-left: 1px solid var(--darker-gray);
     `}
 `;
 
-const SubCircle = Styled(Circle)`
-    width: 10px;
-    height: 10px;
-    margin: 0;
-    opacity: 0.8;
-`;
+
 
 
 
@@ -51,8 +55,18 @@ function Subtitle(props) {
     if (!message) {
         return <React.Fragment />;
     }
+    // The border of the Pill separates it from the title
+    if (circle) {
+        return <H3 className="subtitle">
+            <Pill
+                variant={VARIANTS[circle] || "gray"}
+                message={message}
+                isOutlined
+                withDot
+            />
+        </H3>;
+    }
     return <H3 className="subtitle" withBorder={withBorder}>
-        {!!circle && <SubCircle color={circle} />}
         {NLS.get(message)}
     </H3>;
 }
