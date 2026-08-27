@@ -13,14 +13,17 @@ import Beta                 from "../Common/Beta";
 
 
 // Styles
-const Container = Styled.div.attrs(({ isCollapsed }) => ({ isCollapsed }))`
-    position: sticky;
-    top: var(--details-title-top);
+const Container = Styled.div.attrs(({ isCollapsed, noSticky }) => ({ isCollapsed, noSticky }))`
     padding: 6px 0;
     padding-top: var(--details-spacing);
     background-color: var(--content-color);
     border-bottom: 1px solid var(--border-color-light);
     z-index: 2;
+
+    ${(props) => !props.noSticky && `
+        position: sticky;
+        top: var(--details-title-top);
+    `}
 
     ${(props) => props.isCollapsed && `
         border-bottom: none;
@@ -70,7 +73,7 @@ const Title = Styled.div`
 function DetailTitle(props) {
     const {
         isHidden, className, icon, message, isBeta,
-        collapsible, isCollapsed,
+        collapsible, isCollapsed, noSticky,
         viewAction, canView, viewIcon, viewTooltip,
         action, canEdit, editIcon, editTooltip,
         onAction, onClose, onClick,
@@ -94,6 +97,7 @@ function DetailTitle(props) {
     return <Container
         className={`details-title ${className}`}
         isCollapsed={isCollapsed}
+        noSticky={noSticky}
     >
         <Inside onClick={onClick} isCollapsible={isCollapsible}>
             {hasPreCollapse && <IconLink
@@ -150,6 +154,7 @@ DetailTitle.propTypes = {
     isBeta      : PropTypes.bool,
     collapsible : PropTypes.string,
     isCollapsed : PropTypes.bool,
+    noSticky    : PropTypes.bool,
     viewAction  : PropTypes.string,
     canView     : PropTypes.bool,
     viewIcon    : PropTypes.string,

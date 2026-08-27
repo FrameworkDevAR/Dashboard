@@ -33,7 +33,7 @@ const Content = Styled.section`
 function DetailList(props) {
     const {
         isHidden, className, icon, message, isBeta,
-        collapsible, action, canEdit, editIcon, editTooltip,
+        collapsible, noSticky, action, canEdit, editIcon, editTooltip,
         viewAction, canView, viewIcon, viewTooltip, onAction, children,
     } = props;
 
@@ -82,6 +82,7 @@ function DetailList(props) {
             isBeta={isBeta}
             collapsible={collapsible}
             isCollapsed={isCollapsed}
+            noSticky={noSticky}
             action={action}
             canEdit={canEdit}
             editIcon={editIcon}
@@ -110,6 +111,7 @@ DetailList.propTypes = {
     message     : PropTypes.string,
     isBeta      : PropTypes.bool,
     collapsible : PropTypes.string,
+    noSticky    : PropTypes.bool,
     action      : PropTypes.string,
     canEdit     : PropTypes.bool,
     editIcon    : PropTypes.string,
