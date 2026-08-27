@@ -346,6 +346,58 @@ function unselectAll() {
 }
 
 /**
+ * Returns the closest ancestor of the Node that scrolls in the given axis
+ * @param {Element} node
+ * @param {boolean} isVertical
+ * @returns {?Element}
+ */
+function getScrollParent(node, isVertical) {
+    let parent = node.parentElement;
+    while (parent) {
+        // A Container that does not overflow yet is still the one that owns the Node, so
+        // the size is not checked here and scrolling it just does nothing
+        const style    = window.getComputedStyle(parent);
+        const overflow = isVertical ? style.overflowY : style.overflowX;
+        if ([ "auto", "scroll", "overlay" ].includes(overflow)) {
+            return parent;
+        }
+        parent = parent.parentElement;
+    }
+    return null;
+}
+
+/**
+ * Returns the scroll of the Container that shows the Node
+ * @param {number} scroll
+ * @param {number} position
+ * @param {number} size
+ * @param {number} containerSize
+ * @param {string} block
+ * @returns {number}
+ */
+function getScrollTo(scroll, position, size, containerSize, block) {
+    if (block === "end") {
+        return position - (containerSize - size);
+    }
+
+    // The nearest block only moves the Container when the Node is out of the visible area
+    if (block === "nearest") {
+        if (position < scroll) {
+            return position;
+        }
+        if (position + size > scroll + containerSize) {
+            return position + size - containerSize;
+        }
+        return scroll;
+    }
+
+    if (block === "center") {
+        return position - (containerSize - size) / 2;
+    }
+    return position;
+}
+
+/**
  * Scrolls the Selector into View
  * @param {string}  selector
  * @param {string=} block
@@ -353,15 +405,46 @@ function unselectAll() {
  * @param {string=} behavior
  * @returns {boolean}
  */
-function scrollIntoView(selector, block, inline = "center", behavior = "smooth") {
+function scrollIntoView(selector, block = "start", inline = "center", behavior = "smooth") {
     const node = document.querySelector(selector);
     if (!node) {
         return false;
     }
-    node.scrollIntoView({
-        // @ts-ignore
-        block, inline, behavior,
-    });
+
+    // The native scrollIntoView moves every scrollable ancestor of the Node, which shifts
+    // the whole page, so only the closest container of each axis is moved here
+    const nodeBounds = node.getBoundingClientRect();
+    const vertical   = getScrollParent(node, true);
+    const horizontal = getScrollParent(node, false);
+
+    // The same Container often owns both axes, and a second scrollTo would cancel the
+    // smooth scroll that the first one started, so each one is scrolled once
+    const options = new Map();
+
+    if (vertical) {
+        const bounds = vertical.getBoundingClientRect();
+        options.set(vertical, { behavior, top : getScrollTo(
+            vertical.scrollTop,
+            vertical.scrollTop + nodeBounds.top - bounds.top,
+            nodeBounds.height,
+            vertical.clientHeight,
+            block,
+        ) });
+    }
+    if (horizontal) {
+        const bounds = horizontal.getBoundingClientRect();
+        options.set(horizontal, { behavior, ...options.get(horizontal), left : getScrollTo(
+            horizontal.scrollLeft,
+            horizontal.scrollLeft + nodeBounds.left - bounds.left,
+            nodeBounds.width,
+            horizontal.clientWidth,
+            inline,
+        ) });
+    }
+
+    for (const [ container, option ] of options) {
+        container.scrollTo(option);
+    }
     return true;
 }
 
