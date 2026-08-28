@@ -21,6 +21,7 @@ const initialState = {
         maxWidth  : 0,
         delay     : 0,
         hasBreaks : false,
+        isDark    : false,
     },
     error       : {
         open    : false,
@@ -107,10 +108,11 @@ const actions = {
      * @param {number}   maxWidth
      * @param {number}   delay
      * @param {boolean=} hasBreaks
+     * @param {boolean=} isDark
      * @returns {void}
      */
-    showTooltip(dispatch, targetRef, variant, message, maxWidth, delay, hasBreaks) {
-        const tooltip = { open : true, targetRef, variant, message, maxWidth, delay, hasBreaks };
+    showTooltip(dispatch, targetRef, variant, message, maxWidth, delay, hasBreaks, isDark) {
+        const tooltip = { open : true, targetRef, variant, message, maxWidth, delay, hasBreaks, isDark };
         return dispatch({ type : "CORE_TOOLTIP", tooltip });
     },
 

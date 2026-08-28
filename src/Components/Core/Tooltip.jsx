@@ -22,7 +22,7 @@ const open = keyframes`
 `;
 
 // Styles
-const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks }) => ({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks }))`
+const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks, isDark }) => ({ variant, top, left, width, maxWidth, toLeft, arrow, delay, hasBreaks, isDark }))`
     box-sizing: border-box;
     position: fixed;
     top: ${(props) => `${props.top}px`};
@@ -41,6 +41,11 @@ const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toL
     border-radius: var(--border-radius);
     pointer-events: none;
     z-index: var(--z-tooltip);
+
+    ${(props) => props.isDark && `
+        --tooltip-color: white;
+        --tooltip-background: rgba(0, 0, 0, 0.8);
+    `}
 
     ${(props) => css`animation: ${open} 0.3s ${props.delay}s ease-out forwards;`}
 
@@ -99,7 +104,7 @@ const Container = Styled(Html).attrs(({ variant, top, left, width, maxWidth, toL
  */
 function Tooltip() {
     const { tooltip } = Store.useState("core");
-    const { open, targetRef, variant, message, maxWidth, delay, hasBreaks } = tooltip;
+    const { open, targetRef, variant, message, maxWidth, delay, hasBreaks, isDark } = tooltip;
 
 
     // Variables
@@ -167,6 +172,7 @@ function Tooltip() {
         arrow={arrow}
         delay={delay || 1}
         hasBreaks={hasBreaks}
+        isDark={isDark}
         content={content}
     />;
 }
