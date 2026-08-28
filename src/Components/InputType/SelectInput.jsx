@@ -118,6 +118,7 @@ function SelectInput(props) {
                 value       : noneValue,
                 message     : NLS.get(noneText),
                 text        : "",
+                icon        : "",
                 description : "",
                 isTitle     : false,
             });
@@ -128,6 +129,7 @@ function SelectInput(props) {
                 value       : customKey || -1,
                 message     : NLS.get(customText  || "GENERAL_CUSTOM"),
                 text        : "",
+                icon        : "",
                 description : "",
                 isTitle     : false,
             });
@@ -137,23 +139,25 @@ function SelectInput(props) {
             if (typeof item === "string") {
                 itemData = { key : item, value : item };
             }
-            const { key, value, description, isTitle } = itemData;
+            const { key, value, icon : itemIcon, description, isTitle } = itemData;
 
             result.push({
                 key         : `item-${key}`,
                 value       : key,
                 message     : NLS.get(value),
                 text        : "",
+                icon        : itemIcon || "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
                 isTitle     : Boolean(isTitle),
             });
         }
-        for (const { key, value, description } of extraItems) {
+        for (const { key, value, icon : extraIcon, description } of extraItems) {
             result.push({
                 key         : `extra-${key}`,
                 value       : key,
                 message     : NLS.get(value),
                 text        : "",
+                icon        : extraIcon || "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
                 isTitle     : false,
             });
@@ -164,6 +168,7 @@ function SelectInput(props) {
                 value       : customKey || -1,
                 message     : NLS.get(customText || "GENERAL_CUSTOM"),
                 text        : "",
+                icon        : "",
                 description : "",
                 isTitle     : false,
             });
@@ -537,14 +542,15 @@ function SelectInput(props) {
             maxHeight={style.maxHeight}
             opacity={style.opacity}
         >
-            {filteredOptions.map(({ key, value, text, message, description, isTitle }, index) => <InputOption
+            {filteredOptions.map(({ key, value, text, message, icon : optionIcon, description, isTitle }, index) => <InputOption
                 key={key}
                 className={`input-option-${index}`}
                 hasCreate={hasCreate}
                 forCreate={value === "__create__"}
                 isOnlyOption={isOnlyOption}
                 isTitle={isTitle}
-                leftSpace={hasTitles && !isTitle}
+                leftSpace={hasTitles && !isTitle && !optionIcon}
+                icon={optionIcon}
                 content={text || message}
                 description={description}
                 inlineDescription={inlineDescription}
