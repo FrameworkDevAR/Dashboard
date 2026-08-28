@@ -40,7 +40,7 @@ function EditorField(props) {
     const {
         isHidden, baseUrl, filesUrl,
         name, value, helperText, error, height, maxHeight, language,
-        clientID, contentStyle, menubar, menu,
+        clientID, contentStyle, menubar, menu, toolbar,
         onChange, onMedia, onSetup, isDisabled, isSimple,
     } = props;
 
@@ -116,7 +116,7 @@ function EditorField(props) {
                 convert_urls         : false,
                 menubar              : isSimple ? "" : `edit insert view format table tools ${menubar}`,
                 toolbar              : isSimple ? `
-                    undo redo | bold italic underline | link
+                    undo redo | bold italic underline | link ${toolbar ? `| ${toolbar}` : ""}
                 ` : `
                     undo redo | blocks |
                     bold italic forecolor |
@@ -166,6 +166,7 @@ EditorField.propTypes = {
     clientID     : PropTypes.number,
     contentStyle : PropTypes.string,
     menubar      : PropTypes.string,
+    toolbar      : PropTypes.string,
     menu         : PropTypes.object,
     onChange     : PropTypes.func.isRequired,
     onMedia      : PropTypes.func,
@@ -186,6 +187,7 @@ EditorField.defaultProps = {
     clientID     : 0,
     contentStyle : "",
     menubar      : "",
+    toolbar      : "",
     isDisabled   : false,
     isSimple     : false,
 };
