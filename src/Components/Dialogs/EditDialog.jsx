@@ -30,7 +30,7 @@ function EditDialog(props) {
         width, isNarrow, isWide, minHeight, fullHeight,
         noOverflow, withSpacing, bigSpacing,
         error, isDisabled, dontClose, noAutoFocus,
-        hidePrimary, primary, primaryVariant, onSubmit,
+        hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryLoading, onSecondary,
         tertiary, tertiaryVariant, onTertiary,
@@ -61,6 +61,7 @@ function EditDialog(props) {
             noOverflow={noOverflow}
             withSpacing={withSpacing}
             bigSpacing={isLoading || bigSpacing}
+            hideFooter={hideFooter}
         >
             <Message variant="h3" message={message} />
             <Form
@@ -71,7 +72,7 @@ function EditDialog(props) {
                 {children}
             </Form>
         </DialogBody>
-        <DialogFooter
+        {!hideFooter && <DialogFooter
             isDisabled={isLoading || isDisabled}
             primary={hidePrimary ? "" : primary}
             primaryVariant={primaryVariant}
@@ -86,7 +87,7 @@ function EditDialog(props) {
             tertiary={tertiary}
             tertiaryVariant={tertiaryVariant}
             onTertiary={onTertiary}
-        />
+        />}
     </Dialog>;
 }
 
@@ -107,6 +108,7 @@ EditDialog.propTypes = {
     isLoading        : PropTypes.bool,
     loadingMessage   : PropTypes.string,
     isDisabled       : PropTypes.bool,
+    hideFooter       : PropTypes.bool,
     noAutoFocus      : PropTypes.bool,
     width            : PropTypes.number,
     isNarrow         : PropTypes.bool,
@@ -119,7 +121,7 @@ EditDialog.propTypes = {
     hidePrimary      : PropTypes.bool,
     primary          : PropTypes.string,
     primaryVariant   : PropTypes.string,
-    onSubmit         : PropTypes.func.isRequired,
+    onSubmit         : PropTypes.func,
     cancel           : PropTypes.string,
     cancelVariant    : PropTypes.string,
     onCancel         : PropTypes.func,

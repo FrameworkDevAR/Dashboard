@@ -70,8 +70,9 @@ function PillTabs(props) {
     });
 
 
-    // Moves the Indicator to the selected Pill. The observer is used as the
-    // list can mount hidden, when it is inside a closed section
+    // Moves the Indicator to the selected Pill. The hidden is a dependency as there is no
+    // node to measure while the list is hidden, and the observer is used as the list can
+    // also mount with a size of zero, when it is inside a closed section
     React.useEffect(() => {
         const node = contentRef.current;
         if (!node) {
@@ -89,7 +90,7 @@ function PillTabs(props) {
         const observer = new ResizeObserver(update);
         observer.observe(node);
         return () => observer.disconnect();
-    }, [ selected, items.length ]);
+    }, [ isHidden, selected, items.length ]);
 
 
     // Do the Render

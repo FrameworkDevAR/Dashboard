@@ -33,6 +33,9 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
         padding: var(--dialog-padding);
         --dialog-content: calc(var(--dialog-body) - 2 * var(--dialog-padding));
     `}
+    ${(props) => ((props.withSpacing || props.bigSpacing) && props.hideFooter) && `
+        padding-bottom: var(--dialog-padding);
+    `}
     ${(props) => props.minHeight && `
         min-height: min(var(--dialog-body), ${props.minHeight}px);
     `}

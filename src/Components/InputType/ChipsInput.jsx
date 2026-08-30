@@ -2,27 +2,39 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Core
+import NLS                  from "../../Core/NLS";
+import InputType            from "../../Core/InputType";
+
 // Components
 import InputContent         from "../Input/InputContent";
 
 
 
+// Constants
+const MAX_CHIPS = 20;
+
 // Styles
-const Container = Styled.div`
+// Without the box of the Input the Chips are the whole field, so they are given the size
+// that the Input would have had, and the negative margin that fit them in it is dropped
+const Container = Styled.div.attrs(({ isBigger }) => ({ isBigger }))`
     display: flex;
     align-items: center;
     gap: 6px;
     width: 100%;
-    margin-bottom: -2px;
+    margin-bottom: ${(props) => props.isBigger ? "0" : "-2px"};
 `;
 
-const Chip = Styled.button.attrs(({ isSelected }) => ({ type : "button", isSelected }))`
+const Chip = Styled.button.attrs(({ isSelected, isBigger }) => ({ type : "button", isSelected, isBigger }))`
     box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     height: 24px;
     min-width: 28px;
     padding: 0 8px;
-    border: 1px solid var(--border-color-light);
-    border-radius: var(--border-radius-small);
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--border-radius);
     background-color: var(--content-color);
     color: var(--font-light);
     font-family: var(--main-font);
@@ -34,17 +46,22 @@ const Chip = Styled.button.attrs(({ isSelected }) => ({ type : "button", isSelec
     transition: all 0.2s;
 
     &:hover {
-        border-color: var(--primary-color);
+        border-color: var(--input-border-hover);
     }
     &:disabled {
         cursor: not-allowed;
         opacity: 0.5;
     }
 
+    ${(props) => props.isBigger && `
+        height: 32px;
+        min-width: 36px;
+        padding: 0 12px;
+        font-size: 13px;
+    `}
     ${(props) => props.isSelected && `
-        border-color: var(--primary-color);
-        background-color: var(--accent-light, var(--lightest-gray));
-        color: var(--primary-color);
+        border-color: var(--border-color-medium);
+        background-color: var(--lighter-gray);
     `}
 `;
 
@@ -59,7 +76,7 @@ const Stepper = Styled.div`
     gap: 5px;
 `;
 
-const Step = Styled.button.attrs(() => ({ type : "button" }))`
+const Step = Styled.button.attrs(({ isBigger }) => ({ type : "button", isBigger }))`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,8 +84,13 @@ const Step = Styled.button.attrs(() => ({ type : "button" }))`
     width: 22px;
     height: 24px;
     padding: 0;
-    border: 1px solid var(--border-color-light);
-    border-radius: var(--border-radius-small);
+
+    ${(props) => props.isBigger && `
+        width: 28px;
+        height: 32px;
+    `}
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--border-radius);
     background-color: var(--content-color);
     color: var(--font-light);
     font-family: var(--main-font);
@@ -78,7 +100,7 @@ const Step = Styled.button.attrs(() => ({ type : "button" }))`
     transition: all 0.2s;
 
     &:hover {
-        border-color: var(--primary-color);
+        border-color: var(--input-border-hover);
     }
     &:disabled {
         cursor: not-allowed;
@@ -104,27 +126,79 @@ const Amount = Styled.div`
  */
 function ChipsInput(props) {
     const {
-        className, isFocused, isDisabled, withCustom,
+        className, isFocused, isDisabled, isMultiple, withBorder, withCustom,
         name, value, minValue, maxValue, onChange,
     } = props;
 
 
     // Variables
-    const amount = Number(value) || 0;
+    const items     = InputType.useOptions(props);
+    const amount    = Number(value) || 0;
+
+    // The Options replace the amounts when given, so the Chips pick one of them or many
+    const hasItems  = items.length > 0;
+    const hasCustom = withCustom && !hasItems;
 
     // Any amount over the last Chip is a custom one, so the state of the
     // Stepper is read from the value and there is nothing else to store
-    const isCustom = withCustom && amount > maxValue;
+    const isCustom  = hasCustom && amount > maxValue;
 
-    const chips    = [];
-    for (let i = minValue; i <= maxValue; i += 1) {
-        chips.push(i);
+    const chips     = [];
+    if (hasItems) {
+        for (const item of items) {
+            chips.push({ key : item.key, text : NLS.get(item.value) });
+        }
+    } else {
+        // The maximum can come from an Input that never set one, and that amount of Chips
+        // is not something that can be shown, so the last one is capped
+        const lastValue = Math.min(maxValue, minValue + MAX_CHIPS);
+        for (let i = minValue; i <= lastValue; i += 1) {
+            chips.push({ key : i, text : String(i) });
+        }
     }
 
+    // The value of a multiple is the json of the list, as in the other inputs that pick many
+    const parts = React.useMemo(() => {
+        let result = [];
+        if (!isMultiple) {
+            return result;
+        }
+        try {
+            result = Array.isArray(value) ? value : JSON.parse(String(value));
+        } catch (e) {
+            result = [];
+        }
+        return result.map((item) => String(item));
+    }, [ isMultiple, JSON.stringify(value) ]);
+
+
+    // Returns true if the given Chip is selected
+    const isSelected = (key) => {
+        if (isMultiple) {
+            return parts.includes(String(key));
+        }
+        if (hasItems) {
+            return String(value) === String(key);
+        }
+        return amount === key;
+    };
 
     // Handles the Click of a Chip
-    const handleClick = (newAmount) => {
-        onChange(name, newAmount);
+    const handleClick = (key) => {
+        if (!isMultiple) {
+            onChange(name, key);
+            return;
+        }
+
+        const newKey = String(key);
+        const keys   = parts.includes(newKey)
+            ? parts.filter((elem) => elem !== newKey)
+            : [ ...parts, newKey ];
+
+        // The result keeps the order of the Chips, so any click order gives the same value
+        onChange(name, JSON.stringify(chips
+            .map((chip) => String(chip.key))
+            .filter((elem) => keys.includes(elem))));
     };
 
     // Handles the Step of the custom amount
@@ -148,39 +222,45 @@ function ChipsInput(props) {
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
-        withBorder
-        withPadding
-        withLabel
+        withBorder={withBorder}
+        withPadding={withBorder}
+        withLabel={withBorder}
     >
-        <Container>
+        <Container isBigger={!withBorder}>
             {!isCustom && chips.map((chip) => <Chip
-                key={chip}
-                isSelected={amount === chip}
+                key={chip.key}
+                isSelected={isSelected(chip.key)}
+                isBigger={!withBorder}
                 disabled={isDisabled}
-                onClick={() => handleClick(chip)}
-            >{chip}</Chip>)}
+                onClick={() => handleClick(chip.key)}
+            >{chip.text}</Chip>)}
 
             {isCustom && <DashedChip
+                isBigger={!withBorder}
                 disabled={isDisabled}
                 onClick={handleBack}
             >{`${minValue}–${maxValue}`}</DashedChip>}
 
-            {withCustom && (isCustom ? <Chip
+            {hasCustom && (isCustom ? <Chip
                 isSelected
+                isBigger={!withBorder}
                 disabled={isDisabled}
                 onClick={handleBack}
             >{`${maxValue}+`}</Chip> : <DashedChip
+                isBigger={!withBorder}
                 disabled={isDisabled}
                 onClick={handleCustom}
             >{`${maxValue}+`}</DashedChip>)}
 
             {isCustom && <Stepper>
                 <Step
+                    isBigger={!withBorder}
                     disabled={isDisabled || amount <= maxValue + 1}
                     onClick={() => handleStep(-1)}
                 >−</Step>
                 <Amount>{amount}</Amount>
                 <Step
+                    isBigger={!withBorder}
                     disabled={isDisabled}
                     onClick={() => handleStep(1)}
                 >+</Step>
@@ -197,9 +277,12 @@ ChipsInput.propTypes = {
     className  : PropTypes.string,
     isFocused  : PropTypes.bool,
     isDisabled : PropTypes.bool,
+    isMultiple : PropTypes.bool,
+    withBorder : PropTypes.bool,
     withCustom : PropTypes.bool,
     name       : PropTypes.string.isRequired,
     value      : PropTypes.any,
+    options    : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     minValue   : PropTypes.number,
     maxValue   : PropTypes.number,
     onChange   : PropTypes.func.isRequired,
@@ -213,6 +296,8 @@ ChipsInput.defaultProps = {
     className  : "",
     isFocused  : false,
     isDisabled : false,
+    isMultiple : false,
+    withBorder : true,
     withCustom : false,
     minValue   : 0,
     maxValue   : 5,

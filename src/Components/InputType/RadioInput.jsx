@@ -4,6 +4,7 @@ import Styled, { keyframes } from "styled-components";
 
 // Core
 import NLS                   from "../../Core/NLS";
+import Utils                 from "../../Utils/Utils";
 import InputType             from "../../Core/InputType";
 
 // Components
@@ -109,9 +110,22 @@ const Iconography = Styled(Icon)`
     margin-right: 8px;
 `;
 
+const Content = Styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+`;
+
 const Text = Styled(Html)`
     flex-shrink: 0;
-    max-width: calc(100% - 20px);
+`;
+
+const Description = Styled(Html)`
+    color: var(--darkest-gray);
+    font-size: var(--font-size-small);
+    line-height: 1.4;
 `;
 
 const Input = Styled(InputBase)`
@@ -128,8 +142,8 @@ const Input = Styled(InputBase)`
  */
 function RadioInput(props) {
     const {
-        className, isFocused, isDisabled, withLabel, noBorder,
-        name, value, options, withIcons, iconSize,
+        className, isFocused, isDisabled, withLabel, withBorder,
+        name, value, options, descriptions, withIcons, iconSize,
         withCustom, customText, columns,
         onChange, onFocus, onBlur,
     } = props;
@@ -142,10 +156,21 @@ function RadioInput(props) {
     const valString = String(value);
     const isSelect  = !Array.isArray(options);
     const items     = InputType.useOptions(props);
+    const descItems = Array.isArray(descriptions) ? descriptions : NLS.select(descriptions);
     const valParts  = valString.split("|");
     const radioVal  = valParts.length > 1 ? valParts[0] : valString;
     const customVal = valParts.length > 1 ? valParts[1] : "";
     const customKey = props.customKey || "custom";
+
+
+    // Returns the Description of an Option, from the Option itself or from the list
+    // of descriptions that is given apart, the same as the Select does
+    const getDescription = (key, description) => {
+        if (description) {
+            return description;
+        }
+        return Utils.getValue(descItems, "key", key, "value");
+    };
 
 
     // Handles the Radio Change
@@ -182,12 +207,12 @@ function RadioInput(props) {
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
-        withBorder={!noBorder}
-        withPadding={!noBorder}
+        withBorder={withBorder}
+        withPadding={withBorder}
         withLabel={withLabel}
     >
         <Container columns={columns}>
-            {items.map(({ key, value }) => <Label
+            {items.map(({ key, value, description }) => <Label
                 key={key}
                 isDisabled={isDisabled}
             >
@@ -204,7 +229,13 @@ function RadioInput(props) {
                     icon={key.toLowerCase()}
                     size={iconSize}
                 />}
-                <Text>{NLS.get(value)}</Text>
+                <Content>
+                    <Text>{NLS.get(value)}</Text>
+                    <Description
+                        isHidden={!getDescription(key, description)}
+                        message={getDescription(key, description)}
+                    />
+                </Content>
             </Label>)}
             {withCustom && <Label>
                 <Radio
@@ -237,23 +268,24 @@ function RadioInput(props) {
  * @type {object} propTypes
  */
 RadioInput.propTypes = {
-    className  : PropTypes.string,
-    isFocused  : PropTypes.bool,
-    isDisabled : PropTypes.bool,
-    withLabel  : PropTypes.bool,
-    noBorder   : PropTypes.bool,
-    name       : PropTypes.string.isRequired,
-    value      : PropTypes.any,
-    options    : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
-    onChange   : PropTypes.func.isRequired,
-    onFocus    : PropTypes.func.isRequired,
-    onBlur     : PropTypes.func.isRequired,
-    withIcons  : PropTypes.bool,
-    iconSize   : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    withCustom : PropTypes.bool,
-    customText : PropTypes.string,
-    customKey  : PropTypes.string,
-    columns    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    className    : PropTypes.string,
+    isFocused    : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
+    withBorder   : PropTypes.bool,
+    name         : PropTypes.string.isRequired,
+    value        : PropTypes.any,
+    options      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+    descriptions : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+    onChange     : PropTypes.func.isRequired,
+    onFocus      : PropTypes.func.isRequired,
+    onBlur       : PropTypes.func.isRequired,
+    withIcons    : PropTypes.bool,
+    iconSize     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    withCustom   : PropTypes.bool,
+    customText   : PropTypes.string,
+    customKey    : PropTypes.string,
+    columns      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
 };
 
 /**
@@ -264,6 +296,7 @@ RadioInput.defaultProps = {
     className  : "",
     isFocused  : false,
     isDisabled : false,
+    withBorder : true,
     withIcons  : false,
     iconSize   : 16,
     customText : "",

@@ -7,6 +7,7 @@ import Setting              from "../../Hooks/Setting";
 // Components
 import Html                 from "../Common/Html";
 import Icon                 from "../Common/Icon";
+import InputItem            from "../Form/InputItem";
 import CircularLoader       from "../Loader/CircularLoader";
 
 
@@ -100,6 +101,9 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
     .inputfield:not(:has(> .inputfield-label)) {
         --input-height: var(--setting-input-height);
     }
+    .inputview:not(:has(> .inputview-label)) {
+        --input-height: var(--setting-view-height);
+    }
 `;
 
 
@@ -134,10 +138,12 @@ function SettingOption(props) {
     }, [ saving.name, saving.status ]);
 
 
-    // Returns true if any of the given Children is a required Input
+    // Returns true if any of the given Children is a required Input. An Input Item is
+    // only the definition of a field inside another Input, and the required of those
+    // belongs to each field and not to the Input that the Option titles
     const hasRequired = (children) => {
         return React.Children.toArray(children).some((child) => {
-            if (!React.isValidElement(child)) {
+            if (!React.isValidElement(child) || child.type === InputItem) {
                 return false;
             }
             // @ts-ignore

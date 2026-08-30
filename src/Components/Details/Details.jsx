@@ -16,6 +16,7 @@ import CircularLoader       from "../Loader/CircularLoader";
 // Styles
 const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom }) => ({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom }))`
     --details-title-top: ${(props) => props.hasInternalTabs ? "var(--details-sticky-top)" : "0px"};
+    --details-fade: 16px;
 
     box-sizing: border-box;
     display: flex;
@@ -92,7 +93,7 @@ const Error = Styled.div`
  */
 function Details(props) {
     const {
-        className, isHidden, isInside, isWide, isLarge,
+        passedRef, className, isHidden, isInside, isWide, isLarge,
         hasInternalTabs, hasExternalTabs, withBorder,
         isLoading, isEmpty, hasError, error,
         canEdit, onAction, collapsible, stickyBottom, children,
@@ -128,6 +129,7 @@ function Details(props) {
         return <React.Fragment />;
     }
     return <Container
+        ref={passedRef}
         className={`details ${className}`}
         isInside={isInside}
         isWide={isWide}
@@ -148,6 +150,7 @@ function Details(props) {
  * @type {object} propTypes
  */
 Details.propTypes = {
+    passedRef       : PropTypes.any,
     className       : PropTypes.string,
     isHidden        : PropTypes.bool,
     isInside        : PropTypes.bool,

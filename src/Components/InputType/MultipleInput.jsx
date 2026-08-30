@@ -39,7 +39,7 @@ const Container = Styled.div.attrs(({ columns, withLabel }) => ({ columns, withL
  */
 function MultipleInput(props) {
     const {
-        className, isFocused, isDisabled, withLabel,
+        className, isFocused, isDisabled, withLabel, withBorder,
         name, value, columns, getDisabled,
         onChange, onFocus, onBlur,
     } = props;
@@ -93,8 +93,8 @@ function MultipleInput(props) {
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
-        withBorder
-        withPadding
+        withBorder={withBorder}
+        withPadding={withBorder}
         withLabel={withLabel}
     >
         <Container
@@ -125,6 +125,7 @@ MultipleInput.propTypes = {
     isFocused   : PropTypes.bool,
     isDisabled  : PropTypes.bool,
     withLabel   : PropTypes.bool,
+    withBorder  : PropTypes.bool,
     name        : PropTypes.string.isRequired,
     value       : PropTypes.any,
     options     : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
@@ -145,6 +146,7 @@ MultipleInput.defaultProps = {
     className  : "",
     isFocused  : false,
     isDisabled : false,
+    withBorder : true,
     noneText   : "",
     columns    : 2,
 };

@@ -26,7 +26,7 @@ const Content = Styled.div`
  * @returns {React.ReactElement}
  */
 function Form(props) {
-    const { className, error, noAutoFocus, onSubmit, children } = props;
+    const { passedRef, className, error, noAutoFocus, onSubmit, children } = props;
 
 
     // Clone the Children
@@ -43,7 +43,7 @@ function Form(props) {
 
 
     // Do the Render
-    return <Content className={className}>
+    return <Content ref={passedRef} className={className}>
         <Alert
             className="form-error"
             variant="error"
@@ -58,6 +58,7 @@ function Form(props) {
  * @type {object} propTypes
  */
 Form.propTypes = {
+    passedRef   : PropTypes.any,
     className   : PropTypes.string,
     error       : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     noAutoFocus : PropTypes.bool,

@@ -141,6 +141,10 @@ const Error = Styled(InputError)`
     border-radius: var(--border-radius);
 `;
 
+const Add = Styled(Button)`
+    margin-top: 8px;
+`;
+
 
 
 /**
@@ -387,6 +391,7 @@ function FieldInput(props) {
                         const value    = getValue(item, elem, index);
                         const columns  = item.getColumns?.(data) || item.columns || 1;
                         const isHidden = item.hide?.(data) ?? false;
+                        const label    = item.getLabel?.(data) || item.label;
 
                         if (isHidden) {
                             return <React.Fragment key={key} />;
@@ -397,7 +402,7 @@ function FieldInput(props) {
                                 passedRef={inputRef}
                                 name={`${item.name}-${index}`}
                                 type={item.getType?.(data) || item.type}
-                                label={item.getLabel?.(data) || item.label}
+                                label={label}
                                 value={value}
                                 options={item.getOptions?.(data) || item.options}
                                 icon={item.getIcon?.(data) || item.icon}
@@ -414,8 +419,8 @@ function FieldInput(props) {
                                 onMedia={() => item.onMedia?.(index, item.name)}
                                 onCreate={item.onCreate ? (value) => item.onCreate(value, index) : undefined}
                                 onCustom={item.onCustom ? (value) => item.onCustom(value, index) : undefined}
-                                withLabel={!!item.label || (!withTitle && index === 0)}
-                                isSmall={!item.label && (withTitle || index > 0)}
+                                withLabel={!!label || (!withTitle && index === 0)}
+                                isSmall={!label && (withTitle || index > 0)}
                                 fullWidth
                             >
                                 {Utils.cloneChildren(item.children, () => ({
@@ -450,9 +455,10 @@ function FieldInput(props) {
             <b>{NLS.get(noneText)}</b>
         </Container>}
 
-        <Button
+        <Add
             isHidden={!canAdd}
             variant="outlined"
+            icon="add"
             message={addButton}
             onClick={() => handleAdd()}
             isSmall

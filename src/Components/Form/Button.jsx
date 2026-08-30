@@ -25,6 +25,7 @@ const Variant = {
     OUTLINED_WHITE  : "outlined-white",
     OUTLINED_ACCENT : "outlined-accent",
     OUTLINED_ERROR  : "outlined-error",
+    OUTLINED_GRAY   : "outlined-gray",
     MENU            : "menu",
     ICON            : "icon",
 };
@@ -207,6 +208,23 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
             --button-hover-color: white;
             --button-hover-border: var(--error-color);
             --button-hover-background: var(--error-color);
+
+            &:disabled,
+            &:disabled:hover,
+            &:disabled:focus,
+            &:disabled:active {
+                color: var(--darkest-gray);
+                background-color: var(--content-color);
+            }
+        `;
+
+        case Variant.OUTLINED_GRAY: return `
+            --button-color: var(--font-light);
+            --button-border: var(--border-color-medium);
+            --button-background: var(--content-color);
+            --button-hover-color: var(--font-color);
+            --button-hover-border: var(--darker-gray);
+            --button-hover-background: var(--lighter-gray);
 
             &:disabled,
             &:disabled:hover,
