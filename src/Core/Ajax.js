@@ -2,8 +2,7 @@ import Auth                 from "../Core/Auth";
 import Utils                from "../Utils/Utils";
 
 // Module variables
-let controller = null;
-let wasAborted = false;
+const controllers = new Set();
 
 let setResult  = null;
 let setError   = null;
@@ -46,11 +45,13 @@ async function ajax(url, options = {}, showResult = true, abortController = null
     let result   = null;
 
     // To be able to Abort
+    let controller = null;
     if (abortController) {
         options.signal = abortController.signal;
     } else if (!skipAbort && window.AbortController) {
         controller     = new window.AbortController();
         options.signal = controller.signal;
+        controllers.add(controller);
     }
 
 
@@ -59,11 +60,14 @@ async function ajax(url, options = {}, showResult = true, abortController = null
         // @ts-ignore
         response = await fetch(url, options);
     } catch (error) {
-        if (wasAborted) {
-            wasAborted = false;
+        if (error.name === "AbortError") {
             return { aborted : true };
         }
         throw defError;
+    } finally {
+        if (controller) {
+            controllers.delete(controller);
+        }
     }
 
     // Bad Response
@@ -148,14 +152,15 @@ async function handleError(response, options) {
 }
 
 /**
- * Aborts a Fetch
+ * Aborts every pending Fetch, as each request has its own controller and aborting
+ * only the last one would leave the others on the wing
  * @returns {void}
  */
 function abort() {
-    if (controller) {
+    for (const controller of controllers) {
         controller.abort();
-        wasAborted = true;
     }
+    controllers.clear();
 }
 
 
