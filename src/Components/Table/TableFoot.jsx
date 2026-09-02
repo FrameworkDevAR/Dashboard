@@ -11,13 +11,19 @@ import TableRowCnt          from "../Table/TableRowCnt";
 
 
 // Styles
-const TFoot = Styled.tfoot`
+const TFoot = Styled.tfoot.attrs(({ isLarge }) => ({ isLarge }))`
     position: sticky;
     bottom: 0;
     z-index: 2;
 
     background: var(--table-background);
     border-radius: var(--table-border-radius);
+
+    ${(props) => props.isLarge && `
+        && th {
+            font-size: 14px;
+        }
+    `}
 `;
 
 
@@ -28,7 +34,7 @@ const TFoot = Styled.tfoot`
  * @returns {React.ReactElement}
  */
 function TableFoot(props) {
-    const { hasActions, columns, children } = props;
+    const { isLarge, hasActions, columns, children } = props;
 
 
     // Clone the Children
@@ -38,7 +44,7 @@ function TableFoot(props) {
 
 
     // Do the Render
-    return <TFoot>
+    return <TFoot isLarge={isLarge}>
         <TableRowCnt hasActions={hasActions}>
             {items}
             {hasActions && <th />}
@@ -51,6 +57,7 @@ function TableFoot(props) {
  * @type {object} propTypes
  */
 TableFoot.propTypes = {
+    isLarge    : PropTypes.bool,
     hasActions : PropTypes.bool,
     columns    : PropTypes.array,
     children   : PropTypes.any,
@@ -61,6 +68,7 @@ TableFoot.propTypes = {
  * @type {object} defaultProps
  */
 TableFoot.defaultProps = {
+    isLarge    : false,
     hasActions : false,
 };
 

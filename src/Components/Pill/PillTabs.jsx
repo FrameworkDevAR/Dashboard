@@ -52,7 +52,7 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
  */
 function PillTabs(props) {
     const {
-        isHidden, className, fillWidth, isCentered, topSpace, bottomSpace,
+        isHidden, className, fillWidth, isFit, isCentered, topSpace, bottomSpace,
         selected, onClick, children,
     } = props;
 
@@ -66,7 +66,7 @@ function PillTabs(props) {
 
     // Clone the Children
     const items = Utils.cloneChildren(children, (child, index) => {
-        return { index, selected, onClick };
+        return { index, selected, isFit, onClick };
     });
 
 
@@ -121,6 +121,7 @@ PillTabs.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
     fillWidth   : PropTypes.bool,
+    isFit       : PropTypes.bool,
     isCentered  : PropTypes.bool,
     topSpace    : PropTypes.number,
     bottomSpace : PropTypes.number,
@@ -137,6 +138,7 @@ PillTabs.defaultProps = {
     isHidden   : false,
     className  : "",
     fillWidth  : false,
+    isFit      : false,
     isCentered : false,
 };
 

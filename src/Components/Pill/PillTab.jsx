@@ -13,15 +13,16 @@ import Badge                from "../Common/Badge";
 
 
 // Styles
-const Container = Styled.li.attrs(({ isSelected, isDisabled }) => ({ isSelected, isDisabled }))`
+const Container = Styled.li.attrs(({ isSelected, isDisabled, isFit }) => ({ isSelected, isDisabled, isFit }))`
     box-sizing: border-box;
     position: relative;
-    flex: 1;
+    flex: ${(props) => props.isFit ? "0 0 auto" : "1"};
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     min-width: 0;
+    min-height: calc(var(--pills-height) - var(--pills-space) * 2);
     padding: var(--pills-padding);
     border-radius: 9999px;
     color: var(--pills-color);
@@ -73,7 +74,7 @@ function PillTab(props) {
     const {
         isHidden, className, icon, message, badge,
         tooltip, tooltipVariant, tooltipWidth,
-        url, value, index, selected, isDisabled, onClick,
+        url, value, index, selected, isDisabled, isFit, onClick,
     } = props;
 
 
@@ -111,6 +112,7 @@ function PillTab(props) {
         ref={elementRef}
         className={`pill-tab pill-tab-${id} ${isSelected ? "pill-tab-selected" : ""} ${className}`}
         isSelected={isSelected}
+        isFit={isFit}
         isDisabled={isDisabled}
         onClick={handleClick}
         onMouseEnter={handleTooltip}
@@ -140,6 +142,7 @@ PillTab.propTypes = {
     index      : PropTypes.number,
     selected   : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     isDisabled : PropTypes.bool,
+    isFit      : PropTypes.bool,
     onClick    : PropTypes.func,
 };
 
@@ -153,6 +156,7 @@ PillTab.defaultProps = {
     className  : "",
     index      : 0,
     isDisabled : false,
+    isFit      : false,
 };
 
 export default PillTab;
