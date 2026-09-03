@@ -1,3 +1,7 @@
+import Utils                from "../../Utils/Utils";
+
+
+
 // The initial State
 const initialState = {
     loaders     : {},
@@ -7,6 +11,8 @@ const initialState = {
     smallNav    : false,
     hasDetails  : false,
     showDetails : false,
+    canCollapse : false,
+    isCollapsed : false,
     result      : {
         open    : false,
         variant : "",
@@ -189,6 +195,28 @@ const actions = {
     },
 
     /**
+     * Sets if the Details of the page can be collapsed, restoring the last state
+     * @param {Function} dispatch
+     * @param {boolean}  canCollapse
+     * @returns {void}
+     */
+    setCanCollapse(dispatch, canCollapse) {
+        const isCollapsed = canCollapse && Utils.restoreItem("dashboard-details-collapsed") === "1";
+        dispatch({ type : "CORE_COLLAPSE_SET", canCollapse, isCollapsed });
+    },
+
+    /**
+     * Collapses or expands the Details of the page
+     * @param {Function} dispatch
+     * @param {boolean}  isCollapsed
+     * @returns {void}
+     */
+    setCollapsed(dispatch, isCollapsed) {
+        Utils.storeItem("dashboard-details-collapsed", isCollapsed ? "1" : "0");
+        dispatch({ type : "CORE_COLLAPSE_TOGGLE", isCollapsed });
+    },
+
+    /**
      * Opens the Details
      * @param {Function} dispatch
      * @returns {void}
@@ -276,6 +304,17 @@ const reducer = (state = initialState, action = {}) => {
         return {
             ...state,
             hasDetails : action.hasDetails,
+        };
+    case "CORE_COLLAPSE_SET":
+        return {
+            ...state,
+            canCollapse : action.canCollapse,
+            isCollapsed : action.isCollapsed,
+        };
+    case "CORE_COLLAPSE_TOGGLE":
+        return {
+            ...state,
+            isCollapsed : action.isCollapsed,
         };
     case "CORE_DETAILS_OPEN":
         return {

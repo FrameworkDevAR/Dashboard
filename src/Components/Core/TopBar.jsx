@@ -90,8 +90,14 @@ const H1 = Styled.h1`
 
 const DetailIcon = Styled(BarIcon)`
     display: none;
-    @media (max-width: 1200px) {
+    @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
         display: flex;
+    }
+`;
+
+const CollapseIcon = Styled(BarIcon)`
+    @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
+        display: none;
     }
 `;
 
@@ -110,8 +116,8 @@ function TopBar(props) {
         onLogout, menuItems, children,
     } = props;
 
-    const { hasDetails            } = Store.useState("core");
-    const { openMenu, openDetails } = Store.useAction("core");
+    const { hasDetails, canCollapse, isCollapsed } = Store.useState("core");
+    const { openMenu, openDetails, setCollapsed  } = Store.useAction("core");
 
 
     // Variables
@@ -146,6 +152,13 @@ function TopBar(props) {
             {showLogout && <BarIcon
                 icon="logout"
                 onClick={onLogout}
+            />}
+            {canCollapse && <CollapseIcon
+                icon={isCollapsed ? "sidebar-close" : "sidebar-open"}
+                message={isCollapsed ? "GENERAL_SHOW_DETAILS" : "GENERAL_HIDE_DETAILS"}
+                onClick={() => setCollapsed(!isCollapsed)}
+                tooltipVariant="bottom"
+                withTooltip
             />}
             {hasDetails && <DetailIcon
                 icon="details"

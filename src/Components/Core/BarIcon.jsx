@@ -78,7 +78,7 @@ const BarBadge = Styled(Badge)`
 function BarIcon(props) {
     const {
         passedRef, isHidden, hideMobile, className,
-        isSelected, icon, withText, withTooltip, tooltipDelay,
+        isSelected, icon, withText, withTooltip, tooltipVariant, tooltipDelay,
         message, url, startsWith, badge,
     } = props;
 
@@ -110,7 +110,7 @@ function BarIcon(props) {
     // Handles the Tooltip
     const handleTooltip = () => {
         if (withTooltip && window.innerWidth > 1000) {
-            showTooltip(elementRef, "right", message, 0, tooltipDelay);
+            showTooltip(elementRef, tooltipVariant, message, 0, tooltipDelay);
         }
     };
 
@@ -142,22 +142,23 @@ function BarIcon(props) {
  * @type {object} propTypes
  */
 BarIcon.propTypes = {
-    passedRef    : PropTypes.any,
-    isHidden     : PropTypes.bool,
-    hideMobile   : PropTypes.bool,
-    className    : PropTypes.string,
-    isSelected   : PropTypes.bool,
-    icon         : PropTypes.string.isRequired,
-    message      : PropTypes.string,
-    withText     : PropTypes.bool,
-    withTooltip  : PropTypes.bool,
-    tooltipDelay : PropTypes.number,
-    href         : PropTypes.string,
-    url          : PropTypes.string,
-    target       : PropTypes.string,
-    onClick      : PropTypes.func,
-    startsWith   : PropTypes.bool,
-    badge        : PropTypes.number,
+    passedRef      : PropTypes.any,
+    isHidden       : PropTypes.bool,
+    hideMobile     : PropTypes.bool,
+    className      : PropTypes.string,
+    isSelected     : PropTypes.bool,
+    icon           : PropTypes.string.isRequired,
+    message        : PropTypes.string,
+    withText       : PropTypes.bool,
+    withTooltip    : PropTypes.bool,
+    tooltipVariant : PropTypes.string,
+    tooltipDelay   : PropTypes.number,
+    href           : PropTypes.string,
+    url            : PropTypes.string,
+    target         : PropTypes.string,
+    onClick        : PropTypes.func,
+    startsWith     : PropTypes.bool,
+    badge          : PropTypes.number,
 };
 
 /**
@@ -165,17 +166,18 @@ BarIcon.propTypes = {
  * @type {object} defaultProps
  */
 BarIcon.defaultProps = {
-    isHidden     : false,
-    hideMobile   : false,
-    className    : "",
-    isSelected   : false,
-    withText     : false,
-    withTooltip  : false,
-    tooltipDelay : 1,
-    href         : "",
-    url          : "",
-    target       : "_self",
-    startsWith   : false,
+    isHidden       : false,
+    hideMobile     : false,
+    className      : "",
+    isSelected     : false,
+    withText       : false,
+    withTooltip    : false,
+    tooltipVariant : "right",
+    tooltipDelay   : 1,
+    href           : "",
+    url            : "",
+    target         : "_self",
+    startsWith     : false,
 };
 
 export default BarIcon;
