@@ -199,13 +199,13 @@ function MediaList(props) {
                     <PillTab
                         icon="grid"
                         value="grid"
-                        tooltip="MEDIA_VIEW_GRID"
+                        tooltip="GENERAL_VIEW_GRID"
                         tooltipWidth={120}
                     />
                     <PillTab
                         icon="list"
                         value="list"
-                        tooltip="MEDIA_VIEW_LIST"
+                        tooltip="GENERAL_VIEW_LIST"
                         tooltipWidth={120}
                     />
                 </PillTabs>
