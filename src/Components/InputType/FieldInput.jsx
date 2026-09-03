@@ -41,6 +41,8 @@ const Container = Styled.div.attrs(({ withBorder, isDisabled }) => ({ withBorder
 `;
 
 const Content = Styled.div.attrs(({ withLine }) => ({ withLine }))`
+    --input-height: var(--field-input-height, 44px);
+
     width: 100%;
     display: flex;
     flex-direction: column;

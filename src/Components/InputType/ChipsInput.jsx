@@ -15,8 +15,6 @@ import InputContent         from "../Input/InputContent";
 const MAX_CHIPS = 20;
 
 // Styles
-// Without the box of the Input the Chips are the whole field, so they are given the size
-// that the Input would have had, and the negative margin that fit them in it is dropped
 const Container = Styled.div.attrs(({ isBigger }) => ({ isBigger }))`
     display: flex;
     align-items: center;
