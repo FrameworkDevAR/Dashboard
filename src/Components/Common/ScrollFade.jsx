@@ -100,7 +100,7 @@ function ScrollFade(props) {
     // Do the Render
     return <Container
         className={className}
-        style={topSpace ? { "--fade-top" : `${topSpace}px` } : undefined}
+        style={{ "--fade-top" : `${topSpace}px` }}
         showTop={showTop}
         showBottom={showBottom}
     >
