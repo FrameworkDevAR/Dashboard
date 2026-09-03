@@ -14,9 +14,11 @@ import CircularLoader       from "../Loader/CircularLoader";
 
 
 // Styles
-const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom }) => ({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom }))`
+const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom, atTop, atBottom }) => ({ isInside, isWide, isLarge, hasExternalTabs, hasInternalTabs, withBorder, stickyBottom, atTop, atBottom }))`
     --details-title-top: ${(props) => props.hasInternalTabs ? "var(--details-sticky-top)" : "0px"};
     --details-fade: 16px;
+    --details-fade-top: ${(props) => props.atTop ? 0 : 1};
+    --details-fade-bottom: ${(props) => props.atBottom ? 0 : 1};
 
     box-sizing: border-box;
     display: flex;
@@ -60,6 +62,8 @@ const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternal
             padding-top: 0px;
             margin-right: 0;
             border-radius: 0;
+
+            ${(props) => props.stickyBottom && "padding-bottom: 0px;"}
         }
         z-index: var(--z-details);
     }
@@ -102,6 +106,45 @@ function Details(props) {
     const { setDetails } = Store.useAction("core");
 
 
+    // The References
+    const ownRef     = React.useRef(null);
+    const contentRef = passedRef || ownRef;
+
+    // The Current State
+    const [ atTop,    setAtTop    ] = React.useState(true);
+    const [ atBottom, setAtBottom ] = React.useState(true);
+
+
+    // A fade only makes sense while there is something to scroll to on that side, or it
+    // washes out the content that is already at the end
+    const updateFades = () => {
+        const node = contentRef.current;
+        if (node) {
+            setAtTop(node.scrollTop <= 1);
+            setAtBottom(node.scrollHeight - node.scrollTop - node.clientHeight <= 1);
+        }
+    };
+
+    React.useEffect(() => {
+        const node = contentRef.current;
+        if (!node) {
+            return undefined;
+        }
+        node.addEventListener("scroll", updateFades);
+        const observer = new ResizeObserver(updateFades);
+        observer.observe(node);
+        return () => {
+            node.removeEventListener("scroll", updateFades);
+            observer.disconnect();
+        };
+    }, [ isHidden ]);
+
+    // The content changes without resizing the node, so this runs on every render
+    React.useEffect(() => {
+        updateFades();
+    });
+
+
     // Set/Unset the Details on Load/Unload
     React.useEffect(() => {
         if (!isHidden) {
@@ -129,8 +172,10 @@ function Details(props) {
         return <React.Fragment />;
     }
     return <Container
-        ref={passedRef}
+        ref={contentRef}
         className={`details ${className}`}
+        atTop={atTop}
+        atBottom={atBottom}
         isInside={isInside}
         isWide={isWide}
         isLarge={isLarge}
