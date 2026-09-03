@@ -45,7 +45,7 @@ const FieldContent = Styled.div.attrs(({ withLabel, isSmall, maxHeight, noWrap, 
         margin: 0;
         padding: var(--input-padding);
         min-height: calc(var(--input-height) - 2px);
-        line-height: 1.5;
+        line-height: 1.3;
         overflow: auto;
 
         ${(props) => props.isSelected && `

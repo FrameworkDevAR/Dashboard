@@ -49,7 +49,7 @@ function InputCopy(props) {
 
     // Handles the Text Copy
     const handleCopy = () => {
-        let value = copyValue || inputValue;
+        let value = String(copyValue || inputValue || "");
         if (onCopy) {
             value = onCopy(value);
         }
@@ -82,7 +82,7 @@ function InputCopy(props) {
 InputCopy.propTypes = {
     isHidden   : PropTypes.bool,
     isFloating : PropTypes.bool,
-    copyValue  : PropTypes.string,
+    copyValue  : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     inputValue : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onCopy     : PropTypes.func,
 };
