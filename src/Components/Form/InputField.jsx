@@ -150,6 +150,7 @@ function InputField(props) {
     }
     return <InputContainer
         className={`inputfield inputfield-${type} ${className}`}
+        dataName={name}
         width={width}
         fullWidth={fullWidth}
         hasError={hasError}

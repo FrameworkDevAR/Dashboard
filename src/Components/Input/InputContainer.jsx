@@ -35,10 +35,11 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel }) =>
  * @returns {React.ReactElement}
  */
 function InputContainer(props) {
-    const { className, width, fullWidth, hasError, bigLabel, children } = props;
+    const { className, dataName, width, fullWidth, hasError, bigLabel, children } = props;
 
     return <Container
         className={className}
+        data-name={dataName}
         width={width}
         fullWidth={fullWidth}
         hasError={hasError}
@@ -54,6 +55,7 @@ function InputContainer(props) {
  */
 InputContainer.propTypes = {
     className : PropTypes.string,
+    dataName  : PropTypes.string,
     width     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     fullWidth : PropTypes.bool,
     hasError  : PropTypes.bool,
@@ -67,6 +69,7 @@ InputContainer.propTypes = {
  */
 InputContainer.defaultProps = {
     className : "",
+    dataName  : "",
     fullWidth : false,
     hasError  : false,
 };
