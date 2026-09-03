@@ -26,7 +26,7 @@ const Spacer = Styled.div`
 function AccordionList(props) {
     const {
         isHidden, className, passedRef, initial, selected,
-        maxWidth, hideAside, noClose, onChange, children,
+        maxWidth, hideAside, noClose, onChange, header, children,
     } = props;
 
 
@@ -199,10 +199,11 @@ function AccordionList(props) {
     };
 
     // Generate the Items
+    const hasSelection = selection !== "" && selection !== undefined && selection !== null;
     const items = Utils.cloneChildren(children, (child, index) => {
         const id = child.props.value || index;
         return {
-            maxWidth, hideAside,
+            maxWidth, hideAside, hasSelection,
             number     : index + 1,
             isSelected : id === selection,
             onClick    : handleClick(id, child.props.isDisabled),
@@ -223,6 +224,7 @@ function AccordionList(props) {
             }
         }}
     >
+        {header}
         {items}
         <Spacer ref={spacerRef} />
     </div>;
@@ -242,6 +244,7 @@ AccordionList.propTypes = {
     hideAside : PropTypes.bool,
     noClose   : PropTypes.bool,
     onChange  : PropTypes.func,
+    header    : PropTypes.any,
     children  : PropTypes.any,
 };
 

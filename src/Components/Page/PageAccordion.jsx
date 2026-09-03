@@ -27,7 +27,7 @@ const Container = Styled(AccordionList).attrs(({ withSpacing }) => ({ withSpacin
 function PageAccordion(props) {
     const {
         initial, selected, onChange, maxWidth, noClose,
-        withSpacing, hideAside, children,
+        withSpacing, hideAside, header, children,
     } = props;
 
 
@@ -46,6 +46,7 @@ function PageAccordion(props) {
             noClose={noClose}
             withSpacing={withSpacing}
             hideAside={hideAside}
+            header={header}
         >
             {children}
         </Container>
@@ -64,6 +65,7 @@ PageAccordion.propTypes = {
     noClose     : PropTypes.bool,
     withSpacing : PropTypes.bool,
     hideAside   : PropTypes.bool,
+    header      : PropTypes.any,
     children    : PropTypes.any,
 };
 

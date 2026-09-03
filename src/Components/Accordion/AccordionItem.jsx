@@ -16,14 +16,9 @@ import Pill                 from "../Pill/Pill";
 const ANIMATION_TIME = 320;
 
 // Styles
-const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled }) => ({ isFirst, isSelected, isDisabled }))`
+const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled, hasSelection }) => ({ isFirst, isSelected, isDisabled, hasSelection }))`
     display: flex;
-    opacity: 0.7;
     transition: 0.2s all;
-
-    aside {
-        opacity: 0.5;
-    }
 
     ${(props) => props.isFirst ? `
         margin-top: 16px;
@@ -31,17 +26,28 @@ const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled }) => 
         margin-top: 32px;
     `}
 
-    ${(props) => props.isSelected && `
+    ${(props) => !props.hasSelection ? `
         opacity: 1;
         aside {
             opacity: 1;
         }
+    ` : `
+        opacity: ${props.isSelected ? "1" : "0.7"};
+        aside {
+            opacity: ${props.isSelected ? "1" : "0.5"};
+        }
     `}
 
-    ${(props) => !props.isSelected && !props.isDisabled && `:hover {
+    ${(props) => !props.isSelected && !props.isDisabled && props.hasSelection && `:hover {
         opacity: 1;
         aside {
             opacity: 1;
+        }
+    }`}
+
+    ${(props) => !props.isDisabled && `&:has(> div > .accordion-header:hover) {
+        aside, .accordion-titles {
+            transform: translateX(4px);
         }
     }`}
 
@@ -120,6 +126,7 @@ const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled,
     gap: 16px;
     box-sizing: border-box;
     width: 100%;
+    padding-right: 8px;
     cursor: pointer;
 
     ${(props) => props.isDisabled && `
@@ -140,6 +147,7 @@ const Div = Styled.div`
     flex-direction: column;
     gap: 8px;
     min-width: 0;
+    transition: 0.2s all;
 `;
 
 const Arrow = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
@@ -210,6 +218,7 @@ function AccordionItem(props) {
     const {
         className, header, message, description, error, errorCount,
         badge, badgeVariant, number, icon, iconColor, withGap, maxWidth, hideAside,
+        hasSelection,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
     } = props;
 
@@ -245,6 +254,7 @@ function AccordionItem(props) {
         isFirst={isFirst}
         isSelected={isSelected}
         isDisabled={isDisabled}
+        hasSelection={hasSelection}
     >
         {!hideAside && <Aside hasIcon={showIcon}>
             {isComplete && <Complete icon="check" />}
@@ -258,11 +268,12 @@ function AccordionItem(props) {
             maxWidth={maxWidth}
         >
             <Header
+                className="accordion-header"
                 isDisabled={isDisabled}
                 hideAside={hideAside}
                 onClick={onClick}
             >
-                <Div>
+                <Div className="accordion-titles">
                     {header ? header : <>
                         <Title>{NLS.get(message)}</Title>
                         {!!description && <Description>{NLS.get(description)}</Description>}
@@ -321,6 +332,7 @@ AccordionItem.propTypes = {
     isComplete   : PropTypes.bool,
     isSelected   : PropTypes.bool,
     isDisabled   : PropTypes.bool,
+    hasSelection : PropTypes.bool,
     onClick      : PropTypes.func,
     children     : PropTypes.any,
 };
@@ -344,6 +356,7 @@ AccordionItem.defaultProps = {
     isComplete   : false,
     isSelected   : false,
     isDisabled   : false,
+    hasSelection : true,
 };
 
 export default AccordionItem;
