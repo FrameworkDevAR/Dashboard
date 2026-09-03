@@ -50,10 +50,10 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     cursor: pointer;
 
     &:focus {
-        background-color: var(--link-background, transparent);
         outline: none;
     }
-    &:hover {
+    &:hover,
+    &:focus-visible {
         outline: none;
         background-color: var(--link-background, transparent);
     }
@@ -90,8 +90,19 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     `}
 
     ${(props) => props.isDisabled && `
+        --link-color: var(--darkest-gray);
         cursor: not-allowed;
     `}
+    ${(props) => props.isDisabled && (props.variant === Brightness.PRIMARY ? `
+        --link-background: var(--primary-color);
+    ` : `
+        &&,
+        &&:hover,
+        &&:focus,
+        &&:active {
+            background-color: transparent;
+        }
+    `)}
 
     ${(props) => props.withMark && `
         &::after {
@@ -161,7 +172,7 @@ function IconLink(props) {
         isTiny={isTiny}
         size={size}
         withMark={withMark}
-        href={Navigate.getUrl(props)}
+        href={isDisabled ? undefined : Navigate.getUrl(props)}
         target={target}
         onClick={handleClick}
         onTouchEnd={onTouchEnd}
