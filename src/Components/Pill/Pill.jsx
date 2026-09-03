@@ -10,6 +10,16 @@ import Icon                 from "../Common/Icon";
 
 
 
+// Constants. The Backend gives the color of a state with a name, and each one has a variant
+const STATE_VARIANTS = {
+    green  : "success",
+    yellow : "warning",
+    orange : "error-low",
+    red    : "error",
+    blue   : "primary",
+    gray   : "gray",
+};
+
 // Styles
 const Container = Styled.span.attrs(({ variant, isOutlined, withDot, smallRadius }) => ({ variant, isOutlined, withDot, smallRadius }))`
     flex-shrink: 0;
@@ -78,7 +88,7 @@ function Pill(props) {
     }
     return <Container
         className={`pill ${className}`}
-        variant={variant}
+        variant={STATE_VARIANTS[variant] || variant || "gray"}
         isOutlined={isOutlined}
         withDot={withDot}
         smallRadius={smallRadius}

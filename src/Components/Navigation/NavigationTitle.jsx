@@ -11,9 +11,18 @@ import Responsive           from "../../Core/Responsive";
 // Components
 import IconLink             from "../Link/IconLink";
 import Icon                 from "../Common/Icon";
-import Circle               from "../Common/Circle";
+import Pill                 from "../Pill/Pill";
 
 
+
+// Constants
+const VARIANTS = {
+    green  : "success",
+    yellow : "warning",
+    orange : "warning",
+    red    : "error",
+    blue   : "primary",
+};
 
 // Styles
 const Container = Styled.header.attrs(({ smallNav, onlyIcon }) => ({ smallNav, onlyIcon }))`
@@ -86,14 +95,6 @@ const Title = Styled.h2.attrs(({ hasSubTitle }) => ({ hasSubTitle }))`
     color: var(--navigation-title-color, var(--title-color));
 `;
 
-const SubCircle = Styled(Circle)`
-    width: 8px;
-    height: 8px;
-    margin: 0;
-    flex-shrink: 0;
-    opacity: 0.8;
-`;
-
 const Span1 = Styled.span`
     display: block;
     overflow: visible;
@@ -104,7 +105,7 @@ const Span1 = Styled.span`
     color: var(--navigation-subtitle-color, var(--subtitle-color));
 `;
 
-const SubTitle = Styled.h3`
+const SubTitle = Styled.h3.attrs(({ withBorder }) => ({ withBorder }))`
     flex-grow: 2;
     flex-shrink: 0;
     display: flex;
@@ -112,13 +113,16 @@ const SubTitle = Styled.h3`
     gap: 6px;
     margin: 0;
     margin-left: 8px;
-    padding-left: 12px;
-    border-left: 1px solid var(--darker-gray);
     white-space: nowrap;
     color: var(--darkest-gray);
     font-family: var(--main-font);
     font-weight: 400;
     font-size: 14px;
+
+    ${(props) => props.withBorder && `
+        padding-left: 12px;
+        border-left: 1px solid var(--darker-gray);
+    `}
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         flex-grow: 0;
@@ -172,6 +176,9 @@ function NavigationTitle(props) {
     const showEdit   = canEdit && !smallNav;
     const showManage = canManage && !smallNav;
 
+    // The border of the Pill separates it from the title
+    const showBorder = !subCircle;
+
 
     // Do the Render
     return <Container
@@ -196,9 +203,16 @@ function NavigationTitle(props) {
             </>}
         </Title>}
 
-        {showTitle && !!subTitle && <SubTitle className="navigation-subtitle">
-            {!!subCircle && <SubCircle color={subCircle} />}
-            {NLS.get(subTitle)}
+        {showTitle && !!subTitle && <SubTitle
+            className="navigation-subtitle"
+            withBorder={showBorder}
+        >
+            {!subCircle ? NLS.get(subTitle) : <Pill
+                variant={VARIANTS[subCircle] || "gray"}
+                message={subTitle}
+                isOutlined
+                withDot
+            />}
         </SubTitle>}
 
         {showAdd && <IconLink
