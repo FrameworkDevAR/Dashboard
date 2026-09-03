@@ -9,6 +9,7 @@ import NLS                   from "../../Core/NLS";
 import ScrollFade            from "../Common/ScrollFade";
 import Html                  from "../Common/Html";
 import Icon                  from "../Common/Icon";
+import Pill                  from "../Pill/Pill";
 
 
 
@@ -28,7 +29,6 @@ const enter = keyframes`
 const Container = Styled.section`
     flex-grow: 2;
     min-height: 0;
-    padding: var(--step-content-padding, 32px 0 0);
     overflow: auto;
 `;
 
@@ -70,6 +70,12 @@ const Titles = Styled.div`
     gap: 6px;
 `;
 
+const Heading = Styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+`;
+
 const Title = Styled.h2`
     margin: 0;
     color: var(--title-color);
@@ -94,7 +100,7 @@ const Description = Styled(Html)`
 function StepContent(props) {
     const {
         isHidden, className, header, icon, color, message, description,
-        maxWidth, indent, children,
+        badge, badgeVariant, maxWidth, indent, children,
     } = props;
 
 
@@ -117,7 +123,16 @@ function StepContent(props) {
                         size={22}
                     />}
                     <Titles>
-                        <Title>{NLS.get(message)}</Title>
+                        <Heading>
+                            <Title>{NLS.get(message)}</Title>
+                            <Pill
+                                isHidden={!badge}
+                                variant={badgeVariant}
+                                message={badge}
+                                isOutlined
+                                withDot
+                            />
+                        </Heading>
                         <Description variant="p" message={description} />
                     </Titles>
                 </Header>
@@ -134,16 +149,18 @@ function StepContent(props) {
  * @type {object} propTypes
  */
 StepContent.propTypes = {
-    isHidden    : PropTypes.bool,
-    className   : PropTypes.string,
-    header      : PropTypes.any,
-    icon        : PropTypes.string,
-    color       : PropTypes.string,
-    message     : PropTypes.string.isRequired,
-    description : PropTypes.string,
-    maxWidth    : PropTypes.number,
-    indent      : PropTypes.number,
-    children    : PropTypes.any,
+    isHidden     : PropTypes.bool,
+    className    : PropTypes.string,
+    header       : PropTypes.any,
+    icon         : PropTypes.string,
+    color        : PropTypes.string,
+    message      : PropTypes.string.isRequired,
+    description  : PropTypes.string,
+    badge        : PropTypes.string,
+    badgeVariant : PropTypes.string,
+    maxWidth     : PropTypes.number,
+    indent       : PropTypes.number,
+    children     : PropTypes.any,
 };
 
 /**
@@ -151,13 +168,15 @@ StepContent.propTypes = {
  * @type {object} defaultProps
  */
 StepContent.defaultProps = {
-    isHidden    : false,
-    className   : "",
-    icon        : "",
-    color       : "",
-    description : "",
-    maxWidth    : 0,
-    indent      : 54,
+    isHidden     : false,
+    className    : "",
+    icon         : "",
+    color        : "",
+    description  : "",
+    badge        : "",
+    badgeVariant : "gray",
+    maxWidth     : 0,
+    indent       : 54,
 };
 
 export default StepContent;

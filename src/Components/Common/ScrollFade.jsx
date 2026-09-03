@@ -28,7 +28,7 @@ const Container = Styled.div.attrs(({ showTop, showBottom }) => ({ showTop, show
         opacity: ${(props) => props.showTop ? 1 : 0};
     }
     &::after {
-        bottom: 0;
+        bottom: var(--fade-bottom, 0px);
         background: linear-gradient(to top, var(--fade-color, var(--content-color)), transparent);
         opacity: ${(props) => props.showBottom ? 1 : 0};
     }
@@ -48,31 +48,34 @@ function ScrollFade(props) {
     // The Current State
     const [ showTop,    setShowTop    ] = React.useState(false);
     const [ showBottom, setShowBottom ] = React.useState(false);
-    const [ topSpace,   setTopSpace   ] = React.useState(0);
+    const [ topSpace,    setTopSpace    ] = React.useState(0);
+    const [ bottomSpace, setBottomSpace ] = React.useState(0);
 
 
-    // Returns the height of the first sticky element, which can be the first
-    // child or the one inside it, as in a Table with a sticky head
-    const getStickyHeight = (node) => {
-        let child = node.firstElementChild;
-        for (let index = 0; child && index < 2; index += 1) {
+    // Returns the height of the sticky element at the start or the end, which can be
+    // the child itself or one nested a few levels down, as in a Table with a sticky
+    // head or in a Step Content with a sticky footer
+    const getStickyHeight = (node, atEnd) => {
+        let child = atEnd ? node.lastElementChild : node.firstElementChild;
+        for (let index = 0; child && index < 3; index += 1) {
             if (window.getComputedStyle(child).position === "sticky") {
                 return child.offsetHeight;
             }
-            child = child.firstElementChild;
+            child = atEnd ? child.lastElementChild : child.firstElementChild;
         }
         return 0;
     };
 
-    // Shows a fade on each side that the content can be scrolled to. The top
-    // fade starts under the sticky header, if there is one, so it stays visible
+    // Shows a fade on each side that the content can be scrolled to. Each fade starts
+    // next to the sticky element of its side, if there is one, so that stays visible
     const updateFades = () => {
         const node = passedRef.current;
         if (!node) {
             return;
         }
 
-        setTopSpace(getStickyHeight(node));
+        setTopSpace(getStickyHeight(node, false));
+        setBottomSpace(getStickyHeight(node, true));
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };
@@ -100,7 +103,10 @@ function ScrollFade(props) {
     // Do the Render
     return <Container
         className={className}
-        style={{ "--fade-top" : `${topSpace}px` }}
+        style={{
+            "--fade-top"    : `${topSpace}px`,
+            "--fade-bottom" : `${bottomSpace}px`,
+        }}
         showTop={showTop}
         showBottom={showBottom}
     >
