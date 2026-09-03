@@ -19,30 +19,55 @@ function Iframe(props) {
     const [ height, setHeight ] = React.useState("0px");
 
 
-    // Handles the Iframe height
-    React.useEffect(() => {
-        const observer = new ResizeObserver(([ entry ]) => {
-            if (containerRef.current && entry.target.tagName.toLowerCase() === "iframe") {
-                handleHeight();
-            }
-        });
-
-        if (containerRef.current) {
-            handleHeight();
-            observer.observe(containerRef.current);
-        }
-        return () => {
-            observer.disconnect();
-        };
-    }, [ containerRef.current ]);
-
     // Updates the Height
     const handleHeight = () => {
-        if (containerRef.current) {
-            const height = containerRef.current.contentWindow?.document?.body?.scrollHeight ?? 0;
-            setHeight(`${height + spacing}px`);
+        const document = containerRef.current?.contentWindow?.document;
+        if (!document) {
+            return;
         }
+
+        // The body can have a margin of its own, which only the document height includes
+        const height = Math.max(
+            document.body?.scrollHeight ?? 0,
+            document.body?.offsetHeight ?? 0,
+            document.documentElement?.scrollHeight ?? 0,
+            document.documentElement?.offsetHeight ?? 0,
+        );
+        setHeight(`${height + spacing}px`);
     };
+
+    // Handles the Iframe height. What is watched is the document inside, as it keeps growing
+    // on its own while the images and the fonts load, and watching the Iframe only tells when
+    // it was resized here, which leaves it at the height that the content had at first
+    React.useEffect(() => {
+        const iframe = containerRef.current;
+        if (!iframe) {
+            return undefined;
+        }
+
+        let observer = null;
+        const handleLoad = () => {
+            const document = iframe.contentWindow?.document;
+            handleHeight();
+            observer?.disconnect();
+            if (!document?.documentElement) {
+                return;
+            }
+
+            observer = new ResizeObserver(handleHeight);
+            observer.observe(document.documentElement);
+            if (document.body) {
+                observer.observe(document.body);
+            }
+        };
+
+        handleLoad();
+        iframe.addEventListener("load", handleLoad);
+        return () => {
+            observer?.disconnect();
+            iframe.removeEventListener("load", handleLoad);
+        };
+    }, [ content ]);
 
 
     // Nothing to Render
@@ -53,7 +78,6 @@ function Iframe(props) {
     return <iframe
         ref={containerRef}
         className={className}
-        onLoad={handleHeight}
         srcDoc={`<base target=&quot;_blank&quot;>${content}`}
         height={height}
         // scrolling="no"
