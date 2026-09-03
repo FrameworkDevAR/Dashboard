@@ -32,6 +32,18 @@ const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter }) => ({ zIndex, h
     }
 `;
 
+const Wrapper = Styled.div`
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+    max-height: 100%;
+`;
+
+const AsideBox = Styled.div`
+    display: flex;
+`;
+
 const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosing }) => ({ width, isWide, isNarrow, hasTabs, isClosing }))`
     position: static;
     display: block;
@@ -199,6 +211,22 @@ function Dialog(props) {
     }
 
 
+    // The Dialog Content
+    const content = <Content
+        ref={contentRef}
+        className={`dialog ${className}`}
+        onMouseDown={handleMouseDown}
+        width={width}
+        isWide={isWide}
+        isNarrow={isNarrow}
+        hasTabs={hasTabs}
+        isClosing={isClosing}
+        open
+    >
+        {items}
+    </Content>;
+
+
     // Do the Render
     return <Container
         open={open}
@@ -208,23 +236,12 @@ function Dialog(props) {
         isClosing={isClosing}
         onClose={handleBackClose}
     >
-        <Content
-            ref={contentRef}
-            className={`dialog ${className}`}
-            onMouseDown={handleMouseDown}
-            width={width}
-            isWide={isWide}
-            isNarrow={isNarrow}
-            hasTabs={hasTabs}
-            isClosing={isClosing}
-            open
-        >
-            {items}
-        </Content>
-
-        {showAside && <div onMouseDown={handleMouseDown}>
-            {aside}
-        </div>}
+        {!aside ? content : <Wrapper>
+            {content}
+            {showAside && <AsideBox onMouseDown={handleMouseDown}>
+                {aside}
+            </AsideBox>}
+        </Wrapper>}
     </Container>;
 }
 
