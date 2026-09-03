@@ -2,8 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
+// Core & Utils
 import NLS                  from "../../Core/NLS";
+import Utils                from "../../Utils/Utils";
 
 // Components
 import IconLink             from "../Link/IconLink";
@@ -11,10 +12,11 @@ import Icon                 from "../Common/Icon";
 
 
 
+// Constants
+const ANIMATION_TIME = 320;
+
 // Styles
-// The Details are the only scroll, so the header is stuck over what goes under it, and it
-// is the one that fades that content, as it is the last thing over it
-const Container = Styled.div`
+const stickyStyles = `
     position: sticky;
     top: var(--details-title-top);
     background-color: var(--content-color);
@@ -23,24 +25,59 @@ const Container = Styled.div`
     &::after {
         content: "";
         position: absolute;
-        top: 100%;
+        top: calc(100% + var(--details-header-border, 0px));
         left: 0;
         right: 0;
         height: var(--details-fade);
         background: linear-gradient(var(--content-color), transparent);
+        opacity: var(--details-fade-top, 1);
+        transition: opacity 0.2s;
         pointer-events: none;
     }
 `;
 
-const Header = Styled.header`
+// A collapsible header sticks on its own, as the container also holds the content that
+// scrolls under it, and any other one sticks with the container, as what it holds are
+// more parts of the header
+const Container = Styled.div.attrs(({ hasChildren, isCollapsible }) => ({ hasChildren, isCollapsible }))`
+    position: relative;
+
+    ${(props) => props.hasChildren && !props.isCollapsible && "padding-bottom: 8px;"}
+    ${(props) => !props.isCollapsible && stickyStyles}
+`;
+
+const Header = Styled.header.attrs(({ isCollapsible, isCollapsed }) => ({ isCollapsible, isCollapsed }))`
     display: flex;
     align-items: flex-start;
     gap: 12px;
     padding: var(--details-spacing) 0 12px;
     border-bottom: 1px solid var(--border-color-light);
+    --details-header-border: 1px;
+
+    ${(props) => props.isCollapsible && stickyStyles}
+
+    ${(props) => props.isCollapsible && `
+        cursor: pointer;
+
+        & > .icon, h3, p {
+            transition: transform 0.2s;
+        }
+        &:hover > .icon,
+        &:hover h3,
+        &:hover p {
+            transform: translateX(4px);
+        }
+        &:hover .link {
+            background-color: var(--hover-overlay, rgba(0, 0, 0, 0.1));
+        }
+    `}
+    ${(props) => props.isCollapsed && `
+        border-bottom: none;
+        --details-header-border: 0px;
+    `}
 `;
 
-const HeaderIcon = Styled(Icon).attrs(({ color }) => ({ color }))`
+const HeaderIcon = Styled(Icon).attrs(({ color, textColor }) => ({ color, textColor }))`
     box-sizing: border-box;
     flex-shrink: 0;
     display: flex;
@@ -49,21 +86,17 @@ const HeaderIcon = Styled(Icon).attrs(({ color }) => ({ color }))`
     width: 40px;
     height: 40px;
     font-size: 24px;
-    color: var(--white-color);
+    color: ${(props) => props.textColor};
     background-color: ${(props) => props.color || "var(--primary-color)"};
     border-radius: var(--border-radius);
 `;
 
-// The description takes the whole line, so it can use the space that is under the close.
-// The minimum height is the one of the icon, so a header with no description still has
-// its title next to the middle of it
 const Content = Styled.div`
     flex: 1;
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
     column-gap: 12px;
-    row-gap: 2px;
     min-width: 0;
     min-height: 40px;
 `;
@@ -75,9 +108,10 @@ const Title = Styled.h3`
     min-width: 0;
     color: var(--black-color);
     font-family: var(--title-font);
+    min-height: 24px;
     font-size: 16px;
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 24px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -97,6 +131,30 @@ const Close = Styled(IconLink)`
     grid-column: 2;
 `;
 
+const Collapse = Styled(IconLink)`
+    grid-row: 1;
+    grid-column: 2;
+`;
+
+const Body = Styled.section.attrs(({ isCollapsed }) => ({ isCollapsed }))`
+    display: grid;
+    grid-template-rows: ${(props) => props.isCollapsed ? "0fr" : "1fr"};
+    margin: 0;
+    color: var(--font-lighter);
+    transition: grid-template-rows ${ANIMATION_TIME}ms cubic-bezier(0.4, 0, 0.2, 1);
+`;
+
+const Clip = Styled.div.attrs(({ isCollapsed }) => ({ isCollapsed }))`
+    min-height: 0;
+    overflow: hidden;
+    opacity: ${(props) => props.isCollapsed ? "0" : "1"};
+    transition: opacity ${(props) => props.isCollapsed ? "120ms" : "240ms"} ease;
+`;
+
+const Inside = Styled.div`
+    padding: 8px 0 20px;
+`;
+
 
 
 /**
@@ -106,19 +164,54 @@ const Close = Styled(IconLink)`
  */
 function DetailHeader(props) {
     const {
-        isHidden, className, icon, color, message, description, onClose, children,
+        isHidden, className, icon, color, message, description,
+        collapsible, onClose, children,
     } = props;
+
+
+    // The Current State
+    const [ isCollapsed, setCollapsed ] = React.useState(false);
+
+
+    // Handles the Initial Collapsed state
+    React.useEffect(() => {
+        if (collapsible) {
+            const collapsed = localStorage.getItem(`dashboard-collapsed-${collapsible}-${message}`);
+            setCollapsed(Boolean(Number(collapsed)));
+        }
+    }, [ collapsible, message ]);
+
+    // Handles the Collapsed click
+    const handleClick = () => {
+        if (collapsible) {
+            setCollapsed(!isCollapsed);
+            localStorage.setItem(`dashboard-collapsed-${collapsible}-${message}`, isCollapsed ? "0" : "1");
+        }
+    };
+
+
+    // Variables
+    const isCollapsible = Boolean(collapsible && !onClose);
 
 
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={`details-header ${className}`}>
-        <Header>
+    return <Container
+        className={`details-header ${className}`}
+        hasChildren={!!children}
+        isCollapsible={isCollapsible}
+    >
+        <Header
+            isCollapsible={isCollapsible}
+            isCollapsed={isCollapsed}
+            onClick={handleClick}
+        >
             <HeaderIcon
                 icon={icon}
                 color={color}
+                textColor={color ? Utils.getContrastColor(color) : "var(--white-color)"}
             />
             <Content>
                 <Title>{NLS.get(message)}</Title>
@@ -129,10 +222,22 @@ function DetailHeader(props) {
                     onClick={onClose}
                     isSmall
                 />
+                <Collapse
+                    isHidden={!isCollapsible}
+                    variant="black"
+                    icon={isCollapsed ? "closed" : "expand"}
+                    isSmall
+                />
                 {!!description && <Description>{NLS.get(description)}</Description>}
             </Content>
         </Header>
-        {children}
+        {!!children && (isCollapsible ? <Body className="details-content" isCollapsed={isCollapsed}>
+            <Clip isCollapsed={isCollapsed}>
+                <Inside>
+                    {children}
+                </Inside>
+            </Clip>
+        </Body> : children)}
     </Container>;
 }
 
@@ -147,6 +252,7 @@ DetailHeader.propTypes = {
     color       : PropTypes.string,
     message     : PropTypes.string.isRequired,
     description : PropTypes.string,
+    collapsible : PropTypes.string,
     onClose     : PropTypes.func,
     children    : PropTypes.any,
 };

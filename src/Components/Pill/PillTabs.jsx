@@ -8,7 +8,7 @@ import Utils                from "../../Utils/Utils";
 
 
 // Styles
-const Container = Styled.ul.attrs(({ fillWidth, isCentered, topSpace, bottomSpace }) => ({ fillWidth, isCentered, topSpace, bottomSpace }))`
+const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, bottomSpace }) => ({ fillWidth, isMedium, isCentered, topSpace, bottomSpace }))`
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -20,6 +20,12 @@ const Container = Styled.ul.attrs(({ fillWidth, isCentered, topSpace, bottomSpac
     list-style: none;
     border-radius: 9999px;
     background-color: var(--pills-background);
+
+    ${(props) => props.isMedium && `
+        --pills-height: var(--pills-medium-height);
+        --pills-padding: var(--pills-medium-padding);
+        --pills-font-size: var(--pills-medium-font-size);
+    `}
 
     ${(props) => props.fillWidth && "width: 100%;"}
     ${(props) => props.isCentered && `
@@ -52,7 +58,7 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
  */
 function PillTabs(props) {
     const {
-        isHidden, className, fillWidth, isFit, isCentered, topSpace, bottomSpace,
+        isHidden, className, fillWidth, isFit, isMedium, isCentered, topSpace, bottomSpace,
         selected, onClick, children,
     } = props;
 
@@ -101,6 +107,7 @@ function PillTabs(props) {
         ref={contentRef}
         className={`pills ${className}`}
         fillWidth={fillWidth}
+        isMedium={isMedium}
         isCentered={isCentered}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
@@ -122,6 +129,7 @@ PillTabs.propTypes = {
     className   : PropTypes.string,
     fillWidth   : PropTypes.bool,
     isFit       : PropTypes.bool,
+    isMedium    : PropTypes.bool,
     isCentered  : PropTypes.bool,
     topSpace    : PropTypes.number,
     bottomSpace : PropTypes.number,
@@ -139,6 +147,7 @@ PillTabs.defaultProps = {
     className  : "",
     fillWidth  : false,
     isFit      : false,
+    isMedium   : false,
     isCentered : false,
 };
 
