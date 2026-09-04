@@ -4,6 +4,7 @@ import Styled               from "styled-components";
 
 // Components
 import CircularLoader       from "../Loader/CircularLoader";
+import ScrollFade           from "../Common/ScrollFade";
 
 
 
@@ -69,7 +70,7 @@ function DialogBody(props) {
         className, isLoading, loadingMessage,
         isCentered, isNarrow, bigSpacing, withSpacing,
         noOverflow, minHeight, fullHeight, hideFooter,
-        passedRef, onScroll, children,
+        withFade, passedRef, onScroll, children,
     } = props;
 
     // The References
@@ -86,7 +87,7 @@ function DialogBody(props) {
 
 
     // Do the Render
-    return <Container
+    const content = <Container
         ref={elementRef}
         className={className}
         isLoading={isLoading}
@@ -104,6 +105,13 @@ function DialogBody(props) {
             message={loadingMessage}
         /> : children}
     </Container>;
+
+    if (withFade) {
+        return <ScrollFade passedRef={elementRef}>
+            {content}
+        </ScrollFade>;
+    }
+    return content;
 }
 
 /**
@@ -123,6 +131,7 @@ DialogBody.propTypes = {
     fullHeight     : PropTypes.bool,
     noOverflow     : PropTypes.bool,
     hideFooter     : PropTypes.bool,
+    withFade       : PropTypes.bool,
     onScroll       : PropTypes.func,
     children       : PropTypes.any,
 };
@@ -141,6 +150,7 @@ DialogBody.defaultProps = {
     fullHeight  : false,
     noOverflow  : false,
     hideFooter  : false,
+    withFade    : false,
 };
 
 export default DialogBody;

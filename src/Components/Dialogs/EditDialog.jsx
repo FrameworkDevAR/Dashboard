@@ -28,7 +28,7 @@ function EditDialog(props) {
     const {
         open, title, icon, header, message, className, isLoading, loadingMessage,
         width, isNarrow, isWide, minHeight, fullHeight,
-        noOverflow, withSpacing, bigSpacing,
+        noOverflow, withSpacing, bigSpacing, withFade,
         error, isDisabled, dontClose, noAutoFocus,
         hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
@@ -61,6 +61,7 @@ function EditDialog(props) {
             noOverflow={noOverflow}
             withSpacing={withSpacing}
             bigSpacing={isLoading || bigSpacing}
+            withFade={withFade}
             hideFooter={hideFooter}
         >
             <Message variant="h3" message={message} />
@@ -118,6 +119,7 @@ EditDialog.propTypes = {
     noOverflow       : PropTypes.bool,
     withSpacing      : PropTypes.bool,
     bigSpacing       : PropTypes.bool,
+    withFade         : PropTypes.bool,
     hidePrimary      : PropTypes.bool,
     primary          : PropTypes.string,
     primaryVariant   : PropTypes.string,
@@ -154,6 +156,7 @@ EditDialog.defaultProps = {
     noOverflow  : false,
     withSpacing : true,
     bigSpacing  : false,
+    withFade    : false,
     hidePrimary : false,
 };
 
