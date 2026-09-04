@@ -68,7 +68,7 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace 
         margin-left: 16px;
     `}
     ${(props) => props.isDisabled && `
-        color: var(--font-lighter);
+        color: var(--darkest-gray);
         cursor: not-allowed;
         &:hover {
             background-color: transparent;
@@ -90,11 +90,23 @@ const MenuCircle = Styled(Circle)`
     margin: 0;
 `;
 
-const MenuText = Styled(Html)`
+const MenuContent = Styled.div`
     flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+`;
+
+const MenuText = Styled(Html)`
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+`;
+
+const MenuDescription = Styled.span`
+    font-size: 12px;
+    white-space: nowrap;
 `;
 
 const MenuShortcut = Styled.span`
@@ -114,7 +126,7 @@ const MenuShortcut = Styled.span`
  */
 function MenuItem(props) {
     const {
-        className, action, icon, circle, title, message, shortcut,
+        className, action, icon, circle, title, message, description, shortcut,
         url, href, target,
         isDisabled, isSelected, isSmall, leftSpace,
         onAction, onClick, dontClose, onClose,
@@ -210,10 +222,15 @@ function MenuItem(props) {
                 color={circle}
             />
             {!!title && <b>{NLS.get(title)}</b>}
-            <MenuText
-                variant="span"
-                content={content}
-            />
+            <MenuContent>
+                <MenuText
+                    variant="span"
+                    content={content}
+                />
+                {!!description && <MenuDescription>
+                    {NLS.get(description)}
+                </MenuDescription>}
+            </MenuContent>
             {shortcutKeys.length > 0 && <MenuShortcut>
                 {shortcutKeys.map((key) => <ShortcutKey key={key}>{key}</ShortcutKey>)}
             </MenuShortcut>}
@@ -249,6 +266,7 @@ MenuItem.propTypes = {
     circle      : PropTypes.string,
     title       : PropTypes.string,
     message     : PropTypes.string,
+    description : PropTypes.string,
     shortcut    : PropTypes.string,
     url         : PropTypes.string,
     href        : PropTypes.string,
