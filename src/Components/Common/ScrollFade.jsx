@@ -52,18 +52,40 @@ function ScrollFade(props) {
     const [ bottomSpace, setBottomSpace ] = React.useState(0);
 
 
-    // Returns the height of the sticky element at the start or the end, which can be
-    // the child itself or one nested a few levels down, as in a Table with a sticky
-    // head or in a Step Content with a sticky footer
-    const getStickyHeight = (node, atEnd) => {
-        let child = atEnd ? node.lastElementChild : node.firstElementChild;
-        for (let index = 0; child && index < 3; index += 1) {
-            if (window.getComputedStyle(child).position === "sticky") {
-                return child.offsetHeight;
+    // Returns the sticky element at the child, which can be the child itself or one
+    // nested a few levels down, as in a Table with a sticky head or in a Step Content
+    // with a sticky footer
+    const getSticky = (child, atEnd) => {
+        let elem = child;
+        for (let index = 0; elem && index < 3; index += 1) {
+            if (window.getComputedStyle(elem).position === "sticky") {
+                return elem;
             }
-            child = atEnd ? child.lastElementChild : child.firstElementChild;
+            elem = atEnd ? elem.lastElementChild : elem.firstElementChild;
         }
-        return 0;
+        return null;
+    };
+
+    // Returns the space taken by the sticky elements at the start or the end. Several
+    // children can stack their sticky elements, as in a Dashboard with a sticky header
+    // followed by a chart with a sticky title, so the space ends where the last one does
+    const getStickySpace = (node, atEnd) => {
+        const children = [ ...node.children ];
+        const nodeRect = node.getBoundingClientRect();
+        let   space    = 0;
+
+        if (atEnd) {
+            children.reverse();
+        }
+        for (const child of children) {
+            const sticky = getSticky(child, atEnd);
+            if (!sticky || !sticky.offsetHeight) {
+                break;
+            }
+            const rect = sticky.getBoundingClientRect();
+            space = atEnd ? nodeRect.bottom - rect.top : rect.bottom - nodeRect.top;
+        }
+        return Math.max(0, Math.round(space));
     };
 
     // Shows a fade on each side that the content can be scrolled to. Each fade starts
@@ -74,8 +96,8 @@ function ScrollFade(props) {
             return;
         }
 
-        setTopSpace(getStickyHeight(node, false));
-        setBottomSpace(getStickyHeight(node, true));
+        setTopSpace(getStickySpace(node, false));
+        setBottomSpace(getStickySpace(node, true));
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };
