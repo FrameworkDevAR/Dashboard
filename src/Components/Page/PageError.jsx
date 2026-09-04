@@ -3,12 +3,12 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Components
-import DialogError          from "../Dialog/DialogError";
+import DialogResult         from "../Dialog/DialogResult";
 
 
 
 // Styles
-const Container = Styled(DialogError).attrs(({ hasTabs }) => ({ hasTabs }))`
+const Container = Styled(DialogResult).attrs(({ hasTabs }) => ({ hasTabs }))`
     box-sizing: border-box;
     height: ${(props) => props.hasTabs ? "var(--page-height-tabs)" : "var(--page-height)"};
 `;
