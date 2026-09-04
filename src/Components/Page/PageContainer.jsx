@@ -8,12 +8,15 @@ import Alert                from "../Form/Alert";
 
 
 // Styles
-const Container = Styled.section.attrs(({ hasTabs, withBorder }) => ({ hasTabs, withBorder }))`
+const Container = Styled.section.attrs(({ hasTabs, hasPills, withBorder }) => ({ hasTabs, hasPills, withBorder }))`
     box-sizing: border-box;
     flex-grow: 2;
     display: flex;
     flex-direction: column;
-    height: ${(props) => props.hasTabs ? "var(--page-height-tabs)" : "var(--page-height)"};
+    height: var(--page-height);
+
+    ${(props) => props.hasTabs && "height: var(--page-height-tabs);"}
+    ${(props) => props.hasPills && "height: var(--page-height-pills);"}
 
     ${(props) => props.withBorder && `
         border: var(--border-width) solid var(--border-color-light);
@@ -33,13 +36,14 @@ const AlertText = Styled(Alert)`
  * @returns {React.ReactElement}
  */
 function PageContainer(props) {
-    const { className, hasTabs, withBorder, error, children } = props;
+    const { className, hasTabs, hasPills, withBorder, error, children } = props;
 
 
     // Do the Render
     return <Container
         className={className}
         hasTabs={hasTabs}
+        hasPills={hasPills}
         withBorder={withBorder}
     >
         <AlertText variant="error" message={error} />
@@ -55,6 +59,7 @@ function PageContainer(props) {
 PageContainer.propTypes = {
     className  : PropTypes.string,
     hasTabs    : PropTypes.bool,
+    hasPills   : PropTypes.bool,
     withBorder : PropTypes.bool,
     error      : PropTypes.string,
     children   : PropTypes.any,
@@ -67,6 +72,7 @@ PageContainer.propTypes = {
 PageContainer.defaultProps = {
     className  : "",
     hasTabs    : false,
+    hasPills   : false,
     withBorder : false,
     error      : "",
 };
