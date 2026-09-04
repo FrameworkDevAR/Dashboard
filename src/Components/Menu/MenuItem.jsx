@@ -67,6 +67,13 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace 
     ${(props) => props.leftSpace && `
         margin-left: 16px;
     `}
+    ${(props) => props.isDisabled && `
+        color: var(--font-lighter);
+        cursor: not-allowed;
+        &:hover {
+            background-color: transparent;
+        }
+    `}
 
     ${(props) => props.isSelected && `
         background-color: var(--primary-color);
@@ -157,7 +164,9 @@ function MenuItem(props) {
 
     // Handles the Click
     const handleClick = (e) => {
-        handleAction();
+        if (!isDisabled) {
+            handleAction();
+        }
         e.preventDefault();
         e.stopPropagation();
     };
