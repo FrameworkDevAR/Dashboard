@@ -3,6 +3,7 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
+import Action               from "../../Core/Action";
 import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
 
@@ -67,7 +68,7 @@ const Header = Styled.header.attrs(({ isCollapsible, isCollapsed }) => ({ isColl
         &:hover p {
             transform: translateX(4px);
         }
-        &:hover .link {
+        &:hover .details-collapse {
             background-color: var(--hover-overlay, rgba(0, 0, 0, 0.1));
         }
     `}
@@ -126,14 +127,12 @@ const Description = Styled.p`
     line-height: 1.4;
 `;
 
-const Close = Styled(IconLink)`
+const Actions = Styled.div`
     grid-row: 1;
     grid-column: 2;
-`;
-
-const Collapse = Styled(IconLink)`
-    grid-row: 1;
-    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 `;
 
 const Body = Styled.section.attrs(({ isCollapsed }) => ({ isCollapsed }))`
@@ -165,7 +164,8 @@ const Inside = Styled.div`
 function DetailHeader(props) {
     const {
         isHidden, className, icon, color, message, description,
-        collapsible, onClose, children,
+        collapsible, action, canEdit, editIcon, editTooltip,
+        onAction, onClose, children,
     } = props;
 
 
@@ -190,8 +190,17 @@ function DetailHeader(props) {
     };
 
 
+    // Handles the Action
+    const handleAction = () => {
+        if (onAction) {
+            onAction(Action.get(action));
+        }
+    };
+
+
     // Variables
     const isCollapsible = Boolean(collapsible && !onClose);
+    const hasAction     = Boolean(action && onAction && canEdit);
 
 
     // Do the Render
@@ -215,19 +224,30 @@ function DetailHeader(props) {
             />
             <Content>
                 <Title>{NLS.get(message)}</Title>
-                <Close
-                    isHidden={!onClose}
-                    variant="black"
-                    icon="close"
-                    onClick={onClose}
-                    isSmall
-                />
-                <Collapse
-                    isHidden={!isCollapsible}
-                    variant="black"
-                    icon={isCollapsed ? "closed" : "expand"}
-                    isSmall
-                />
+                <Actions>
+                    <IconLink
+                        isHidden={!hasAction}
+                        variant="black"
+                        icon={editIcon}
+                        tooltip={editTooltip}
+                        onClick={handleAction}
+                        isSmall
+                    />
+                    <IconLink
+                        isHidden={!onClose}
+                        variant="black"
+                        icon="close"
+                        onClick={onClose}
+                        isSmall
+                    />
+                    <IconLink
+                        isHidden={!isCollapsible}
+                        className="details-collapse"
+                        variant="black"
+                        icon={isCollapsed ? "closed" : "expand"}
+                        isSmall
+                    />
+                </Actions>
                 {!!description && <Description>{NLS.get(description)}</Description>}
             </Content>
         </Header>
@@ -253,6 +273,11 @@ DetailHeader.propTypes = {
     message     : PropTypes.string.isRequired,
     description : PropTypes.string,
     collapsible : PropTypes.string,
+    action      : PropTypes.string,
+    canEdit     : PropTypes.bool,
+    editIcon    : PropTypes.string,
+    editTooltip : PropTypes.string,
+    onAction    : PropTypes.func,
     onClose     : PropTypes.func,
     children    : PropTypes.any,
 };
@@ -264,6 +289,7 @@ DetailHeader.propTypes = {
 DetailHeader.defaultProps = {
     isHidden  : false,
     className : "",
+    editIcon  : "edit",
 };
 
 export default DetailHeader;
