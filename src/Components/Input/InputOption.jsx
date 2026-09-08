@@ -69,10 +69,10 @@ const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, i
     `}
 `;
 
-const Content = Styled.div.attrs(({ inlineDescription, isSelected, isTitle }) => ({ inlineDescription, isSelected, isTitle }))`
+const Content = Styled.div.attrs(({ isSelected, isTitle }) => ({ isSelected, isTitle }))`
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
     padding: 8px;
     font-size: 14px;
     border-radius: var(--border-radius);
@@ -82,12 +82,6 @@ const Content = Styled.div.attrs(({ inlineDescription, isSelected, isTitle }) =>
     &:hover {
         background-color: var(--light-gray);
     }
-
-    ${(props) => props.inlineDescription && `
-        flex-direction: row;
-        align-items: baseline;
-        gap: 8px;
-    `}
 
     ${(props) => props.isSelected && `
         background-color: var(--primary-color);
@@ -108,6 +102,20 @@ const Content = Styled.div.attrs(({ inlineDescription, isSelected, isTitle }) =>
         &:hover {
             background-color: var(--menu-background, var(--white-color));
         }
+    `}
+`;
+
+const Inside = Styled.div.attrs(({ inlineDescription }) => ({ inlineDescription }))`
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    ${(props) => props.inlineDescription && `
+        flex-direction: row;
+        align-items: baseline;
+        gap: 8px;
     `}
 `;
 
@@ -184,30 +192,31 @@ function InputOption(props) {
             onMouseLeave={() => setMenuOpen(false)}
         >
             <Content
-                inlineDescription={inlineDescription}
                 isSelected={isSelected}
                 isTitle={isTitle}
             >
-                <Option>
-                    <Icon
-                        isHidden={!hasIcon}
-                        icon={iconValue}
-                        size="20"
-                    />
-                    <Text
-                        content={content}
-                        message={message}
-                    />
-                    <Icon
-                        isHidden={!hasMenu}
-                        icon="closed"
-                        size="20"
-                    />
-                </Option>
-                <Description
-                    content={description}
-                    isSelected={isSelected}
+                <Icon
+                    isHidden={!hasIcon}
+                    icon={iconValue}
+                    size="20"
                 />
+                <Inside inlineDescription={inlineDescription}>
+                    <Option>
+                        <Text
+                            content={content}
+                            message={message}
+                        />
+                        <Icon
+                            isHidden={!hasMenu}
+                            icon="closed"
+                            size="20"
+                        />
+                    </Option>
+                    <Description
+                        content={description}
+                        isSelected={isSelected}
+                    />
+                </Inside>
             </Content>
         </Container>
 

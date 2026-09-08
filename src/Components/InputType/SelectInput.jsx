@@ -17,7 +17,14 @@ import Icon                 from "../Common/Icon";
 
 
 
+// Constants
+const DESCRIPTION_GAP = 4;
+
 // Styles
+const Content = Styled(InputContent).attrs(({ bottomSpace }) => ({ bottomSpace }))`
+    ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
+`;
+
 const Inside = Styled.div.attrs(({ inlineDescription }) => ({ inlineDescription }))`
     display: flex;
     flex-direction: column;
@@ -98,6 +105,7 @@ function SelectInput(props) {
     const [ timer,       setTimer       ] = React.useState(null);
     const [ style,       setStyle       ] = React.useState({ ...initStyle });
     const [ update,      setUpdate      ] = React.useState(0);
+    const [ bottomSpace, setBottomSpace ] = React.useState(0);
 
     // Variables
     const valueKey   = String(value || noneValue);
@@ -225,12 +233,12 @@ function SelectInput(props) {
         return Boolean(showOptions && (filteredOptions.length || hasCreate || hasCustom));
     }, [ showOptions, filteredOptions.length, hasCreate, hasCustom ]);
 
-    // Get the Option Value and Description. The empty and default texts are
+    // Get the Option Value, Description and Icon. The empty and default texts are
     // shown as a placeholder, as they mean that nothing was selected, while the
     // none option is a value of its own that can be picked like any other
-    const [ optionValue, optionDesc, isPlaceholder ] = React.useMemo(() => {
+    const [ optionValue, optionDesc, optionIcon, isPlaceholder ] = React.useMemo(() => {
         if (optionList.length === 0 && emptyText) {
-            return [ NLS.get(emptyText), "", true ];
+            return [ NLS.get(emptyText), "", "", true ];
         }
 
         if (allowMultiple) {
@@ -241,23 +249,34 @@ function SelectInput(props) {
                 }
             }
             if (!valueList.length && defaultText) {
-                return [ NLS.get(defaultText), "", true ];
+                return [ NLS.get(defaultText), "", "", true ];
             }
-            return [ valueList.join(", "), "", false ];
+            return [ valueList.join(", "), "", "", false ];
         }
 
-        let value = "";
-        let desc  = "";
+        let value    = "";
+        let desc     = "";
+        let itemIcon = "";
         for (const item of optionList) {
             if (!item.isTitle && String(item.value) === valueKey) {
-                value = item.message;
-                desc  = item.description;
+                value    = item.message;
+                desc     = item.description;
+                itemIcon = item.icon;
                 break;
             }
         }
-        return [ NLS.get(value), NLS.get(desc), false ];
+        return [ NLS.get(value), NLS.get(desc), itemIcon, false ];
     }, [ valueKey, JSON.stringify(optionList), allowMultiple, defaultText, emptyText ]);
 
+
+    // Stores the height of the description, which is used as a space under the input while
+    // the options are shown, so hiding it does not move the content that is under the select
+    React.useEffect(() => {
+        const element = containerRef.current?.querySelector(".input-description");
+        if (element) {
+            setBottomSpace(element.offsetHeight + DESCRIPTION_GAP);
+        }
+    }, [ optionDesc, showOptions ]);
 
     // Clear the Timer
     React.useEffect(() => {
@@ -485,10 +504,10 @@ function SelectInput(props) {
 
 
     // Do the Render
-    return <InputContent
+    return <Content
         passedRef={containerRef}
         className={className}
-        icon={icon}
+        icon={showOptions ? "" : (icon || optionIcon)}
         postIcon={postIcon}
         prefixText={prefixText}
         suffixText={suffixText}
@@ -501,6 +520,7 @@ function SelectInput(props) {
         withLabel={withLabel}
         withPadding
         withClick
+        bottomSpace={showOptions ? bottomSpace : 0}
     >
         <Inside inlineDescription={inlineDescription}>
             <Input
@@ -521,6 +541,7 @@ function SelectInput(props) {
                 inlineDescription={inlineDescription}
             />
             {hasDescription && <Description
+                className="input-description"
                 content={optionDesc}
                 isDisabled={isDisabled}
             />}
@@ -560,7 +581,7 @@ function SelectInput(props) {
                 hasChecks={allowMultiple && !isTitle}
             />)}
         </InputOptions>}
-    </InputContent>;
+    </Content>;
 }
 
 /**
