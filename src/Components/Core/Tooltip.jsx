@@ -36,6 +36,13 @@ const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow,
     border-radius: var(--border-radius);
     pointer-events: none;
     z-index: var(--z-tooltip);
+
+    .tooltip-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
     transition:
         opacity ${(props) => props.isVisible ? `${OPEN_TIME}s ease-out ${props.showDelay}s` : `${CLOSE_TIME}s ease-out`},
         top ${MOVE_TIME}s ease-out,
