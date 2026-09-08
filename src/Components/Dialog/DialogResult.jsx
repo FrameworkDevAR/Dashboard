@@ -32,13 +32,24 @@ const Circle = Styled.div.attrs(({ variant }) => ({ variant }))`
     height: 88px;
     border-radius: 50%;
 
-    ${(props) => props.variant === "success" ? `
+    ${(props) => props.variant === "success" && `
         color: var(--success-color);
         background-color: hsl(136, 52%, 95%);
-    ` : `
+    `}
+    ${(props) => props.variant === "warning" && `
+        color: var(--warning-color);
+        background-color: hsl(37, 90%, 95%);
+    `}
+    ${(props) => (props.variant !== "success" && props.variant !== "warning") && `
         color: var(--error-color);
         background-color: hsl(0, 62%, 96%);
     `}
+`;
+
+const Content = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 `;
 
 const Message = Styled(Html)`
@@ -47,6 +58,13 @@ const Message = Styled(Html)`
     font-size: 20px;
     font-weight: 400;
     line-height: 1.4;
+`;
+
+const Description = Styled(Html)`
+    margin: 0;
+    color: var(--font-light);
+    font-size: var(--font-size);
+    line-height: 1.5;
 `;
 
 
@@ -58,13 +76,13 @@ const Message = Styled(Html)`
  */
 function DialogResult(props) {
     const {
-        isHidden, className, variant, icon, message,
-        topSpace, bottomSpace,
+        isHidden, className, variant, icon, message, description,
+        topSpace, bottomSpace, children,
     } = props;
 
 
     // Variables
-    const iconName = icon || (variant === "success" ? "completed" : "error");
+    const iconName = icon || (variant === "success" ? "completed" : variant);
 
 
     // Do the Render
@@ -79,10 +97,17 @@ function DialogResult(props) {
         <Circle variant={variant}>
             <Icon icon={iconName} size="44" />
         </Circle>
-        <Message
-            variant="h3"
-            message={message}
-        />
+        <Content>
+            <Message
+                variant="h3"
+                message={message}
+            />
+            <Description
+                isHidden={!description}
+                message={description}
+            />
+            {children}
+        </Content>
     </Container>;
 }
 
@@ -96,8 +121,10 @@ DialogResult.propTypes = {
     variant     : PropTypes.string,
     icon        : PropTypes.string,
     message     : PropTypes.string,
+    description : PropTypes.string,
     topSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    children    : PropTypes.any,
 };
 
 /**
@@ -105,9 +132,10 @@ DialogResult.propTypes = {
  * @type {object} defaultProps
  */
 DialogResult.defaultProps = {
-    isHidden  : false,
-    className : "",
-    variant   : "error",
+    isHidden    : false,
+    className   : "",
+    variant     : "error",
+    description : "",
 };
 
 export default DialogResult;
