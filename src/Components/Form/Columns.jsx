@@ -11,7 +11,7 @@ import Utils                from "../../Utils/Utils";
 const Div = Styled.div.attrs(({ amount, topSpace, doubleWidth, singleWidth }) => ({ amount, topSpace, doubleWidth, singleWidth }))`
     display: grid;
     grid-template-columns: repeat(${(props) => props.amount}, 1fr);
-    gap: var(--main-gap);
+    gap: var(--form-gap, var(--main-gap));
     ${(props) => props.topSpace && `padding-top: ${props.topSpace}px;`}
 
     > * {
