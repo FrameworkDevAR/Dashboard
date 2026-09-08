@@ -13,13 +13,20 @@ import Html                 from "../Common/Html";
 
 
 // Styles
-const Label = Styled.label`
+const Label = Styled.label.attrs(({ isDisabled, rightToggle }) => ({ isDisabled, rightToggle }))`
     position: relative;
     display: flex;
     align-items: center;
 
     --toggle-size: 16px;
     --toggle-spacing: 3px;
+
+    ${(props) => !props.isDisabled && "cursor: pointer;"}
+
+    ${(props) => props.rightToggle && `
+        width: 100%;
+        justify-content: space-between;
+    `}
 `;
 
 const Input = Styled.input`
@@ -42,7 +49,7 @@ const Input = Styled.input`
     }
 `;
 
-const Span = Styled.span`
+const Span = Styled.span.attrs(({ rightToggle }) => ({ rightToggle }))`
     position: relative;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -65,6 +72,34 @@ const Span = Styled.span`
         background: var(--input-toggle-circle);
         transition: all .2s;
     }
+
+    ${(props) => props.rightToggle && `
+        order: 1;
+        margin-right: 0;
+        margin-left: 12px;
+    `}
+`;
+
+
+
+const Content = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+`;
+
+const Text = Styled(Html).attrs(({ rightToggle }) => ({ rightToggle }))`
+    ${(props) => props.rightToggle && `
+        color: var(--black-color);
+        font-size: 13px;
+        font-weight: 500;
+    `}
+`;
+
+const Helper = Styled(Html)`
+    color: var(--darkest-gray);
+    font-size: var(--font-size-small);
 `;
 
 
@@ -76,8 +111,8 @@ const Span = Styled.span`
  */
 function ToggleInput(props) {
     const {
-        inputRef, className, isFocused, isDisabled, withBorder,
-        name, value, label, onChange, onFocus, onBlur,
+        inputRef, className, isFocused, isDisabled, withBorder, rightToggle,
+        name, value, label, helperText, onChange, onFocus, onBlur,
     } = props;
 
     // Handles the Checkbox Change
@@ -105,7 +140,7 @@ function ToggleInput(props) {
         withClick={withBorder}
         withPadding
     >
-        <Label>
+        <Label isDisabled={isDisabled} rightToggle={rightToggle}>
             <Input
                 ref={inputRef}
                 type="checkbox"
@@ -117,8 +152,15 @@ function ToggleInput(props) {
                 onFocus={onFocus}
                 onBlur={onBlur}
             />
-            <Span />
-            {!!label && <Html variant="span">{NLS.get(label)}</Html>}
+            <Span rightToggle={rightToggle} />
+            {!!label && <Content>
+                <Text variant="span" rightToggle={rightToggle}>
+                    {NLS.get(label)}
+                </Text>
+                {(!!helperText && rightToggle) && <Helper variant="span">
+                    {NLS.get(helperText)}
+                </Helper>}
+            </Content>}
         </Label>
     </InputContent>;
 }
@@ -128,17 +170,19 @@ function ToggleInput(props) {
  * @type {object} propTypes
  */
 ToggleInput.propTypes = {
-    inputRef   : PropTypes.any,
-    className  : PropTypes.string,
-    isFocused  : PropTypes.bool,
-    isDisabled : PropTypes.bool,
-    withBorder : PropTypes.bool,
-    name       : PropTypes.string,
-    value      : PropTypes.any,
-    label      : PropTypes.string,
-    onChange   : PropTypes.func.isRequired,
-    onFocus    : PropTypes.func.isRequired,
-    onBlur     : PropTypes.func.isRequired,
+    inputRef    : PropTypes.any,
+    className   : PropTypes.string,
+    isFocused   : PropTypes.bool,
+    isDisabled  : PropTypes.bool,
+    withBorder  : PropTypes.bool,
+    rightToggle : PropTypes.bool,
+    name        : PropTypes.string,
+    value       : PropTypes.any,
+    label       : PropTypes.string,
+    helperText  : PropTypes.string,
+    onChange    : PropTypes.func.isRequired,
+    onFocus     : PropTypes.func.isRequired,
+    onBlur      : PropTypes.func.isRequired,
 };
 
 /**
@@ -146,10 +190,11 @@ ToggleInput.propTypes = {
  * @type {object} defaultProps
  */
 ToggleInput.defaultProps = {
-    className  : "",
-    isFocused  : false,
-    isDisabled : false,
-    withBorder : false,
+    className   : "",
+    isFocused   : false,
+    isDisabled  : false,
+    withBorder  : false,
+    rightToggle : false,
 };
 
 export default ToggleInput;
