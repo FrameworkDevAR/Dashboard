@@ -22,7 +22,7 @@ const tick = keyframes`
 `;
 
 // Styles
-const Container = Styled.div.attrs(({ columns }) => ({ columns }))`
+const Container = Styled.div.attrs(({ columns, withSplit }) => ({ columns, withSplit }))`
     --radio-outer: var(--input-radio-outer, 20px);
     --radio-inner: var(--input-radio-inner, 12px);
 
@@ -33,10 +33,32 @@ const Container = Styled.div.attrs(({ columns }) => ({ columns }))`
     margin-bottom: 4px;
     width: 100%;
 
+    ${(props) => props.withSplit && `
+        margin-top: 0;
+        margin-bottom: 0;
+    `}
+
     @media (max-width: 400px) {
         display: flex;
         flex-direction: column;
     }
+`;
+
+const Item = Styled.div.attrs(({ isDisabled, isSelected, withSplit }) => ({ isDisabled, isSelected, withSplit }))`
+    ${(props) => props.withSplit && `
+        padding: var(--input-padding);
+        border: 1px solid var(--input-border);
+        border-radius: var(--input-border-radius, var(--border-radius));
+        background-color: var(--content-color);
+    `}
+    ${(props) => (props.withSplit && props.isSelected) && `
+        --input-border: var(--input-border-focus);
+    `}
+    ${(props) => (props.withSplit && !props.isDisabled && !props.isSelected) && `
+        &:hover {
+            --input-border: var(--input-border-hover);
+        }
+    `}
 `;
 
 const Label = Styled.label.attrs(({ isDisabled }) => ({ isDisabled }))`
@@ -44,6 +66,20 @@ const Label = Styled.label.attrs(({ isDisabled }) => ({ isDisabled }))`
     align-items: center;
     font-size: var(--input-font);
     ${(props) => !props.isDisabled && "cursor: pointer;"}
+`;
+
+const Extra = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: var(--main-gap);
+    margin-top: var(--main-gap);
+    margin-left: calc(var(--radio-outer) + 10px);
+    padding-top: var(--main-gap);
+    border-top: 1px solid var(--border-color-light);
+
+    &:empty {
+        display: none;
+    }
 `;
 
 const Radio = Styled.input`
@@ -99,7 +135,7 @@ const Span = Styled.span`
     display: block;
     height: var(--radio-outer);
     width: var(--radio-outer);
-    margin: 0 8px 0 calc(0px - var(--radio-outer));
+    margin: 0 10px 0 calc(0px - var(--radio-outer));
     border: 2px solid var(--border-color-light);
     border-radius: 50%;
     transition: all 0.2s;
@@ -144,7 +180,7 @@ function RadioInput(props) {
     const {
         className, isFocused, isDisabled, withLabel, withBorder,
         name, value, options, descriptions, withIcons, iconSize,
-        withCustom, customText, columns,
+        withCustom, customText, columns, withSplit, getContent,
         onChange, onFocus, onBlur,
     } = props;
 
@@ -207,58 +243,70 @@ function RadioInput(props) {
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
-        withBorder={withBorder}
-        withPadding={withBorder}
+        withBorder={withBorder && !withSplit}
+        withPadding={withBorder && !withSplit}
         withLabel={withLabel}
     >
-        <Container columns={columns}>
-            {items.map(({ key, value, description }) => <Label
+        <Container columns={columns} withSplit={withSplit}>
+            {items.map(({ key, value, icon, description }) => <Item
                 key={key}
                 isDisabled={isDisabled}
+                isSelected={radioVal === String(key)}
+                withSplit={withSplit}
             >
-                <Radio
-                    type="radio"
-                    name={`${name}-${key}`}
-                    value={isSelect ? key : value}
-                    checked={radioVal === String(key)}
-                    onChange={(e) => handleCheck(e, key)}
-                    disabled={isDisabled}
-                />
-                <Span />
-                {withIcons && <Iconography
-                    icon={key.toLowerCase()}
-                    size={iconSize}
-                />}
-                <Content>
-                    <Text>{NLS.get(value)}</Text>
-                    <Description
-                        isHidden={!getDescription(key, description)}
-                        message={getDescription(key, description)}
+                <Label isDisabled={isDisabled}>
+                    <Radio
+                        type="radio"
+                        name={`${name}-${key}`}
+                        value={isSelect ? key : value}
+                        checked={radioVal === String(key)}
+                        onChange={(e) => handleCheck(e, key)}
+                        disabled={isDisabled}
                     />
-                </Content>
-            </Label>)}
-            {withCustom && <Label>
-                <Radio
-                    type="radio"
-                    name={`${name}-${customKey}`}
-                    value={customKey}
-                    checked={radioVal === customKey}
-                    onChange={handleCustom}
-                    disabled={isDisabled}
-                />
-                <Span />
-                <Text>{NLS.get(customText || "GENERAL_OTHER")}</Text>
-                <Input
-                    inputRef={inputRef}
-                    type="text"
-                    name={`${name}-${customKey}-value`}
-                    value={customVal}
-                    isDisabled={isDisabled}
-                    onChange={handleChange}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                />
-            </Label>}
+                    <Span />
+                    {withIcons && <Iconography
+                        icon={icon || key.toLowerCase()}
+                        size={iconSize}
+                    />}
+                    <Content>
+                        <Text>{NLS.get(value)}</Text>
+                        <Description
+                            isHidden={!getDescription(key, description)}
+                            message={getDescription(key, description)}
+                        />
+                    </Content>
+                </Label>
+                {!!getContent && <Extra>
+                    {getContent(key)}
+                </Extra>}
+            </Item>)}
+            {withCustom && <Item
+                isSelected={radioVal === customKey}
+                withSplit={withSplit}
+            >
+                <Label>
+                    <Radio
+                        type="radio"
+                        name={`${name}-${customKey}`}
+                        value={customKey}
+                        checked={radioVal === customKey}
+                        onChange={handleCustom}
+                        disabled={isDisabled}
+                    />
+                    <Span />
+                    <Text>{NLS.get(customText || "GENERAL_OTHER")}</Text>
+                    <Input
+                        inputRef={inputRef}
+                        type="text"
+                        name={`${name}-${customKey}-value`}
+                        value={customVal}
+                        isDisabled={isDisabled}
+                        onChange={handleChange}
+                        onFocus={onFocus}
+                        onBlur={onBlur}
+                    />
+                </Label>
+            </Item>}
         </Container>
     </InputContent>;
 }
@@ -283,6 +331,8 @@ RadioInput.propTypes = {
     withIcons    : PropTypes.bool,
     iconSize     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     withCustom   : PropTypes.bool,
+    withSplit    : PropTypes.bool,
+    getContent   : PropTypes.func,
     customText   : PropTypes.string,
     customKey    : PropTypes.string,
     columns      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
@@ -302,6 +352,7 @@ RadioInput.defaultProps = {
     customText : "",
     customKey  : "",
     withCustom : false,
+    withSplit  : false,
     columns    : 1,
 };
 
