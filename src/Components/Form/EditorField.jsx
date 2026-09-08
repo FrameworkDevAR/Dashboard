@@ -15,12 +15,16 @@ import InputError           from "../Input/InputError";
 
 
 // Styles
-const Container = Styled.div.attrs(({ maxHeight }) => ({ maxHeight }))`
+const Container = Styled.div.attrs(({ maxHeight, fullHeight }) => ({ maxHeight, fullHeight }))`
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     ${(props) => props.maxHeight && `max-height: ${props.maxHeight}px;`}
+    ${(props) => props.fullHeight && `
+        flex-grow: 1;
+        min-height: 0;
+    `}
 `;
 
 const FieldHelper = Styled.p`
@@ -39,7 +43,7 @@ const FieldHelper = Styled.p`
 function EditorField(props) {
     const {
         isHidden, baseUrl, filesUrl,
-        name, value, helperText, error, height, maxHeight, language,
+        name, value, helperText, error, height, maxHeight, fullHeight, language,
         clientID, contentStyle, menubar, menu, toolbar,
         onChange, onMedia, onSetup, isDisabled, isSimple,
     } = props;
@@ -99,6 +103,7 @@ function EditorField(props) {
     return <Container
         className={error ? "editorfield-error" : ""}
         maxHeight={maxHeight}
+        fullHeight={fullHeight}
     >
         <EditorStyles />
         <Editor
@@ -162,6 +167,7 @@ EditorField.propTypes = {
     error        : PropTypes.string,
     height       : PropTypes.number,
     maxHeight    : PropTypes.number,
+    fullHeight   : PropTypes.bool,
     language     : PropTypes.string,
     clientID     : PropTypes.number,
     contentStyle : PropTypes.string,

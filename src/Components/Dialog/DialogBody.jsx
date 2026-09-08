@@ -9,7 +9,7 @@ import ScrollFade           from "../Common/ScrollFade";
 
 
 // Styles
-const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, fullHeight, hideFooter, noOverflow }))`
+const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, keptHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, keptHeight, fullHeight, hideFooter, noOverflow }))`
     --dialog-content: var(--dialog-body);
 
     box-sizing: border-box;
@@ -43,6 +43,11 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
     ${(props) => props.fullHeight && `
         height: var(--dialog-body);
     `}
+    ${(props) => props.keptHeight ? `
+        height: min(var(--dialog-body), ${props.keptHeight}px);
+        display: flex;
+        flex-direction: column;
+    ` : ""}
     ${(props) => !props.noOverflow && `
         overflow: auto;
     `}
@@ -69,13 +74,29 @@ function DialogBody(props) {
     const {
         className, isLoading, loadingMessage,
         isCentered, isNarrow, bigSpacing, withSpacing,
-        noOverflow, minHeight, fullHeight, hideFooter,
+        noOverflow, minHeight, keepHeight, fullHeight, hideFooter,
         withFade, passedRef, onScroll, children,
     } = props;
 
     // The References
     const defaultRef = React.useRef(null);
     const elementRef = passedRef || defaultRef;
+
+    // The Current State
+    const [ contentHeight, setContentHeight ] = React.useState(0);
+
+
+    // Stores the height of the tallest content, which is used as the minimum from then on,
+    // so the dialog does not change its size when moving between the tabs
+    React.useEffect(() => {
+        if (!keepHeight || isLoading || !elementRef.current) {
+            return;
+        }
+        const height = elementRef.current.scrollHeight;
+        if (height > contentHeight) {
+            setContentHeight(height);
+        }
+    });
 
 
     // Handle the Scroll
@@ -96,6 +117,7 @@ function DialogBody(props) {
         withSpacing={withSpacing}
         bigSpacing={bigSpacing}
         minHeight={minHeight}
+        keptHeight={keepHeight ? contentHeight : 0}
         fullHeight={fullHeight}
         hideFooter={hideFooter}
         noOverflow={noOverflow}
@@ -128,6 +150,7 @@ DialogBody.propTypes = {
     withSpacing    : PropTypes.bool,
     bigSpacing     : PropTypes.bool,
     minHeight      : PropTypes.number,
+    keepHeight     : PropTypes.bool,
     fullHeight     : PropTypes.bool,
     noOverflow     : PropTypes.bool,
     hideFooter     : PropTypes.bool,

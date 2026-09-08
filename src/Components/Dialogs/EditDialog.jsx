@@ -17,6 +17,11 @@ const Message = Styled(DialogMessage)`
     margin-top: 0;
 `;
 
+const Content = Styled(Form)`
+    flex-grow: 1;
+    min-height: 0;
+`;
+
 
 
 /**
@@ -27,14 +32,14 @@ const Message = Styled(DialogMessage)`
 function EditDialog(props) {
     const {
         open, title, icon, header, message, className, isLoading, loadingMessage,
-        width, isNarrow, isWide, minHeight, fullHeight,
+        width, isNarrow, isWide, minHeight, keepHeight, fullHeight,
         noOverflow, withSpacing, bigSpacing, withFade,
-        error, isDisabled, dontClose, noAutoFocus,
+        error, isDisabled, dontClose, noAutoFocus, bigGap,
         hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryLoading, onSecondary,
         tertiary, tertiaryVariant, onTertiary,
-        aside, children,
+        aside, asideWidth, children,
     } = props;
 
 
@@ -50,6 +55,7 @@ function EditDialog(props) {
         dontClose={dontClose}
         dontBackClose
         aside={aside}
+        asideWidth={asideWidth}
     >
         <DialogHeader message={title} icon={icon}>
             {header}
@@ -57,6 +63,7 @@ function EditDialog(props) {
         <DialogBody
             className={className}
             minHeight={minHeight}
+            keepHeight={keepHeight}
             fullHeight={fullHeight}
             noOverflow={noOverflow}
             withSpacing={withSpacing}
@@ -65,13 +72,14 @@ function EditDialog(props) {
             hideFooter={hideFooter}
         >
             <Message variant="h3" message={message} />
-            <Form
+            <Content
                 error={error}
                 onSubmit={onSubmit}
                 noAutoFocus={noAutoFocus}
+                bigGap={bigGap}
             >
                 {children}
-            </Form>
+            </Content>
         </DialogBody>
         {!hideFooter && <DialogFooter
             isDisabled={isLoading || isDisabled}
@@ -111,10 +119,12 @@ EditDialog.propTypes = {
     isDisabled       : PropTypes.bool,
     hideFooter       : PropTypes.bool,
     noAutoFocus      : PropTypes.bool,
+    bigGap           : PropTypes.bool,
     width            : PropTypes.number,
     isNarrow         : PropTypes.bool,
     isWide           : PropTypes.bool,
     minHeight        : PropTypes.number,
+    keepHeight       : PropTypes.bool,
     fullHeight       : PropTypes.bool,
     noOverflow       : PropTypes.bool,
     withSpacing      : PropTypes.bool,
@@ -135,6 +145,7 @@ EditDialog.propTypes = {
     tertiaryVariant  : PropTypes.string,
     onTertiary       : PropTypes.func,
     aside            : PropTypes.any,
+    asideWidth       : PropTypes.number,
     children         : PropTypes.any,
 };
 
@@ -150,8 +161,10 @@ EditDialog.defaultProps = {
     isLoading   : false,
     isDisabled  : false,
     noAutoFocus : false,
+    bigGap      : false,
     isNarrow    : false,
     isWide      : false,
+    keepHeight  : false,
     fullHeight  : false,
     noOverflow  : false,
     withSpacing : true,

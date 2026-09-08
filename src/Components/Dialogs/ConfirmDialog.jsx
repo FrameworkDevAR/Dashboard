@@ -37,7 +37,7 @@ const Children = Styled.div`
  */
 function ConfirmDialog(props) {
     const {
-        open, icon, title, message, content, isLoading, isWide,
+        open, className, icon, title, message, content, isLoading, isWide,
         bigSpacing, primary, primaryVariant, cancel, result,
         onSubmit, onClose, children,
     } = props;
@@ -50,6 +50,7 @@ function ConfirmDialog(props) {
     // Do the Render
     return <Dialog
         open={open}
+        className={className}
         onClose={onClose}
         isLoading={isLoading}
         dontClose={isLoading}
@@ -80,6 +81,7 @@ function ConfirmDialog(props) {
  */
 ConfirmDialog.propTypes = {
     open           : PropTypes.bool.isRequired,
+    className      : PropTypes.string,
     icon           : PropTypes.string.isRequired,
     title          : PropTypes.string.isRequired,
     message        : PropTypes.string.isRequired,

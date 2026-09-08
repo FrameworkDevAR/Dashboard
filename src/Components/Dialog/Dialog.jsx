@@ -40,8 +40,20 @@ const Wrapper = Styled.div`
     max-height: 100%;
 `;
 
-const AsideBox = Styled.div`
-    display: flex;
+const AsideBox = Styled.div.attrs(({ asideWidth }) => ({ asideWidth }))`
+    position: relative;
+    flex-shrink: 0;
+    width: ${(props) => `${props.asideWidth}px`};
+    margin-left: var(--main-gap);
+
+    > * {
+        position: absolute;
+        inset: 0;
+    }
+
+    @media (max-width: 1000px) {
+        display: none;
+    }
 `;
 
 const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosing }) => ({ width, isWide, isNarrow, hasTabs, isClosing }))`
@@ -96,7 +108,7 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
 function Dialog(props) {
     const {
         open, className, isLoading, loadingMessage,
-        width, isWide, isNarrow, noTab, zIndex, aside,
+        width, isWide, isNarrow, noTab, zIndex, aside, asideWidth,
         dontClose, dontBackClose, onClose, hasFooter, children,
     } = props;
 
@@ -238,7 +250,7 @@ function Dialog(props) {
     >
         {!aside ? content : <Wrapper>
             {content}
-            {showAside && <AsideBox onMouseDown={handleMouseDown}>
+            {showAside && <AsideBox asideWidth={asideWidth} onMouseDown={handleMouseDown}>
                 {aside}
             </AsideBox>}
         </Wrapper>}
@@ -264,6 +276,7 @@ Dialog.propTypes = {
     loadingMessage : PropTypes.string,
     hasFooter      : PropTypes.bool,
     aside          : PropTypes.any,
+    asideWidth     : PropTypes.number,
     children       : PropTypes.any,
 };
 
@@ -281,6 +294,7 @@ Dialog.defaultProps = {
     isNarrow      : false,
     noTab         : false,
     isLoading     : false,
+    asideWidth    : 320,
 };
 
 export default Dialog;
