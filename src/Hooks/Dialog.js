@@ -42,8 +42,9 @@ function useDialog(slice, open, elemID = 0, data = null, setElem = null, getElem
     };
 
 
-    // Dialog Opens
-    React.useEffect(() => {
+    // Dialog Opens. The loading starts before the browser paints, as the body of the dialog
+    // would show the fields with the data of the last time it was open for a frame
+    React.useLayoutEffect(() => {
         if (!open) {
             return;
         }
