@@ -70,7 +70,7 @@ function CardItem(props) {
     if (isHidden || (!message && !children)) {
         return <React.Fragment />;
     }
-    return <Container className={className}>
+    return <Container className={`card-item ${className}`}>
         <Label>{NLS.get(label)}</Label>
         <Value>{content}</Value>
         {hasCopy && <Copy>

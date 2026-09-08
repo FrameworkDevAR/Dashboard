@@ -12,6 +12,10 @@ const Container = Styled.section`
     padding: 16px 18px;
     border: 1px solid var(--border-color-light);
     border-radius: var(--border-radius-medium);
+
+    &:has(> .card-item) {
+        padding-bottom: 10px;
+    }
 `;
 
 const Title = Styled.h3`
