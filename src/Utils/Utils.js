@@ -1252,6 +1252,27 @@ function getSelectItems(itemIDs, options, idsPerItem) {
 }
 
 /**
+ * Returns the Values that still belong to one of the given Parents
+ * @param {number[]} itemIDs
+ * @param {number[]} values
+ * @param {object}   idsPerItem
+ * @returns {number[]}
+ */
+function getSelectValues(itemIDs, values, idsPerItem) {
+    if (!itemIDs || !itemIDs.length) {
+        return values;
+    }
+
+    const itemIDsPerItem = [];
+    for (const itemID of itemIDs) {
+        if (idsPerItem[itemID]) {
+            itemIDsPerItem.push(...idsPerItem[itemID]);
+        }
+    }
+    return values.filter((value) => hasValue(itemIDsPerItem, value));
+}
+
+/**
  * Returns the Select list based on a Parent
  * @param {boolean}  loading
  * @param {number[]} itemIDs
@@ -1891,6 +1912,7 @@ export default {
     parseList,
     hasError,
     hasFormError,
+    getSelectValues,
     useSelectList,
     useSubSelectList,
     isSpecialKey,

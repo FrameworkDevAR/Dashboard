@@ -88,14 +88,17 @@ function ChooserInput(props) {
 
     // Sets the Values
     const setValues = (key) => {
-        const pos = values.indexOf(key);
+        // The value is the state of the parent, so it is copied and not edited in place,
+        // as the change would not be seen by whatever derives a list from it
+        const newValues = [ ...values ];
+        const pos       = newValues.indexOf(key);
         if (pos > -1) {
-            values.splice(pos, 1);
+            newValues.splice(pos, 1);
         } else {
-            values.push(key);
+            newValues.push(key);
         }
 
-        onChange(name, values);
+        onChange(name, newValues);
         setFilter("");
         setSelectedIndex();
     };
