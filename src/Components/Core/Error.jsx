@@ -4,6 +4,7 @@ import Styled               from "styled-components";
 // Core & Utils
 import Store                from "../../Core/Store";
 import Utils                from "../../Utils/Utils";
+import SQL                  from "../../Utils/SQL";
 
 // Components
 import ViewDialog           from "../Dialogs/ViewDialog";
@@ -177,7 +178,7 @@ function Error() {
         // Parse an SQL error
         if (error.message.includes("MySQL Error")) {
             const title = "PHP: MySQL Error";
-            const dump  = Utils.sqlToHtml(error.message.replace("MySQL Error: ", "").replace(/\n/g, "<br>"));
+            const dump  = SQL.toHtml(error.message.replace("MySQL Error: ", ""));
             return { title, message : "", filePath : "", fileName : "", line : "", stackLines : [], dump, isSQL : true };
         }
 
