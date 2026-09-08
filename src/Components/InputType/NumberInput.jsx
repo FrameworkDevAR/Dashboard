@@ -1,5 +1,6 @@
 import React                from "react";
 import PropTypes            from "prop-types";
+import Styled               from "styled-components";
 
 // Core & Utils
 import KeyCode              from "../../Utils/KeyCode";
@@ -7,6 +8,27 @@ import KeyCode              from "../../Utils/KeyCode";
 // Components
 import InputContent         from "../Input/InputContent";
 import InputBase            from "../Input/InputBase";
+import IconLink             from "../Link/IconLink";
+
+
+
+// Styles
+const Step = Styled(IconLink)`
+    flex-shrink: 0;
+    margin: -4px 0;
+`;
+
+const Input = Styled(InputBase).attrs(({ withSteps }) => ({ withSteps }))`
+    ${(props) => props.withSteps && `
+        text-align: center;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+    `}
+`;
 
 
 
@@ -19,7 +41,7 @@ function NumberInput(props) {
     const {
         inputRef, className, icon, postIcon, prefixText, suffixText,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
-        id, name, value, step, minValue, maxValue, placeholder,
+        id, name, value, step, minValue, maxValue, placeholder, withSteps,
         onChange, onInput, onPaste, onClear,
         onFocus, onBlur, onKeyDown, onKeyUp, onSubmit,
     } = props;
@@ -63,6 +85,17 @@ function NumberInput(props) {
         }
     };
 
+    // Handles the Step, which adds or removes the amount of a step
+    const handleStep = (amount) => {
+        let val = Number(value || 0) + amount * Number(step);
+        if (isNaN(val) || val < minNumber) {
+            val = minNumber;
+        } else if (maxNumber !== 0 && val > maxNumber) {
+            val = maxNumber;
+        }
+        onChange(name, val);
+    };
+
     // Handles the Key Up
     const handleKeyUp = (e) => {
         if (e.keyCode === KeyCode.DOM_VK_RETURN && onSubmit) {
@@ -90,8 +123,16 @@ function NumberInput(props) {
         withLabel={withLabel}
         withPadding
     >
-        <InputBase
+        {withSteps && <Step
+            variant="black"
+            icon="minus"
+            onClick={() => handleStep(-1)}
+            isDisabled={isDisabled}
+            isSmall
+        />}
+        <Input
             inputRef={inputRef}
+            withSteps={withSteps}
             type="number"
             id={id}
             name={name}
@@ -109,6 +150,13 @@ function NumberInput(props) {
             onFocus={onFocus}
             onBlur={onBlur}
         />
+        {withSteps && <Step
+            variant="black"
+            icon="plus"
+            onClick={() => handleStep(1)}
+            isDisabled={isDisabled}
+            isSmall
+        />}
     </InputContent>;
 }
 
@@ -135,6 +183,7 @@ NumberInput.propTypes = {
     step        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     minValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     maxValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    withSteps   : PropTypes.bool,
     onChange    : PropTypes.func.isRequired,
     onInput     : PropTypes.func,
     onPaste     : PropTypes.func,
@@ -159,6 +208,7 @@ NumberInput.defaultProps = {
     withLabel   : true,
     placeholder : "",
     step        : "1",
+    withSteps   : false,
 };
 
 export default NumberInput;
