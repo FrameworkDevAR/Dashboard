@@ -21,7 +21,7 @@ const STATE_VARIANTS = {
 };
 
 // Styles
-const Container = Styled.span.attrs(({ variant, isOutlined, withDot, smallRadius }) => ({ variant, isOutlined, withDot, smallRadius }))`
+const Container = Styled.span.attrs(({ variant, isOutlined, isSmall, withDot, smallRadius }) => ({ variant, isOutlined, isSmall, withDot, smallRadius }))`
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -46,6 +46,10 @@ const Container = Styled.span.attrs(({ variant, isOutlined, withDot, smallRadius
 
     ${(props) => props.isOutlined && `
         border-color: ${props.variant === "gray" ? "var(--light-gray)" : "currentColor"};
+    `}
+    ${(props) => props.isSmall && `
+        --pill-padding: 2px 8px;
+        --pill-font-size: 12px;
     `}
     ${(props) => props.smallRadius && `
         border-radius: var(--border-radius-small);
@@ -77,7 +81,7 @@ const PillIcon = Styled(Icon)`
  */
 function Pill(props) {
     const {
-        isHidden, className, variant, isOutlined, withDot, smallRadius,
+        isHidden, className, variant, isOutlined, isSmall, withDot, smallRadius,
         icon, message, children,
     } = props;
 
@@ -90,6 +94,7 @@ function Pill(props) {
         className={`pill ${className}`}
         variant={STATE_VARIANTS[variant] || variant || "gray"}
         isOutlined={isOutlined}
+        isSmall={isSmall}
         withDot={withDot}
         smallRadius={smallRadius}
     >
@@ -107,6 +112,7 @@ Pill.propTypes = {
     className   : PropTypes.string,
     variant     : PropTypes.string,
     isOutlined  : PropTypes.bool,
+    isSmall     : PropTypes.bool,
     withDot     : PropTypes.bool,
     smallRadius : PropTypes.bool,
     icon        : PropTypes.string,

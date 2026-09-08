@@ -17,7 +17,7 @@ import PillYesNo            from "../Pill/PillYesNo";
 
 
 // Styles
-const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle }) => ({ gap, isLink, isSelected, withTitle }))`
+const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle, smallPill }) => ({ gap, isLink, isSelected, withTitle, smallPill }))`
     position: relative;
     display: flex;
     align-items: center;
@@ -26,6 +26,7 @@ const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle }) => (
     border-radius: var(--border-radius);
     transition: all 0.2s;
 
+    ${(props) => props.smallPill && "padding: 4px 8px;"};
     ${(props) => !!props.gap && `gap: ${props.gap}px;`};
     ${(props) => props.isLink && "cursor: pointer;"};
     ${(props) => props.withTitle && `
@@ -85,7 +86,7 @@ const DetailCopy = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
 function DetailItem(props) {
     const {
         isHidden, className, textColor, gap,
-        message, icon, title, prefix, prefixLine, yesNo, showAlways,
+        message, icon, title, prefix, prefixLine, yesNo, smallPill, showAlways,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
         href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected,
         hasCopy, copyValue, children,
@@ -149,7 +150,8 @@ function DetailItem(props) {
     return <Container
         ref={elementRef}
         className={textColor ? `text-${textColor} ${className}` : className}
-        gap={hasYesNo ? "8" : gap}
+        gap={gap}
+        smallPill={hasYesNo && smallPill}
         isLink={isLink}
         isSelected={isSelected}
         withTitle={withTitle}
@@ -161,7 +163,7 @@ function DetailItem(props) {
         {withTitle && <ItemTitle>{NLS.get(title)}</ItemTitle>}
         {hasYesNo && <Text>{content}</Text>}
         {!hasYesNo && (isHtml ? <Html addBreaks>{content}</Html> : content)}
-        {hasYesNo && <PillYesNo value={yesNo} />}
+        {hasYesNo && <PillYesNo value={yesNo} isSmall={smallPill} />}
         {showCopy && <DetailCopy
             isFloating={floatCopy}
             onClick={handleCopyClick}
@@ -193,6 +195,7 @@ DetailItem.propTypes = {
     prefix         : PropTypes.string,
     prefixLine     : PropTypes.bool,
     yesNo          : PropTypes.oneOfType([ PropTypes.bool, PropTypes.number, PropTypes.string ]),
+    smallPill      : PropTypes.bool,
     href           : PropTypes.string,
     url            : PropTypes.string,
     target         : PropTypes.string,

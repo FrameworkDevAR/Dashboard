@@ -15,7 +15,7 @@ import Pill                 from "./Pill";
  * @returns {React.ReactElement}
  */
 function PillYesNo(props) {
-    const { isHidden, className, value } = props;
+    const { isHidden, className, value, isSmall } = props;
 
 
     // Do the Render
@@ -23,6 +23,7 @@ function PillYesNo(props) {
         isHidden={isHidden}
         className={className}
         variant={Number(value) ? "success" : "gray"}
+        isSmall={isSmall}
         withDot
     >
         {Utils.toYesNo(value)}
@@ -37,6 +38,7 @@ PillYesNo.propTypes = {
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
     value     : PropTypes.oneOfType([ PropTypes.bool, PropTypes.number, PropTypes.string ]),
+    isSmall   : PropTypes.bool,
 };
 
 export default PillYesNo;
