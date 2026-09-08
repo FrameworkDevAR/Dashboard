@@ -36,6 +36,17 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
 `;
 
+const Sticky = Styled.div`
+    position: sticky;
+    top: -4px;
+    display: flex;
+    justify-content: center;
+    margin-top: -4px;
+    padding: 4px 0;
+    background-color: var(--content-color);
+    z-index: 4;
+`;
+
 const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
     position: absolute;
     top: var(--pills-space);
@@ -58,8 +69,8 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
  */
 function PillTabs(props) {
     const {
-        isHidden, className, fillWidth, isFit, isMedium, isCentered, topSpace, bottomSpace,
-        selected, onClick, children,
+        isHidden, className, fillWidth, isFit, isMedium, isCentered, isSticky,
+        topSpace, bottomSpace, selected, onClick, children,
     } = props;
 
 
@@ -103,7 +114,7 @@ function PillTabs(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container
+    const content = <Container
         ref={contentRef}
         className={`pills ${className}`}
         fillWidth={fillWidth}
@@ -118,6 +129,13 @@ function PillTabs(props) {
         />
         {items}
     </Container>;
+
+    if (isSticky) {
+        return <Sticky>
+            {content}
+        </Sticky>;
+    }
+    return content;
 }
 
 /**
@@ -131,6 +149,7 @@ PillTabs.propTypes = {
     isFit       : PropTypes.bool,
     isMedium    : PropTypes.bool,
     isCentered  : PropTypes.bool,
+    isSticky    : PropTypes.bool,
     topSpace    : PropTypes.number,
     bottomSpace : PropTypes.number,
     selected    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
@@ -149,6 +168,7 @@ PillTabs.defaultProps = {
     isFit      : false,
     isMedium   : false,
     isCentered : false,
+    isSticky   : false,
 };
 
 export default PillTabs;
