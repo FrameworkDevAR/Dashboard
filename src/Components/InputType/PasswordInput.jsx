@@ -17,7 +17,11 @@ import IconLink             from "../Link/IconLink";
 const InputIcon = Styled(IconLink).attrs(({ withLabel }) => ({ withLabel }))`
     margin-right: -6px;
 
-    ${(props) => props.withLabel && "margin-top: -4px;"}
+    ${(props) => props.withLabel ? `
+        margin-top: -4px;
+    ` : `
+        margin-block: -4px;
+    `}
 `;
 
 

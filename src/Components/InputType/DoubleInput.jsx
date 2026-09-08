@@ -12,7 +12,7 @@ import InputField           from "../Form/InputField";
 
 
 // Styles
-const Container = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
+const Container = Styled.div.attrs(({ withLabel, outsideLabel }) => ({ withLabel, outsideLabel }))`
     width: 100%;
     display: flex;
     align-items: center;
@@ -49,6 +49,13 @@ const Container = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
             right: 0;
         }
     `}
+
+    ${(props) => props.outsideLabel && `
+        .input-content {
+            min-height: 36px;
+            padding: var(--input-padding) !important;
+        }
+    `}
 `;
 
 
@@ -60,7 +67,7 @@ const Container = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
  */
 function DoubleInput(props) {
     const {
-        className, isFocused, isDisabled, withLabel, withBorder,
+        className, isFocused, isDisabled, withLabel, outsideLabel, withBorder,
         onChange, onFocus, onBlur, children,
     } = props;
 
@@ -79,17 +86,18 @@ function DoubleInput(props) {
         withPadding={withLabel}
         withBorder={withBorder}
     >
-        <Container withLabel={withLabel}>
+        <Container withLabel={withLabel} outsideLabel={outsideLabel}>
             {items.map((item) => <InputField
                 {...item}
                 key={item.name}
+                label={outsideLabel ? "" : item.label}
                 onChange={item.onChange || onChange}
                 isDisabled={isDisabled}
                 withBorder={false}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 withPadding
-                withLabel
+                withLabel={!outsideLabel}
                 fullWidth
             />)}
         </Container>
@@ -101,15 +109,16 @@ function DoubleInput(props) {
  * @type {object} propTypes
  */
 DoubleInput.propTypes = {
-    className  : PropTypes.string,
-    isFocused  : PropTypes.bool,
-    isDisabled : PropTypes.bool,
-    withBorder : PropTypes.bool,
-    withLabel  : PropTypes.bool,
-    onChange   : PropTypes.func.isRequired,
-    onFocus    : PropTypes.func,
-    onBlur     : PropTypes.func,
-    children   : PropTypes.any,
+    className    : PropTypes.string,
+    isFocused    : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    withBorder   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
+    outsideLabel : PropTypes.bool,
+    onChange     : PropTypes.func.isRequired,
+    onFocus      : PropTypes.func,
+    onBlur       : PropTypes.func,
+    children     : PropTypes.any,
 };
 
 /**
@@ -117,11 +126,12 @@ DoubleInput.propTypes = {
  * @type {object} defaultProps
  */
 DoubleInput.defaultProps = {
-    className  : "",
-    isFocused  : false,
-    isDisabled : false,
-    withBorder : true,
-    withLabel  : true,
+    className    : "",
+    isFocused    : false,
+    isDisabled   : false,
+    withBorder   : true,
+    withLabel    : true,
+    outsideLabel : false,
 };
 
 export default DoubleInput;

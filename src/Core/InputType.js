@@ -68,6 +68,18 @@ function canShrink(type) {
 }
 
 /**
+ * Returns true if the Input has an element that can be focused
+ * @param {string} type
+ * @returns {boolean}
+ */
+function canFocus(type) {
+    return ![
+        BUTTONS, CHECKBOX, CHIPS, COLOR, DOUBLE, EMOJI, FIELDS,
+        FILE, LIST, MEDIA, MULTIPLE, RADIO, RADIOBOX, TOGGLE,
+    ].includes(type);
+}
+
+/**
  * Returns true if there is a value
  * @param {string} type
  * @param {*}      value
@@ -162,6 +174,7 @@ export default {
     hasLabel,
     hasClear,
     canShrink,
+    canFocus,
     isValueFilled,
     hasValue,
     getOptions,

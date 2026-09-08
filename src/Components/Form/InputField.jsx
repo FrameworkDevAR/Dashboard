@@ -17,14 +17,19 @@ import InputCopy            from "../Input/InputCopy";
 
 // Styles
 const FieldContent = Styled.div`
+    position: relative;
     display: flex;
     align-items: center;
 `;
 
-const FieldHelper = Styled.p`
-    font-size: 0.9em;
+const FieldHelper = Styled.p.attrs(({ isOutside }) => ({ isOutside }))`
+    font-size: var(--font-size-small);
     margin: 4px 0 0 4px;
     color: var(--darkest-gray);
+
+    ${(props) => props.isOutside && `
+        margin: -2px 0 6px 0;
+    `}
 `;
 
 
@@ -40,7 +45,8 @@ function InputField(props) {
         label, icon, postIcon, prefixText, suffixText, value,
         error, helperText, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
-        autoFocus, withLabel, shrinkLabel, bigLabel, errorBackground,
+        autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel,
+        rightToggle, rightInput, atBottom, errorBackground,
         suggestID, hasClear, forceClear, hideClear, onClear,
         hasCopy, copyValue, onCopy,
     } = props;
@@ -132,16 +138,30 @@ function InputField(props) {
 
 
     // Variables
+    // The label is shown over the border of the Input, unless it is asked outside of it.
+    // An Input with no label takes the same style, so it is as tall as one that has it
     const hasLabel      = Boolean(label && InputType.hasLabel(type));
+    const hasOutside    = Boolean(hasLabel && outsideLabel);
+    const withOutside   = Boolean(outsideLabel);
+    const canFocus      = InputType.canFocus(type);
     const isValueFilled = InputType.isValueFilled(type, value);
     const hasValue      = InputType.hasValue(type, value);
     const showsEmpty    = InputType.showsEmpty(type, props);
     const withTransform = !shrinkLabel && InputType.canShrink(type);
     const withValue     = Boolean(isValueFilled || isFocused || showsEmpty);
-    const withInsideCnt = !hasLabel || isValueFilled || isFocused || shrinkLabel || showsEmpty;
+    const withInsideCnt = hasOutside || !hasLabel || isValueFilled || isFocused
+        || shrinkLabel || showsEmpty;
     const withClear     = forceClear || (hasValue && !hideClear && (hasClear || InputType.hasClear(type)));
     const hasError      = Boolean(error);
     const hasHelperText = !hasError && Boolean(helperText);
+
+
+    // Handles the Label Click, which focuses the input as a real label does
+    const handleLabel = () => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
 
 
     // Do the Render
@@ -155,17 +175,26 @@ function InputField(props) {
         fullWidth={fullWidth}
         hasError={hasError}
         bigLabel={bigLabel}
+        outsideLabel={withOutside}
+        bottomSpace={rightToggle}
+        rightInput={rightInput}
+        atBottom={atBottom}
     >
         {hasLabel && <InputLabel
             className="inputfield-label"
             isRequired={isRequired}
-            withTransform={withTransform}
-            withValue={withValue}
-            isFocused={isFocused}
+            withTransform={!hasOutside && withTransform}
+            withValue={hasOutside || withValue}
+            isFocused={!hasOutside && isFocused}
             isBigger={bigLabel}
+            isOutside={hasOutside}
             message={label}
+            onClick={(hasOutside && canFocus) ? handleLabel : undefined}
         />}
-        <FieldContent ref={containerRef}>
+        {(hasHelperText && hasOutside) && <FieldHelper className="inputfield-helper" isOutside>
+            {NLS.get(helperText)}
+        </FieldHelper>}
+        <FieldContent className="inputfield-content" ref={containerRef}>
             <Input
                 {...props}
                 className="inputfield-input"
@@ -180,7 +209,7 @@ function InputField(props) {
                 prefixText={withInsideCnt ? prefixText : undefined}
                 suffixText={withInsideCnt ? suffixText : undefined}
                 onClear={withClear ? handleClear : undefined}
-                withLabel={withLabel || hasLabel}
+                withLabel={withLabel || (hasLabel && !hasOutside)}
                 withInsideCnt={withInsideCnt}
             />
             <InputCopy
@@ -195,7 +224,7 @@ function InputField(props) {
             error={error}
             useBackground={errorBackground}
         />
-        {hasHelperText && <FieldHelper>
+        {(hasHelperText && !hasOutside && !rightToggle) && <FieldHelper className="inputfield-helper">
             {NLS.get(helperText)}
         </FieldHelper>}
     </InputContainer>;
@@ -226,6 +255,7 @@ InputField.propTypes = {
     allowMultiple     : PropTypes.bool,
     step              : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     minValue          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    withSteps         : PropTypes.bool,
     maxValue          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     maxAmount         : PropTypes.number,
     maxLength         : PropTypes.number,
@@ -234,6 +264,7 @@ InputField.propTypes = {
     isRequired        : PropTypes.bool,
     isDisabled        : PropTypes.bool,
     getDisabled       : PropTypes.func,
+    getContent        : PropTypes.func,
     onChange          : PropTypes.func,
     onInput           : PropTypes.func,
     onPaste           : PropTypes.func,
@@ -272,8 +303,12 @@ InputField.propTypes = {
     fullWidth         : PropTypes.bool,
     shrinkLabel       : PropTypes.bool,
     bigLabel          : PropTypes.bool,
+    outsideLabel      : PropTypes.bool,
     withLabel         : PropTypes.bool,
     withBorder        : PropTypes.bool,
+    rightToggle       : PropTypes.bool,
+    rightInput        : PropTypes.bool,
+    atBottom          : PropTypes.bool,
     dashedBorder      : PropTypes.bool,
     withLine          : PropTypes.bool,
     withEditor        : PropTypes.bool,
@@ -331,6 +366,7 @@ InputField.defaultProps = {
     suggestParams   : {},
     fullWidth       : false,
     shrinkLabel     : false,
+    outsideLabel    : false,
     bigLabel        : false,
     isSmall         : false,
     errorBackground : false,

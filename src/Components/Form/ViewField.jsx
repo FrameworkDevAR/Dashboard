@@ -117,10 +117,14 @@ const FieldError = Styled.p`
     color: #ff0033;
 `;
 
-const FieldHelper = Styled.p`
+const FieldHelper = Styled.p.attrs(({ isOutside }) => ({ isOutside }))`
     font-size: 0.9em;
     margin: 4px 0 0 4px;
     color: var(--darkest-gray);
+
+    ${(props) => props.isOutside && `
+        margin: -2px 0 6px 0;
+    `}
 `;
 
 
@@ -133,7 +137,7 @@ const FieldHelper = Styled.p`
 function ViewField(props) {
     const {
         isHidden, showEmpty, className, viewClass, textColor,
-        label, value, copyValue, message, icon,
+        label, value, copyValue, message, icon, outsideLabel,
         fullWidth, isSmall, maxHeight, noWrap, usePre,
         isSelected, error, helperText,
         linkIcon, linkVariant, linkUrl, linkHref, linkTarget,
@@ -151,6 +155,7 @@ function ViewField(props) {
     const isHtml      = !isLink && !hasChildren && (content.includes("<br>") || content.includes("<b>") || content.includes("<i>"));
     const isText      = !isLink && !hasChildren && !isHtml;
     const withLabel   = !!label;
+    const hasOutside  = Boolean(withLabel && outsideLabel);
     const hasLink     = Boolean(linkIcon && linkHref);
     const hasButton   = Boolean(showButton && buttonMessage && onButton);
     const hasError    = Boolean(error);
@@ -166,18 +171,23 @@ function ViewField(props) {
         className={`inputview ${className}`}
         fullWidth={fullWidth}
         hasError={hasError}
+        outsideLabel={hasOutside}
     >
         {withLabel && <FieldLabel
             className="inputview-label"
             message={label}
             isSelected={isSelected}
-            withTransform
+            isOutside={hasOutside}
+            withTransform={!hasOutside}
             withValue
         />}
+        {(hasHelper && hasOutside) && <FieldHelper isOutside>
+            {NLS.get(helperText)}
+        </FieldHelper>}
         <FieldContent
             className="inputview-cnt"
             isSmall={isSmall}
-            withLabel={withLabel}
+            withLabel={withLabel && !hasOutside}
             maxHeight={maxHeight}
             noWrap={noWrap}
             withLink={!!onClick}
@@ -232,7 +242,7 @@ function ViewField(props) {
             />
         </FieldContent>
         {hasError  && <FieldError>{NLS.get(error)}</FieldError>}
-        {hasHelper && <FieldHelper>{NLS.get(helperText)}</FieldHelper>}
+        {(hasHelper && !hasOutside) && <FieldHelper>{NLS.get(helperText)}</FieldHelper>}
     </InputContainer>;
 }
 
@@ -247,6 +257,7 @@ ViewField.propTypes = {
     viewClass     : PropTypes.string,
     textColor     : PropTypes.string,
     label         : PropTypes.string,
+    outsideLabel  : PropTypes.bool,
     icon          : PropTypes.string,
     value         : PropTypes.any,
     copyValue     : PropTypes.any,

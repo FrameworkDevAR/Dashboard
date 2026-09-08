@@ -213,6 +213,7 @@ function DropZone(props) {
             error={error}
             showError
             isNarrow
+            outsideLabel
         />
     </>;
 }

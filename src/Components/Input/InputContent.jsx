@@ -75,6 +75,7 @@ const Container = Styled.div.attrs(({ isFocused, isDisabled, isSmall, withBorder
 const InputIcon = Styled(Icon)`
     flex-shrink: 0;
     margin-left: -4px;
+    margin-block: -1px;
     color: var(--black-color);
 `;
 
@@ -109,7 +110,7 @@ const InputButton = Styled(MenuLink).attrs(({ withLabel }) => ({ withLabel }))`
     --link-hover: var(--primary-color);
     --link-gap: 2px;
 
-    ${(props) => props.withLabel && "margin-top: -8px;"}
+    ${(props) => props.withLabel ? "margin-top: -8px;" : "margin-block: -3px;"}
     margin-right: calc(6px - var(--input-horiz-padding));
     margin-left: 4px;
     padding: 2px 6px 2px 2px;

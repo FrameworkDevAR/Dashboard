@@ -27,7 +27,7 @@ const InputValue = Styled.div`
 `;
 
 const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
-    ${(props) => props.withLabel && "margin-top: -4px;"}
+    ${(props) => props.withLabel ? "margin-top: -4px;" : "margin-block: -4px;"}
     margin-right: -6px;
     transform: rotate(45deg);
 `;

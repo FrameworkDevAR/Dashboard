@@ -8,7 +8,7 @@ import NLS                  from "../../Core/NLS";
 
 
 // Styles
-const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused, isBigger }) => ({ isRequired, withTransform, withValue, isFocused, isBigger }))`
+const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused, isBigger, isOutside, isClickable }) => ({ isRequired, withTransform, withValue, isFocused, isBigger, isOutside, isClickable }))`
     box-sizing: border-box;
     position: absolute;
     top: 6px;
@@ -47,6 +47,28 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
     ${(props) => props.isBigger && `
         font-size: 14px;
     `}
+
+    ${(props) => props.isOutside && `
+        position: static;
+        width: fit-content;
+        max-width: none;
+        margin-bottom: 6px;
+        padding: 0;
+        background-color: transparent;
+        color: var(--black-color);
+        font-size: 13px;
+        font-weight: 500;
+        transform: none;
+
+        &::after {
+            color: var(--error-color);
+        }
+    `}
+
+    ${(props) => (props.isOutside && props.isClickable) && `
+        pointer-events: auto;
+        cursor: pointer;
+    `}
 `;
 
 
@@ -59,7 +81,7 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
 function InputLabel(props) {
     const {
         className, isRequired, withTransform, withValue,
-        isFocused, isBigger, message,
+        isFocused, isBigger, isOutside, message, onClick,
     } = props;
 
 
@@ -71,6 +93,9 @@ function InputLabel(props) {
         withValue={withValue}
         isFocused={isFocused}
         isBigger={isBigger}
+        isOutside={isOutside}
+        isClickable={Boolean(onClick)}
+        onClick={onClick}
     >
         {NLS.get(message)}
     </Label>;
@@ -87,7 +112,9 @@ InputLabel.propTypes = {
     withValue     : PropTypes.bool,
     isFocused     : PropTypes.bool,
     isBigger      : PropTypes.bool,
+    isOutside     : PropTypes.bool,
     message       : PropTypes.string.isRequired,
+    onClick       : PropTypes.func,
 };
 
 /**
@@ -101,6 +128,7 @@ InputLabel.defaultProps = {
     withValue     : false,
     isFocused     : false,
     isBigger      : false,
+    isOutside     : false,
 };
 
 export default InputLabel;
