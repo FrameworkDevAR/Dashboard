@@ -2,6 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Utils
+import Utils                from "../../Utils/Utils";
+
 // Components
 import InputContent         from "../Input/InputContent";
 import InputBase            from "../Input/InputBase";
@@ -19,7 +22,7 @@ const List = Styled.ul`
     gap: 6px;
 `;
 
-const Item = Styled.li.attrs(({ color }) => ({ color }))`
+const Item = Styled.li.attrs(({ color, isSelected }) => ({ color, isSelected }))`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -29,11 +32,16 @@ const Item = Styled.li.attrs(({ color }) => ({ color }))`
     border: 1px solid var(--input-border-color);
     border-radius: var(--border-radius);
     background-color: ${(props) => props.color};
+    color: ${(props) => Utils.getContrastColor(props.color)};
+    transition: box-shadow 0.2s;
     cursor: pointer;
 
-    :hover {
-        border-color: var(--input-border-hover);
+    &:hover, &:focus {
+        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${(props) => props.color};
     }
+    ${(props) => props.isSelected && `
+        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${props.color};
+    `}
 `;
 
 const Input = Styled(InputBase).attrs(({ maxWidth }) => ({ maxWidth }))`
@@ -96,6 +104,7 @@ function ColorInput(props) {
             {options.map((color) => <Item
                 key={color}
                 color={color}
+                isSelected={value === color}
                 onClick={() => onChange(name, color)}
             >
                 {value === color && <Icon icon="check" size="18" />}

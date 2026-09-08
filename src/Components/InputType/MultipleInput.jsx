@@ -16,12 +16,22 @@ const Container = Styled.div.attrs(({ columns, withLabel }) => ({ columns, withL
     box-sizing: border-box;
     display: grid;
     grid-template-columns: ${(props) => `repeat(${props.columns}, 1fr)`};
-    gap: 8px;
-    width: 100%;
+    gap: 2px;
+    width: calc(100% + 12px);
+    margin: -4px -6px;
+
+    > .input-content {
+        padding: 4px 6px;
+        border-radius: var(--border-radius);
+        transition: background-color 0.2s;
+    }
+    > .input-content:hover {
+        background-color: var(--light-gray);
+    }
 
     ${(props) => props.withLabel && `
-        margin-top: 8px;
-        margin-bottom: 4px;
+        margin-top: 4px;
+        margin-bottom: 0;
     `}
 
     @media (max-width: 400px) {
