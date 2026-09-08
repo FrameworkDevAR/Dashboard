@@ -5,26 +5,45 @@ import Styled               from "styled-components";
 // Core
 import NLS                  from "../../Core/NLS";
 
+// Components
+import InputCopy            from "../Input/InputCopy";
+
 
 
 // Styles
 const Container = Styled.div`
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
-    padding: 6px 0;
+    margin: 0 -8px;
+    padding: 6px 8px;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: var(--lightest-gray);
+    }
 `;
 
 const Label = Styled.div`
     flex: none;
     width: var(--card-label-width, 150px);
-    font-size: var(--font-size-small);
     color: var(--font-lighter);
+    font-size: var(--font-size-small);
+`;
+
+const Copy = Styled.div`
+    flex: none;
+    align-self: center;
+    margin-block: -6px;
+
+    .link {
+        margin-top: 0;
+    }
 `;
 
 const Value = Styled.div`
     flex: 1;
-    font-weight: 500;
     color: var(--title-color);
     overflow-wrap: anywhere;
 `;
@@ -37,7 +56,11 @@ const Value = Styled.div`
  * @returns {React.ReactElement}
  */
 function CardItem(props) {
-    const { isHidden, className, label, message, children } = props;
+    const { isHidden, className, label, message, hasCopy, copyValue, children } = props;
+
+
+    // Variables
+    const content = message ? NLS.get(String(message)) : children;
 
 
     // Do the Render
@@ -46,7 +69,13 @@ function CardItem(props) {
     }
     return <Container className={className}>
         <Label>{NLS.get(label)}</Label>
-        <Value>{message ? NLS.get(String(message)) : children}</Value>
+        <Value>{content}</Value>
+        {hasCopy && <Copy>
+            <InputCopy
+                copyValue={copyValue}
+                inputValue={content}
+            />
+        </Copy>}
     </Container>;
 }
 
@@ -59,6 +88,8 @@ CardItem.propTypes = {
     className : PropTypes.string,
     label     : PropTypes.string,
     message   : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    hasCopy   : PropTypes.bool,
+    copyValue : PropTypes.any,
     children  : PropTypes.any,
 };
 
@@ -69,6 +100,7 @@ CardItem.propTypes = {
 CardItem.defaultProps = {
     isHidden  : false,
     className : "",
+    hasCopy   : false,
 };
 
 export default CardItem;
