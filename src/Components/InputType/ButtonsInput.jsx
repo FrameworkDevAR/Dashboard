@@ -17,34 +17,59 @@ import Icon                 from "../Common/Icon";
 const TOOLTIP_DELAY = 0.2;
 
 // Styles
+const Content = Styled(InputContent)`
+    --buttons-padding: 4px;
+    --buttons-height: 38px;
+
+    && {
+        padding: var(--buttons-padding);
+    }
+`;
+
 const Container = Styled.div`
+    position: relative;
     display: flex;
+    align-items: stretch;
     justify-content: flex-start;
     width: 100%;
     gap: 4px;
-    margin-top: 0;
-    margin-bottom: -4px;
 `;
 
-const Item = Styled.div.attrs(({ withTexts, isDisabled, isSelected }) => ({ withTexts, isDisabled, isSelected }))`
+const Indicator = Styled.div.attrs(({ left, width, color }) => ({ left, width, color }))`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: ${(props) => props.width}px;
+    translate: ${(props) => props.left}px;
+    border-radius: calc(var(--input-border-radius, var(--border-radius)) - var(--buttons-padding));
+    background: ${(props) => props.color ? `color-mix(in srgb, var(--${props.color}-color) 12%, transparent)` : "rgb(237, 241, 250)"};
+    transition: translate 320ms cubic-bezier(0.34, 1.4, 0.4, 1), width 320ms cubic-bezier(0.34, 1.4, 0.4, 1);
+`;
+
+const Item = Styled.div.attrs(({ withTexts, isDisabled, isSelected, color }) => ({ withTexts, isDisabled, isSelected, color }))`
+    box-sizing: border-box;
+    position: relative;
     display: flex;
     gap: 4px;
     align-items: center;
     justify-content: center;
-    padding: 3px 6px;
+    min-height: calc(var(--buttons-height) - var(--buttons-padding) * 2 - 2px);
+    padding: 4px 8px;
     font-size: 12px;
     color: var(--input-label-color);
-    border-radius: var(--border-radius);
+    border-radius: calc(var(--input-border-radius, var(--border-radius)) - var(--buttons-padding));
     transition: all 0.2s;
 
     ${(props) => props.withTexts && `
         flex-grow: 2;
     `}
 
-    ${(props) => props.isDisabled ? `
+    ${(props) => props.isDisabled && `
         cursor: not-allowed;
         opacity: 0.5;
-    ` : `
+    `}
+    ${(props) => (!props.isDisabled && !props.isSelected) && `
         cursor: pointer;
         &:hover {
             background: var(--lighter-gray);
@@ -52,10 +77,10 @@ const Item = Styled.div.attrs(({ withTexts, isDisabled, isSelected }) => ({ with
     `}
 
     ${(props) => props.isSelected && `
-        background: var(--lighter-gray);
-        color: var(--primary-color);
+        color: ${props.color ? `var(--${props.color}-color)` : "var(--black-color)"};
+        font-weight: 500;
         .icon {
-            color: var(--primary-color);
+            color: ${props.color ? `var(--${props.color}-color)` : "var(--black-color)"};
         }
     `}
 `;
@@ -73,7 +98,7 @@ const Iconography = Styled(Icon).attrs(({ isSelected }) => ({ isSelected }))`
  * @returns {React.ReactElement}
  */
 function ButtonsItem(props) {
-    const { itemKey, message, isSelected, isDisabled, withTexts, onClick } = props;
+    const { icon, message, color, isSelected, isDisabled, withTexts, onClick } = props;
 
     const elementRef = React.useRef(null);
 
@@ -92,6 +117,8 @@ function ButtonsItem(props) {
     // Do the Render
     return <Item
         ref={elementRef}
+        className={isSelected ? "buttons-selected" : ""}
+        color={color}
         isSelected={isSelected}
         isDisabled={isDisabled}
         withTexts={withTexts}
@@ -99,11 +126,11 @@ function ButtonsItem(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
-        <Iconography
-            icon={itemKey}
+        {!!icon && <Iconography
+            icon={icon}
             size="18"
             isSelected={isSelected}
-        />
+        />}
         {withTexts && NLS.get(message)}
     </Item>;
 }
@@ -113,8 +140,9 @@ function ButtonsItem(props) {
  * @type {object} propTypes
  */
 ButtonsItem.propTypes = {
-    itemKey    : PropTypes.string.isRequired,
+    icon       : PropTypes.string,
     message    : PropTypes.string.isRequired,
+    color      : PropTypes.string,
     isSelected : PropTypes.bool.isRequired,
     isDisabled : PropTypes.bool,
     withTexts  : PropTypes.bool,
@@ -135,9 +163,38 @@ function ButtonsInput(props) {
     } = props;
 
 
+    // The References
+    const containerRef = React.useRef(null);
+
+    // The Current State
+    const [ bounds, setBounds ] = React.useState({ left : 0, width : 0 });
+
     // Variables
-    const items = InputType.useOptions(props);
-    const val   = String(value);
+    const items    = InputType.useOptions(props);
+    const val      = String(value);
+    const selected = items.find(({ key }) => String(key) === val);
+
+
+    // Moves the Indicator to the selected Button, using the observer as the input can
+    // mount with a size of zero, when it is inside a section that is closed
+    React.useEffect(() => {
+        const node = containerRef.current;
+        if (!node) {
+            return () => {};
+        }
+
+        const update = () => {
+            const item = node.querySelector(".buttons-selected");
+            if (item && item.offsetWidth) {
+                setBounds({ left : item.offsetLeft, width : item.offsetWidth });
+            }
+        };
+
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [ val, items.length ]);
 
 
     // Handles the Radio Change
@@ -147,7 +204,7 @@ function ButtonsInput(props) {
 
 
     // Do the Render
-    return <InputContent
+    return <Content
         className={className}
         isFocused={isFocused}
         isDisabled={isDisabled}
@@ -155,18 +212,24 @@ function ButtonsInput(props) {
         withPadding
         withLabel={withLabel}
     >
-        <Container>
-            {items.map(({ key, value }) => <ButtonsItem
+        <Container ref={containerRef}>
+            <Indicator
+                left={bounds.left}
+                width={bounds.width}
+                color={selected?.color}
+            />
+            {items.map(({ key, value, icon, color }) => <ButtonsItem
                 key={key}
-                itemKey={String(key)}
+                icon={icon || (withTexts ? "" : String(key).toLowerCase())}
                 message={value}
+                color={color}
                 isSelected={val === String(key)}
                 isDisabled={isDisabled}
                 withTexts={withTexts}
                 onClick={() => handleClick(key)}
             />)}
         </Container>
-    </InputContent>;
+    </Content>;
 }
 
 /**
