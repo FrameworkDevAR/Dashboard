@@ -23,6 +23,9 @@ const Container = Styled.div`
     &:hover {
         background-color: var(--lightest-gray);
     }
+    &:has(.pill) {
+        padding-block: 2px;
+    }
 `;
 
 const Label = Styled.div`
