@@ -11,7 +11,7 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Container = Styled.div.attrs(({ isSelected, withError, canDrag }) => ({ isSelected, withError, canDrag }))`
+const Container = Styled.div.attrs(({ isSelected, withError, canDrag, isClickable }) => ({ isSelected, withError, canDrag, isClickable }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -26,8 +26,8 @@ const Container = Styled.div.attrs(({ isSelected, withError, canDrag }) => ({ is
     border: 1px solid var(--border-color-light);
     border-radius: var(--border-radius);
     box-shadow: rgba(17, 24, 32, 0.04) 0 1px 1px;
-    transition: all 0.2s;
-    cursor: ${(props) => props.canDrag ? "grab" : "pointer"};
+    transition: opacity 0.2s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+    cursor: ${(props) => props.canDrag ? "grab" : (props.isClickable ? "pointer" : "default")};
 
     &:hover {
         border-color: var(--border-color-medium);
@@ -46,6 +46,12 @@ const Container = Styled.div.attrs(({ isSelected, withError, canDrag }) => ({ is
         padding-top: 6px;
         padding-bottom: 6px;
     `}
+`;
+
+const Grip = Styled(Icon)`
+    flex-shrink: 0;
+    color: var(--darkest-gray);
+    font-size: 16px;
 `;
 
 const CardIcon = Styled(Icon).attrs(({ color }) => ({ color }))`
@@ -76,6 +82,14 @@ const ErrorText = Styled.span`
     line-height: 1.3;
 `;
 
+const Actions = Styled.div`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: -4px;
+`;
+
 const Go = Styled(Icon)`
     flex-shrink: 0;
     color: var(--darkest-gray);
@@ -92,7 +106,7 @@ const Go = Styled(Icon)`
 function DetailCard(props) {
     const {
         isHidden, className, icon, color, message, error,
-        isSelected, canDrag, onClick, onMouseDown,
+        isSelected, canDrag, onClick, onMouseDown, onSort, actions, children,
     } = props;
 
 
@@ -105,15 +119,35 @@ function DetailCard(props) {
         isSelected={isSelected}
         withError={!!error}
         canDrag={canDrag}
+        isClickable={Boolean(onClick || onMouseDown)}
         onClick={onClick}
         onMouseDown={onMouseDown}
     >
-        <CardIcon icon={icon} color={color} />
+        <Grip
+            isHidden={!onSort}
+            icon="drag"
+            cursor="grab"
+            onMouseDown={onSort}
+            onClick={(e) => e.stopPropagation()}
+        />
+        <CardIcon
+            isHidden={!icon}
+            icon={icon}
+            color={color}
+        />
         <Content>
-            <Title>{NLS.get(message)}</Title>
-            {!!error && <ErrorText>{NLS.get(error)}</ErrorText>}
+            {children || <>
+                <Title>{NLS.get(message)}</Title>
+                {!!error && <ErrorText>{NLS.get(error)}</ErrorText>}
+            </>}
         </Content>
-        <Go icon={canDrag ? "drag" : "next"} />
+        {!!actions && <Actions onClick={(e) => e.stopPropagation()}>
+            {actions}
+        </Actions>}
+        <Go
+            isHidden={Boolean(actions)}
+            icon={canDrag ? "drag" : "next"}
+        />
     </Container>;
 }
 
@@ -124,14 +158,17 @@ function DetailCard(props) {
 DetailCard.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
-    icon        : PropTypes.string.isRequired,
+    icon        : PropTypes.string,
     color       : PropTypes.string,
-    message     : PropTypes.string.isRequired,
+    message     : PropTypes.string,
     error       : PropTypes.string,
     isSelected  : PropTypes.bool,
     canDrag     : PropTypes.bool,
     onClick     : PropTypes.func,
     onMouseDown : PropTypes.func,
+    onSort      : PropTypes.func,
+    actions     : PropTypes.any,
+    children    : PropTypes.any,
 };
 
 /**
@@ -141,6 +178,8 @@ DetailCard.propTypes = {
 DetailCard.defaultProps = {
     isHidden   : false,
     className  : "",
+    icon       : "",
+    message    : "",
     color      : "var(--font-lighter)",
     error      : "",
     isSelected : false,
