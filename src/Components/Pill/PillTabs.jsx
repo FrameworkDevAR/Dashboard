@@ -36,11 +36,11 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
 `;
 
-const Sticky = Styled.div`
+const Sticky = Styled.div.attrs(({ isCentered }) => ({ isCentered }))`
     position: sticky;
     top: -4px;
     display: flex;
-    justify-content: center;
+    justify-content: ${(props) => props.isCentered ? "center" : "flex-start"};
     margin-top: -4px;
     padding: 4px 0;
     background-color: var(--content-color);
@@ -131,7 +131,7 @@ function PillTabs(props) {
     </Container>;
 
     if (isSticky) {
-        return <Sticky>
+        return <Sticky isCentered={isCentered}>
             {content}
         </Sticky>;
     }
