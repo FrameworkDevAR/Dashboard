@@ -3,6 +3,7 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
+import NLS                  from "../../Core/NLS";
 import KeyCode              from "../../Utils/KeyCode";
 
 // Components
@@ -13,9 +14,24 @@ import IconLink             from "../Link/IconLink";
 
 
 // Styles
-const Step = Styled(IconLink)`
+const Step = Styled(IconLink).attrs(({ isLast }) => ({ isLast }))`
     flex-shrink: 0;
-    margin: -4px 0;
+    align-self: stretch;
+    height: auto;
+    margin: 0;
+
+    ${(props) => props.isLast ? `
+        margin-right: calc(var(--input-vert-padding) - var(--input-horiz-padding));
+    ` : `
+        margin-left: calc(var(--input-vert-padding) - var(--input-horiz-padding));
+    `}
+`;
+
+const Suffix = Styled.p`
+    flex-shrink: 0;
+    margin: 0;
+    font-size: 12px;
+    color: var(--input-label-color);
 `;
 
 const Input = Styled(InputBase).attrs(({ withSteps }) => ({ withSteps }))`
@@ -49,6 +65,13 @@ function NumberInput(props) {
     // Variables
     const minNumber = minValue === undefined || minValue === null ? Number.MIN_SAFE_INTEGER : Number(minValue);
     const maxNumber = maxValue === undefined || maxValue === null ? Number.MAX_SAFE_INTEGER : Number(maxValue);
+
+    // With steps the suffix is drawn here and not by the Input Content, as that one adds it
+    // after the children and the plus has to be the last thing of the field
+    const hasStepSuffix = Boolean(withSteps && suffixText);
+
+    // The steps fill the height of the field and pull themselves out by the difference of the
+    // two paddings, so the two buttons end up with the same space on their four sides
 
 
     // Handles a Change
@@ -85,9 +108,11 @@ function NumberInput(props) {
         }
     };
 
-    // Handles the Step, which adds or removes the amount of a step
-    const handleStep = (amount) => {
-        let val = Number(value || 0) + amount * Number(step);
+    // Handles the Step, which adds or removes the amount of a step. The modifiers multiply
+    // it as the arrow keys do, so a big value does not have to be reached one step at a time
+    const handleStep = (e, amount) => {
+        const mult = e.metaKey ? 100 : (e.shiftKey ? 10 : 1);
+        let   val  = Number(value || 0) + amount * mult * Number(step);
         if (isNaN(val) || val < minNumber) {
             val = minNumber;
         } else if (maxNumber !== 0 && val > maxNumber) {
@@ -114,7 +139,7 @@ function NumberInput(props) {
         icon={icon}
         postIcon={postIcon}
         prefixText={prefixText}
-        suffixText={suffixText}
+        suffixText={hasStepSuffix ? "" : suffixText}
         isFocused={isFocused}
         isDisabled={isDisabled}
         isSmall={isSmall}
@@ -126,7 +151,7 @@ function NumberInput(props) {
         {withSteps && <Step
             variant="black"
             icon="minus"
-            onClick={() => handleStep(-1)}
+            onClick={(e) => handleStep(e, -1)}
             isDisabled={isDisabled}
             isSmall
         />}
@@ -150,11 +175,13 @@ function NumberInput(props) {
             onFocus={onFocus}
             onBlur={onBlur}
         />
+        {hasStepSuffix && <Suffix>{NLS.get(suffixText)}</Suffix>}
         {withSteps && <Step
             variant="black"
             icon="plus"
-            onClick={() => handleStep(1)}
+            onClick={(e) => handleStep(e, 1)}
             isDisabled={isDisabled}
+            isLast
             isSmall
         />}
     </InputContent>;
@@ -208,6 +235,7 @@ NumberInput.defaultProps = {
     withLabel   : true,
     placeholder : "",
     step        : "1",
+    minValue    : 0,
     withSteps   : false,
 };
 
