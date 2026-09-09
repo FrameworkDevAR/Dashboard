@@ -123,7 +123,7 @@ const Description = Styled.p`
     grid-column: 1 / -1;
     margin: 0;
     color: var(--font-lighter);
-    font-size: var(--font-size-small);
+    font-size: var(--font-size);
     line-height: 1.4;
 `;
 
@@ -165,6 +165,7 @@ function DetailHeader(props) {
     const {
         isHidden, className, icon, color, message, description,
         collapsible, action, canEdit, editIcon, editTooltip,
+        viewAction, canView, viewIcon, viewTooltip,
         onAction, onClose, children,
     } = props;
 
@@ -191,9 +192,10 @@ function DetailHeader(props) {
 
 
     // Handles the Action
-    const handleAction = () => {
+    const handleAction = (e, name) => {
+        e.stopPropagation();
         if (onAction) {
-            onAction(Action.get(action));
+            onAction(Action.get(name));
         }
     };
 
@@ -201,6 +203,7 @@ function DetailHeader(props) {
     // Variables
     const isCollapsible = Boolean(collapsible && !onClose);
     const hasAction     = Boolean(action && onAction && canEdit);
+    const hasView       = Boolean(viewAction && onAction && canView);
 
 
     // Do the Render
@@ -226,11 +229,19 @@ function DetailHeader(props) {
                 <Title>{NLS.get(message)}</Title>
                 <Actions>
                     <IconLink
+                        isHidden={!hasView}
+                        variant="black"
+                        icon={viewIcon}
+                        tooltip={viewTooltip}
+                        onClick={(e) => handleAction(e, viewAction)}
+                        isSmall
+                    />
+                    <IconLink
                         isHidden={!hasAction}
                         variant="black"
                         icon={editIcon}
                         tooltip={editTooltip}
-                        onClick={handleAction}
+                        onClick={(e) => handleAction(e, action)}
                         isSmall
                     />
                     <IconLink
@@ -277,6 +288,10 @@ DetailHeader.propTypes = {
     canEdit     : PropTypes.bool,
     editIcon    : PropTypes.string,
     editTooltip : PropTypes.string,
+    viewAction  : PropTypes.string,
+    canView     : PropTypes.bool,
+    viewIcon    : PropTypes.string,
+    viewTooltip : PropTypes.string,
     onAction    : PropTypes.func,
     onClose     : PropTypes.func,
     children    : PropTypes.any,
@@ -290,6 +305,7 @@ DetailHeader.defaultProps = {
     isHidden  : false,
     className : "",
     editIcon  : "edit",
+    viewIcon  : "view",
 };
 
 export default DetailHeader;
