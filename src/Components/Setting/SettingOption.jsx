@@ -100,11 +100,19 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
     gap: var(--main-gap);
     max-width: ${(props) => props.isWide ? "none" : `var(${props.isNarrow ? "--setting-narrow-width" : "--setting-width"})`};
 
+    &:has(> .inputfield > .inputfield-label) {
+        margin-top: 6px;
+    }
+
     > * {
         flex: 1 1 180px;
     }
     > .btn {
         flex: 0 0 auto;
+    }
+    > .inputfield-color {
+        flex: 1 1 140px;
+        max-width: var(--setting-narrow-width);
     }
 
     .inputfield:not(:has(> .inputfield-label)) {
@@ -164,10 +172,11 @@ function SettingOption(props) {
         });
     };
 
-    // Handles the Header click, which works as the label of the option
+    // Handles the Header click, which works as the label of the option. A click that ends a
+    // selection does nothing, so the title and the description can be picked and copied
     const handleClick = () => {
         const node = containerRef.current;
-        if (noLabel || !node) {
+        if (noLabel || !node || !window.getSelection()?.isCollapsed) {
             return;
         }
         const toggleInput = node.querySelector("input[type='checkbox']");
