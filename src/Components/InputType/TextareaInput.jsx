@@ -2,8 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
+// Core & Utils
 import NLS                  from "../../Core/NLS";
+import KeyCode              from "../../Utils/KeyCode";
 
 // Components
 import InputContent         from "../Input/InputContent";
@@ -106,7 +107,7 @@ const Aside = Styled.aside`
 function TextareaInput(props) {
     const {
         inputRef, className, isFocused, isDisabled, withLabel,
-        id, name, value, placeholder, rows, maxRows, withEditor,
+        id, name, value, placeholder, rows, maxRows, withEditor, noNewLines,
         onChange, onClear, onInput, onPaste,
         onFocus, onBlur, onKeyDown, onKeyUp,
         maxLength, children,
@@ -119,13 +120,17 @@ function TextareaInput(props) {
     const [ actualRows, setActualRows ] = React.useState(minRows);
 
 
-    // Returns the Value
+    // Returns the Value. The new lines are dropped and not only stopped in the key down, as
+    // a paste brings them too, and they are turned into a space so the words do not join
     const getValue = (e) => {
-        const text = String(e.target.value);
+        let text = String(e.target.value);
+        if (noNewLines) {
+            text = text.replace(/\s*\n+\s*/g, " ");
+        }
         if (maxLength && text.length > maxLength) {
             return text.substring(0, maxLength);
         }
-        return e.target.value;
+        return text;
     };
 
     // Handles the Input Change
@@ -138,6 +143,17 @@ function TextareaInput(props) {
         handleAutoGrow();
         if (onInput) {
             onInput(name, getValue(e));
+        }
+    };
+
+    // Handles the Key Down, stopping the Enter when the text has to stay in a single line
+    const handleKeyDown = (e) => {
+        if (noNewLines && e.keyCode === KeyCode.DOM_VK_RETURN) {
+            e.preventDefault();
+            return;
+        }
+        if (onKeyDown) {
+            onKeyDown(e);
         }
     };
 
@@ -232,7 +248,7 @@ function TextareaInput(props) {
                 onPaste={onPaste}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                onKeyDown={onKeyDown}
+                onKeyDown={handleKeyDown}
                 onKeyUp={onKeyUp}
                 withLabel={withLabel}
             />
@@ -263,6 +279,7 @@ TextareaInput.propTypes = {
     isDisabled  : PropTypes.bool,
     withLabel   : PropTypes.bool,
     withEditor  : PropTypes.bool,
+    noNewLines  : PropTypes.bool,
     id          : PropTypes.string,
     name        : PropTypes.string.isRequired,
     placeholder : PropTypes.string,

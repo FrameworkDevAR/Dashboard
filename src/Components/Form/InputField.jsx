@@ -254,6 +254,7 @@ InputField.propTypes = {
     isChecked         : PropTypes.bool,
     allowMultiple     : PropTypes.bool,
     step              : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    noNewLines        : PropTypes.bool,
     minValue          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     withSteps         : PropTypes.bool,
     maxValue          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
