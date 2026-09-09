@@ -44,13 +44,31 @@ const Item = Styled.li.attrs(({ color, isSelected }) => ({ color, isSelected }))
     `}
 `;
 
-const Input = Styled(InputBase).attrs(({ maxWidth }) => ({ maxWidth }))`
-    height: 16px;
-    max-width: ${(props) => props.maxWidth};
+const Swatch = Styled(InputBase)`
+    flex: none;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
 
+    &:disabled {
+        cursor: default;
+    }
     &::-webkit-color-swatch-wrapper {
         padding: 0;
     }
+    &::-webkit-color-swatch {
+        border: 1px solid var(--input-border);
+        border-radius: var(--border-radius-small);
+    }
+`;
+
+const Value = Styled(InputBase)`
+    height: 16px;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
 `;
 
 
@@ -110,18 +128,7 @@ function ColorInput(props) {
                 {value === color && <Icon icon="check" size="18" />}
             </Item>)}
         </List> : <>
-            <Input
-                inputRef={inputRef}
-                name={name}
-                value={color}
-                isDisabled={isDisabled}
-                onChange={handleChange}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                maxLength={7}
-                maxWidth="80px"
-            />
-            <Input
+            <Swatch
                 type="color"
                 id={id}
                 name={name}
@@ -130,6 +137,16 @@ function ColorInput(props) {
                 onChange={handleChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
+            />
+            <Value
+                inputRef={inputRef}
+                name={name}
+                value={color}
+                isDisabled={isDisabled}
+                onChange={handleChange}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                maxLength={7}
             />
         </>}
     </InputContent>;
