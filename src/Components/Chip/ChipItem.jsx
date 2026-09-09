@@ -17,7 +17,7 @@ const Variant = {
 
 // Styles
 const Container = Styled.li.attrs(({ variant, hasClick, hasClose, isDisabled }) => ({ variant, hasClick, hasClose, isDisabled }))`
-    padding: 2px 8px;
+    padding: 1px 8px;
     font-size: 12px;
     line-height: 16px;
     border-radius: var(--border-radius);
