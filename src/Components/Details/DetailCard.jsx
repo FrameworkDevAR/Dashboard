@@ -11,7 +11,7 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Container = Styled.div.attrs(({ isSelected, withError, canDrag, isClickable }) => ({ isSelected, withError, canDrag, isClickable }))`
+const Container = Styled.div.attrs(({ isSelected, isDimmed, withError, canDrag, isClickable }) => ({ isSelected, isDimmed, withError, canDrag, isClickable }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -26,13 +26,21 @@ const Container = Styled.div.attrs(({ isSelected, withError, canDrag, isClickabl
     border: 1px solid var(--border-color-light);
     border-radius: var(--border-radius);
     box-shadow: rgba(17, 24, 32, 0.04) 0 1px 1px;
-    transition: opacity 0.2s, border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+    transition:
+        opacity 0.25s ease,
+        scale 0.3s cubic-bezier(0.34, 1.5, 0.4, 1),
+        border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
     cursor: ${(props) => props.canDrag ? "grab" : (props.isClickable ? "pointer" : "default")};
 
     &:hover {
         border-color: var(--border-color-medium);
         box-shadow: rgba(17, 24, 32, 0.13) 0 2px 6px -1px;
     }
+
+    ${(props) => props.isDimmed && `
+        opacity: 0.4;
+        scale: 0.97;
+    `}
 
     ${(props) => props.isSelected && `
         background-color: var(--lighter-gray);
@@ -106,7 +114,7 @@ const Go = Styled(Icon)`
 function DetailCard(props) {
     const {
         isHidden, className, icon, color, message, error,
-        isSelected, canDrag, onClick, onMouseDown, onSort, actions, children,
+        isSelected, isDimmed, canDrag, onClick, onMouseDown, onSort, actions, children,
     } = props;
 
 
@@ -117,6 +125,7 @@ function DetailCard(props) {
     return <Container
         className={`details-card ${className}`}
         isSelected={isSelected}
+        isDimmed={isDimmed}
         withError={!!error}
         canDrag={canDrag}
         isClickable={Boolean(onClick || onMouseDown)}
@@ -163,6 +172,7 @@ DetailCard.propTypes = {
     message     : PropTypes.string,
     error       : PropTypes.string,
     isSelected  : PropTypes.bool,
+    isDimmed    : PropTypes.bool,
     canDrag     : PropTypes.bool,
     onClick     : PropTypes.func,
     onMouseDown : PropTypes.func,
@@ -183,6 +193,7 @@ DetailCard.defaultProps = {
     color      : "var(--font-lighter)",
     error      : "",
     isSelected : false,
+    isDimmed   : false,
     canDrag    : false,
 };
 

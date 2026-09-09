@@ -75,12 +75,7 @@ const List = Styled.div`
     gap: 8px;
 `;
 
-const Item = Styled(DetailCard).attrs(({ isDimmed, isCurrent }) => ({ isDimmed, isCurrent }))`
-    transition:
-        opacity 0.25s ease,
-        scale 0.3s cubic-bezier(0.34, 1.5, 0.4, 1),
-        border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
-
+const Item = Styled(DetailCard).attrs(({ isCurrent }) => ({ isCurrent }))`
     u {
         padding: 1px 2px;
         margin: 0 -2px;
@@ -88,11 +83,6 @@ const Item = Styled(DetailCard).attrs(({ isDimmed, isCurrent }) => ({ isDimmed, 
         border-radius: 4px;
         text-decoration: none;
     }
-
-    ${(props) => props.isDimmed && `
-        opacity: 0.4;
-        scale: 0.97;
-    `}
 
     ${(props) => props.isCurrent && `
         &, &:hover {

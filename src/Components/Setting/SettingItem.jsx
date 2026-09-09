@@ -25,7 +25,7 @@ const Content = Styled.div`
  */
 function SettingItem(props) {
     const {
-        isHidden, className, elemID, index,
+        isHidden, isDimmed, className, elemID, index,
         onGrab, onEdit, onDelete, children,
     } = props;
 
@@ -36,6 +36,7 @@ function SettingItem(props) {
     }
     return <DetailCard
         className={className}
+        isDimmed={isDimmed}
         onSort={(e) => onGrab(e, elemID, index)}
         onClick={onEdit}
         actions={<>
@@ -63,6 +64,7 @@ function SettingItem(props) {
  */
 SettingItem.propTypes = {
     isHidden  : PropTypes.bool,
+    isDimmed  : PropTypes.bool,
     className : PropTypes.string,
     elemID    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]).isRequired,
     index     : PropTypes.number,
