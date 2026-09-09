@@ -58,6 +58,15 @@ const Text = Styled.span`
     font-weight: 600;
 `;
 
+const Prefix = Styled.b`
+    flex-shrink: 0;
+    margin-right: 4px;
+
+    &::after {
+        content: ":";
+    }
+`;
+
 const ItemTitle = Styled.h4`
     margin: 0 0 2px 0;
     font-size: inherit;
@@ -128,6 +137,7 @@ function DetailItem(props) {
     const copyText  = message ? NLS.get(String(message)) : "";
     const showCopy  = Boolean(hasCopy && (copyValue || copyText));
     const withTitle = Boolean(title);
+    const hasPrefix = Boolean(children && prefix && !hasYesNo);
     const floatCopy = Boolean(withTitle || copyText.length > 1000 || isHtml);
 
 
@@ -161,6 +171,7 @@ function DetailItem(props) {
     >
         {!!icon && <DetailIcon icon={icon} size="16" />}
         {withTitle && <ItemTitle>{NLS.get(title)}</ItemTitle>}
+        {hasPrefix && <Prefix>{NLS.get(prefix)}</Prefix>}
         {hasYesNo && <Text>{content}</Text>}
         {!hasYesNo && (isHtml ? <Html addBreaks>{content}</Html> : content)}
         {hasYesNo && <PillYesNo value={yesNo} isSmall={smallPill} />}
