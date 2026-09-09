@@ -17,6 +17,11 @@ const Container = Styled.div.attrs(({ withLabel, outsideLabel }) => ({ withLabel
     display: flex;
     align-items: center;
 
+    .inputfield-checkbox {
+        flex: 0 0 auto;
+        width: auto;
+    }
+
     .inputfield:first-child::after {
         content: "";
         position: absolute;
@@ -77,7 +82,8 @@ function DoubleInput(props) {
     }
 
 
-    // Do the Render
+    // Do the Render. The label of a checkbox is the text next to the box and not the label
+    // of a field, so it is the one label that stays when the input has its label outside
     return <InputContent
         className={className}
         isFocused={isFocused}
@@ -90,9 +96,9 @@ function DoubleInput(props) {
             {items.map((item) => <InputField
                 {...item}
                 key={item.name}
-                label={outsideLabel ? "" : item.label}
+                label={(outsideLabel && item.type !== "checkbox") ? "" : item.label}
                 onChange={item.onChange || onChange}
-                isDisabled={isDisabled}
+                isDisabled={isDisabled || item.isDisabled}
                 withBorder={false}
                 onFocus={onFocus}
                 onBlur={onBlur}
