@@ -32,13 +32,10 @@ const Title = Styled.h3`
     font-weight: 500;
 `;
 
-const List = Styled.ul`
-    list-style: none;
+const List = Styled.div`
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin: 0;
-    padding: 0;
 `;
 
 
@@ -63,6 +60,9 @@ function SettingList(props) {
 
     // Handles the Drop
     const handleDrop = async () => {
+        if (!orderChanged()) {
+            return;
+        }
         const list = items.map(({ id }) => id);
         swap(list);
 
@@ -73,7 +73,7 @@ function SettingList(props) {
     };
 
     // The Drag
-    const { pick, swap } = useDrag(handleDrop);
+    const { pick, orderChanged, swap } = useDrag(handleDrop);
 
 
     // Clone the Children

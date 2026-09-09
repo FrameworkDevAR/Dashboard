@@ -3,37 +3,17 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Components
-import Icon                 from "../Common/Icon";
+import DetailCard           from "../Details/DetailCard";
 import IconLink             from "../Link/IconLink";
 
 
 
 // Styles
-const Container = Styled.li`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 6px 6px 12px;
-    background-color: var(--lighter-gray);
-    border-radius: var(--border-radius);
-    transition: background-color 0.2s;
-    cursor: pointer;
-
-    &:hover {
-        background-color: var(--light-gray);
-    }
-`;
-
 const Content = Styled.div`
-    flex-grow: 2;
     display: flex;
     align-items: center;
     gap: 6px;
     min-width: 0;
-`;
-
-const Action = Styled(IconLink)`
-    margin-left: -4px;
 `;
 
 
@@ -54,29 +34,27 @@ function SettingItem(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={className}>
-        <Icon
-            icon="drag"
-            cursor="grab"
-            onMouseDown={(e) => onGrab(e, elemID, index)}
-            size={18}
-        />
-        <Content onClick={onEdit}>
-            {children}
-        </Content>
-        <Action
-            variant="black"
-            icon="edit"
-            onClick={onEdit}
-            isSmall
-        />
-        <Action
-            variant="error"
-            icon="delete"
-            onClick={onDelete}
-            isSmall
-        />
-    </Container>;
+    return <DetailCard
+        className={className}
+        onSort={(e) => onGrab(e, elemID, index)}
+        onClick={onEdit}
+        actions={<>
+            <IconLink
+                variant="black"
+                icon="edit"
+                onClick={onEdit}
+                isSmall
+            />
+            <IconLink
+                variant="error"
+                icon="delete"
+                onClick={onDelete}
+                isSmall
+            />
+        </>}
+    >
+        <Content>{children}</Content>
+    </DetailCard>;
 }
 
 /**
