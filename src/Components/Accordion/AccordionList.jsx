@@ -111,6 +111,17 @@ function AccordionList(props) {
         return null;
     };
 
+    // Returns the space that the Header of the List takes when it sticks to the
+    // top, as the Items scroll under it and the one that opens has to clear it
+    const getHeaderSpace = () => {
+        const node = listRef.current;
+        const elem = node ? node.firstElementChild : null;
+        if (!elem || window.getComputedStyle(elem).position !== "sticky") {
+            return 0;
+        }
+        return elem.offsetHeight;
+    };
+
     // Keeps the Header that was clicked in the same place while the content
     // of the Items grows and shrinks, as the one that closes can be over it
     const pinHeader = (elem, isOpening) => {
@@ -141,10 +152,12 @@ function AccordionList(props) {
         let   desired     = scrollTop + offset - pin.offset;
 
         if (pin.isOpening) {
-            const bounds = pin.item.getBoundingClientRect();
-            const itemTop = scrollTop + bounds.top - scrollerTop - SCROLL_SPACE;
-            const minimum = itemTop + bounds.height + SCROLL_SPACE - scroller.clientHeight;
-            desired = minimum > itemTop ? itemTop : Math.min(Math.max(desired, minimum), itemTop);
+            const bounds  = pin.item.getBoundingClientRect();
+            const space   = getHeaderSpace();
+            const itemTop = scrollTop + bounds.top - scrollerTop;
+            const topMost = itemTop - SCROLL_SPACE - space;
+            const minimum = itemTop + bounds.height - scroller.clientHeight;
+            desired = minimum > topMost ? topMost : Math.min(Math.max(desired, minimum), topMost);
         }
         scrollRef.current = Math.max(0, Math.round(desired));
     };
