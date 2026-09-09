@@ -32,7 +32,7 @@ const Content = Styled(Form)`
 function EditDialog(props) {
     const {
         open, title, icon, header, message, className, isLoading, loadingMessage,
-        width, isNarrow, isWide, minHeight, keepHeight, fullHeight,
+        width, isNarrow, isWide, minHeight, maxHeight, keepHeight, fullHeight,
         noOverflow, withSpacing, bigSpacing, withFade,
         error, isDisabled, dontClose, noAutoFocus, bigGap,
         hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
@@ -63,6 +63,7 @@ function EditDialog(props) {
         <DialogBody
             className={className}
             minHeight={minHeight}
+            maxHeight={maxHeight}
             keepHeight={keepHeight}
             fullHeight={fullHeight}
             noOverflow={noOverflow}
@@ -124,6 +125,7 @@ EditDialog.propTypes = {
     isNarrow         : PropTypes.bool,
     isWide           : PropTypes.bool,
     minHeight        : PropTypes.number,
+    maxHeight        : PropTypes.number,
     keepHeight       : PropTypes.bool,
     fullHeight       : PropTypes.bool,
     noOverflow       : PropTypes.bool,

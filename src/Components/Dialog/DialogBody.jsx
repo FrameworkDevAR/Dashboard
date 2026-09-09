@@ -9,7 +9,7 @@ import ScrollFade           from "../Common/ScrollFade";
 
 
 // Styles
-const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, keptHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, keptHeight, fullHeight, hideFooter, noOverflow }))`
+const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }))`
     --dialog-content: var(--dialog-body);
 
     box-sizing: border-box;
@@ -39,6 +39,9 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
     `}
     ${(props) => props.minHeight && `
         min-height: min(var(--dialog-body), ${props.minHeight}px);
+    `}
+    ${(props) => props.maxHeight && `
+        max-height: min(var(--dialog-body), ${props.maxHeight}px);
     `}
     ${(props) => props.fullHeight && `
         height: var(--dialog-body);
@@ -74,7 +77,7 @@ function DialogBody(props) {
     const {
         className, isLoading, loadingMessage,
         isCentered, isNarrow, bigSpacing, withSpacing,
-        noOverflow, minHeight, keepHeight, fullHeight, hideFooter,
+        noOverflow, minHeight, maxHeight, keepHeight, fullHeight, hideFooter,
         withFade, passedRef, onScroll, children,
     } = props;
 
@@ -117,6 +120,7 @@ function DialogBody(props) {
         withSpacing={withSpacing}
         bigSpacing={bigSpacing}
         minHeight={minHeight}
+        maxHeight={maxHeight}
         keptHeight={keepHeight ? contentHeight : 0}
         fullHeight={fullHeight}
         hideFooter={hideFooter}
@@ -150,6 +154,7 @@ DialogBody.propTypes = {
     withSpacing    : PropTypes.bool,
     bigSpacing     : PropTypes.bool,
     minHeight      : PropTypes.number,
+    maxHeight      : PropTypes.number,
     keepHeight     : PropTypes.bool,
     fullHeight     : PropTypes.bool,
     noOverflow     : PropTypes.bool,
