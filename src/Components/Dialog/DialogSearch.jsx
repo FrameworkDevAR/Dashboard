@@ -9,7 +9,7 @@ import InputField           from "../Form/InputField";
 
 // Styles
 const SearchField = Styled(InputField)`
-    --input-height: 32px;
+    --input-plain-height: 32px;
     margin-left: 32px;
     width: 200px;
 `;

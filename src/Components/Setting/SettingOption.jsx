@@ -114,13 +114,6 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
         flex: 1 1 140px;
         max-width: var(--setting-narrow-width);
     }
-
-    .inputfield:not(:has(> .inputfield-label)) {
-        --input-height: var(--setting-input-height);
-    }
-    .inputview:not(:has(> .inputview-label)) {
-        --input-height: var(--setting-view-height);
-    }
 `;
 
 

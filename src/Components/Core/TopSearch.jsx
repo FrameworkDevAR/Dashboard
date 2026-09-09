@@ -130,7 +130,7 @@ const Shortcut = Styled.span`
 `;
 
 const Field = Styled(InputField).attrs(({ hasValue }) => ({ hasValue }))`
-    --input-height: 36px;
+    --input-plain-height: 36px;
     --input-horiz-padding: 12px;
     --input-border-radius: var(--border-radius);
     --input-border: var(--light-gray);
@@ -158,7 +158,7 @@ const Field = Styled(InputField).attrs(({ hasValue }) => ({ hasValue }))`
 `;
 
 const MenuField = Styled(Field).attrs(({ isOpen, inlineWidth }) => ({ isOpen, inlineWidth }))`
-    --input-height: 32px;
+    --input-plain-height: 32px;
 
     width: 34px;
     transition: width 0.2s ease;

@@ -9,7 +9,7 @@ import InputField           from "../Form/InputField";
 
 // Styles
 const DialogField = Styled(InputField)`
-    --input-height: 30px;
+    --input-plain-height: 30px;
     margin-left: 32px;
     width: 200px;
 

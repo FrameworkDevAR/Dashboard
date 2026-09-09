@@ -68,19 +68,16 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
         padding-bottom: 8px;
     `}
 
-    ${(props) => props.outsideLabel && `
-        --input-border-radius: 12px;
-        --input-padding: 10px var(--input-horiz-padding);
+    &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)) {
+        --input-height: var(--input-plain-height, 38px);
+    }
 
-        & > * > .input-content {
-            min-height: 38px;
-        }
-        & > .inputview-cnt {
-            min-height: 38px;
-        }
-        & > .inputview-cnt .inputview-value {
-            min-height: 0;
-        }
+    ${(props) => props.outsideLabel && `
+        --input-height: var(--input-plain-height, 38px);
+        --input-border-radius: 12px;
+        --input-vert-padding: 10px;
+        --input-padding: var(--input-vert-padding) var(--input-horiz-padding);
+
         .inputfield-children {
             margin-top: -4px;
             margin-bottom: -4px;
