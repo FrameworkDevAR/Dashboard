@@ -12,7 +12,7 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Header = Styled.header`
+const Header = Styled.header.attrs(({ isError }) => ({ isError }))`
     position: relative;
     display: flex;
     flex-direction: row;
@@ -23,7 +23,7 @@ const Header = Styled.header`
     border-top-left-radius: var(--dialog-radius);
     border-top-right-radius: var(--dialog-radius);
     height: var(--dialog-header);
-    color: var(--title-color);
+    color: ${(props) => props.isError ? "var(--error-color)" : "var(--title-color)"};
 
     @media (max-width: 500px) {
         padding-right: 16px;
@@ -70,13 +70,13 @@ const H2 = Styled.h2`
  */
 function DialogHeader(props) {
     const {
-        className, message, icon,
+        className, message, icon, isError,
         dontClose, onClose, childrenOnEnd, children,
     } = props;
 
 
     // Do the Render
-    return <Header className={className}>
+    return <Header className={className} isError={isError}>
         <Start>
             {!!icon && <Icon icon={icon} size="24" />}
             <H2>{NLS.get(message)}</H2>
@@ -103,6 +103,7 @@ DialogHeader.propTypes = {
     className     : PropTypes.string,
     message       : PropTypes.string,
     icon          : PropTypes.string,
+    isError       : PropTypes.bool,
     dontClose     : PropTypes.bool,
     onClose       : PropTypes.func,
     childrenOnEnd : PropTypes.bool,

@@ -38,10 +38,10 @@ const Content = Styled(Html)`
  */
 function PromptDialog(props) {
     const {
-        open, title, message, content, icon, isLoading,
+        open, title, message, content, icon, isError, isLoading,
         isWide, isNarrow, bigSpacing, primary, primaryVariant,
         inputType, inputLabel, inputIcon, placeholder, helperText, outsideLabel,
-        initialValue, inputOptions, error, showError,
+        initialValue, inputOptions, error, showError, confirmText,
         maxLength, rows, maxRows, spellCheck, keepOnClose,
         secInputType, secInputLabel, secInputIcon, secPlaceholder,
         secHelperText, secInitialValue, secInputOptions,
@@ -92,16 +92,19 @@ function PromptDialog(props) {
     };
 
 
-    // Is the Form Disabled
+    // Is the Form Disabled. With a Confirm Text the value must be that text, to confirm
+    // actions that can not be undone, and the case and the spaces around it are ignored
     const isDisabled = React.useMemo(() => {
         let result = false;
         if (!isOptional && !value) {
             result = true;
         } else if (secRequired && !secValue) {
             result = true;
+        } else if (confirmText && String(value).trim().toLowerCase() !== NLS.get(confirmText).toLowerCase()) {
+            result = true;
         }
         return result;
-    }, [ value, isOptional, secValue, secRequired ]);
+    }, [ value, isOptional, secValue, secRequired, confirmText ]);
 
 
     // Variables
@@ -117,7 +120,7 @@ function PromptDialog(props) {
         isWide={isWide}
         isNarrow={isNarrow && !isWide}
     >
-        <DialogHeader message={title} icon={icon} />
+        <DialogHeader message={title} icon={icon} isError={isError} />
         <DialogBody bigSpacing={bigSpacing} withSpacing>
             <Container>
                 {hasMessage && <Content variant="h3">{body}</Content>}
@@ -185,6 +188,7 @@ PromptDialog.propTypes = {
     message         : PropTypes.string,
     content         : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     icon            : PropTypes.string,
+    isError         : PropTypes.bool,
     primary         : PropTypes.string,
     primaryVariant  : PropTypes.string,
     inputType       : PropTypes.string,
@@ -192,6 +196,7 @@ PromptDialog.propTypes = {
     placeholder     : PropTypes.string,
     helperText      : PropTypes.string,
     error           : PropTypes.string,
+    confirmText     : PropTypes.string,
     inputIcon       : PropTypes.string,
     outsideLabel    : PropTypes.bool,
     initialValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
