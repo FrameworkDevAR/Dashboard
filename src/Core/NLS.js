@@ -65,13 +65,22 @@ function setLang(langCode) {
 }
 
 /**
+ * Returns the Data of the given Language, or of the default one when it has none
+ * @param {string} langCode
+ * @returns {object}
+ */
+function getLangData(langCode) {
+    const langNoRegion = langCode.toLowerCase().split(/[_-]+/)[0];
+    return langsData[langNoRegion] || langsData[langCode] || langsData[defaultLang];
+}
+
+/**
  * Loads the Language Strings
  * @param {string} key
  * @returns {object}
  */
 function loadLang(key) {
-    const langNoRegion    = language.toLowerCase().split(/[_-]+/)[0];
-    const data            = langsData[langNoRegion] || langsData[language] || langsData[defaultLang];
+    const data            = getLangData(language);
     const messages        = data?.[key] || {};
     const defaultMessages = langsData[defaultLang]?.[key] || {};
 
@@ -295,6 +304,44 @@ function urlToKey(currUrl, ...keys) {
     return "";
 }
 
+/**
+ * Translates the given Url from one language to the other
+ * @param {string} currUrl
+ * @param {string} fromLang
+ * @param {string} toLang
+ * @returns {string}
+ */
+function translateUrl(currUrl, fromLang, toLang) {
+    const fromUrls = getLangData(fromLang)?.urls || {};
+    const toUrls   = getLangData(toLang)?.urls || {};
+    if (fromUrls === toUrls) {
+        return currUrl;
+    }
+
+    // Every Url has the same key in each language, so the parts of both are paired to know
+    // what each word becomes. The params and the parts that are not words, like the IDs, are
+    // kept as they are, and the first pair found for a word is the one that is used
+    const words = {};
+    for (const [ key, fromUrl ] of Object.entries(fromUrls)) {
+        const toUrl = toUrls[key];
+        if (typeof fromUrl !== "string" || typeof toUrl !== "string") {
+            continue;
+        }
+        const fromParts = fromUrl.split("/");
+        const toParts   = toUrl.split("/");
+        if (fromParts.length !== toParts.length) {
+            continue;
+        }
+        fromParts.forEach((part, index) => {
+            if (part && !part.startsWith(":") && words[part] === undefined) {
+                words[part] = toParts[index];
+            }
+        });
+    }
+
+    return currUrl.split("/").map((part) => words[part] ?? part).join("/");
+}
+
 
 
 /**
@@ -350,6 +397,7 @@ export default {
     baseUrl,
     fullUrl,
     urlToKey,
+    translateUrl,
 
     getModule,
     getAction,

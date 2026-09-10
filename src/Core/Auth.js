@@ -3,6 +3,7 @@ import NLS                  from "../Core/NLS";
 
 // Module Variables
 let setCurrentUser = null;
+let userLanguage   = "";
 
 
 
@@ -119,7 +120,15 @@ function setUser() {
 
         setCurrentUser(token.data);
         if (token.data.language) {
+            const oldLanguage = userLanguage;
+            userLanguage = token.data.language;
             NLS.setLang(token.data.language);
+
+            // The Urls are translated, so when the language changes in the middle of a session
+            // the current one is translated too, or the Router finds no route and redirects
+            if (oldLanguage && oldLanguage !== userLanguage) {
+                translateLocation(oldLanguage, userLanguage);
+            }
         }
         if (token.data.appearance) {
             setAppearance(token.data.appearance);
@@ -139,6 +148,25 @@ function setUser() {
  */
 function unsetUser() {
     setCurrentUser({});
+}
+
+/**
+ * Translates the current Location from one language to the other
+ * @param {string} fromLang
+ * @param {string} toLang
+ * @returns {void}
+ */
+function translateLocation(fromLang, toLang) {
+    const { pathname, search, hash } = window.location;
+    const newPath = NLS.translateUrl(pathname, fromLang, toLang);
+    if (newPath === pathname) {
+        return;
+    }
+
+    // The Router only reads the Location again on a popstate, so one is sent after the
+    // change, and it renders the new route together with the new language
+    window.history.replaceState(window.history.state, "", `${newPath}${search}${hash}`);
+    window.dispatchEvent(new PopStateEvent("popstate", { state : window.history.state }));
 }
 
 
