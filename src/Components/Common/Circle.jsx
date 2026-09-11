@@ -15,7 +15,7 @@ const Container = Styled.span.attrs(({ color }) => ({ color }))`
     height: 12px;
     margin-top: -3px;
     margin-right: 8px;
-    border: 1px solid var(--border-color-dark);
+    border: 1px solid ${(props) => `color-mix(in srgb, ${props.color} 75%, black)`};
     border-radius: 50%;
     background-color: ${(props) => props.color};
     vertical-align: middle;
