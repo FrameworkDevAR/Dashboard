@@ -15,6 +15,7 @@ import Form                 from "../Form/Form";
 // Styles
 const Message = Styled(DialogMessage)`
     margin-top: 0;
+    font-size: var(--font-size);
 `;
 
 const Content = Styled(Form)`

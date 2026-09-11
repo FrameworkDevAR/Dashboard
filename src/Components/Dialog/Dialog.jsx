@@ -79,7 +79,7 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
 
     ${(props) => props.width    ?  `max-width: ${props.width}px;` : ""}
     ${(props) => props.isWide   && "max-width: 1000px;"}
-    ${(props) => props.isNarrow && "max-width: 400px;"}
+    ${(props) => (props.isNarrow && !props.width) && "max-width: 400px;"}
     ${(props) => props.hasTabs  && "--dialog-tabs: var(--tabs-dialog);"}
 
     @media (max-width: 500px) {
