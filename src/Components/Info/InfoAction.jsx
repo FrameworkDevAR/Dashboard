@@ -17,7 +17,7 @@ import Button               from "../Form/Button";
 function InfoAction(props) {
     const {
         isHidden, className, variant, icon, message,
-        action, onAction,
+        action, onAction, inLowerCase,
     } = props;
 
     const act = Action.get(action);
@@ -41,6 +41,7 @@ function InfoAction(props) {
         icon={icon || act.icon}
         message={message || act.message}
         onClick={handleClick}
+        inLowerCase={inLowerCase}
     />;
 }
 
@@ -49,13 +50,14 @@ function InfoAction(props) {
  * @type {object} propTypes
  */
 InfoAction.propTypes = {
-    isHidden  : PropTypes.bool,
-    action    : PropTypes.string.isRequired,
-    className : PropTypes.string,
-    variant   : PropTypes.string,
-    icon      : PropTypes.string,
-    message   : PropTypes.string,
-    onAction  : PropTypes.func,
+    isHidden    : PropTypes.bool,
+    action      : PropTypes.string.isRequired,
+    className   : PropTypes.string,
+    variant     : PropTypes.string,
+    icon        : PropTypes.string,
+    message     : PropTypes.string,
+    onAction    : PropTypes.func,
+    inLowerCase : PropTypes.bool,
 };
 
 /**
@@ -65,7 +67,6 @@ InfoAction.propTypes = {
 InfoAction.defaultProps = {
     isHidden  : false,
     className : "",
-    variant   : "accent",
 };
 
 export default InfoAction;

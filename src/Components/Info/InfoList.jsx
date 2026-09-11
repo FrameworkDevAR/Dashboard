@@ -43,14 +43,17 @@ const Actions = Styled.div`
  * @returns {React.ReactElement}
  */
 function InfoList(props) {
-    const { className, variant, onAction, children } = props;
+    const { className, variant, inLowerCase, onAction, children } = props;
 
     const items   = [];
     const actions = [];
 
     for (const [ key, child ] of Utils.getVisibleChildren(children).entries()) {
         if (child.type === InfoAction) {
-            actions.push(React.cloneElement(child, { key, variant, onAction }));
+            actions.push(React.cloneElement(child, {
+                key, inLowerCase, onAction,
+                variant : child.props.variant || variant,
+            }));
         } else {
             items.push(React.cloneElement(child, { key }));
         }
@@ -71,10 +74,11 @@ function InfoList(props) {
  * @type {object} propTypes
  */
 InfoList.propTypes = {
-    className : PropTypes.string,
-    variant   : PropTypes.string,
-    onAction  : PropTypes.func,
-    children  : PropTypes.any,
+    className   : PropTypes.string,
+    variant     : PropTypes.string,
+    inLowerCase : PropTypes.bool,
+    onAction    : PropTypes.func,
+    children    : PropTypes.any,
 };
 
 /**
