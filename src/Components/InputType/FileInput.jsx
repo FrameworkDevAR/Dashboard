@@ -27,10 +27,11 @@ const InputValue = Styled.div`
     text-overflow: ellipsis;
 `;
 
-const InputIcon = Styled(Icon)`
-    margin-top: -4px;
+const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     margin-right: -6px;
     transform: rotate(45deg);
+
+    ${(props) => props.withLabel && "margin-top: -4px;"}
 `;
 
 const Input = Styled.input`
@@ -54,7 +55,7 @@ const Input = Styled.input`
 function FileInput(props) {
     const {
         inputRef, className, icon, postIcon, isFocused, isDisabled,
-        name, value, placeholder, onlyImages, accept, maxSize, withBorder,
+        name, value, placeholder, onlyImages, accept, maxSize, withBorder, withLabel,
         allowMultiple, onChange, onClear, onError, onFocus, onBlur,
     } = props;
 
@@ -129,8 +130,8 @@ function FileInput(props) {
         onClear={onClear ? handleClear : undefined}
         onError={onError}
         withBorder={withBorder}
+        withLabel={withLabel}
         withPadding
-        withLabel
         withClick
     >
         {multipleFiles && <ChipList>
@@ -149,6 +150,7 @@ function FileInput(props) {
         <InputIcon
             icon="attachment"
             size="18"
+            withLabel={withLabel}
         />
         <Input
             ref={inputRef}
@@ -175,6 +177,7 @@ FileInput.propTypes = {
     isFocused     : PropTypes.bool,
     isDisabled    : PropTypes.bool,
     withBorder    : PropTypes.bool,
+    withLabel     : PropTypes.bool,
     name          : PropTypes.string.isRequired,
     value         : PropTypes.any,
     placeholder   : PropTypes.string,
@@ -198,6 +201,7 @@ FileInput.defaultProps = {
     isFocused     : false,
     isDisabled    : false,
     withBorder    : true,
+    withLabel     : true,
     placeholder   : "",
     onlyImages    : false,
     allowMultiple : false,
