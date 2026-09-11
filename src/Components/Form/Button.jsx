@@ -26,6 +26,7 @@ const Variant = {
     OUTLINED_ACCENT : "outlined-accent",
     OUTLINED_ERROR  : "outlined-error",
     OUTLINED_GRAY   : "outlined-gray",
+    OUTLINED_DASHED : "outlined-dashed",
     MENU            : "menu",
     ICON            : "icon",
 };
@@ -36,6 +37,7 @@ const Variant = {
 const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }) => ({ variant, isSmall, fullWidth, inLowerCase, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }))`
     --button-color: var(--black-color);
     --button-border: black;
+    --button-border-style: solid;
     --button-background: black;
     --button-hover-color: var(--button-color);
     --button-hover-border: var(--button-border);
@@ -48,7 +50,7 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
     border: none;
     line-height: 1;
     background: var(--button-background);
-    border: 1px solid var(--button-border);
+    border: 1px var(--button-border-style) var(--button-border);
     color: var(--button-color);
     text-transform: uppercase;
     border-radius: ${(props) => props.smallRadius ? "var(--border-radius-small)" : "var(--border-radius)"};
@@ -183,6 +185,16 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
                 color: var(--darkest-gray);
                 background-color: var(--content-color);
             }
+        `;
+
+        case Variant.OUTLINED_DASHED: return `
+            --button-color: var(--primary-color);
+            --button-border: color-mix(in srgb, var(--primary-color) 45%, transparent);
+            --button-border-style: dashed;
+            --button-background: var(--content-color);
+            --button-hover-color: var(--primary-color);
+            --button-hover-border: var(--primary-color);
+            --button-hover-background: color-mix(in srgb, var(--primary-color) 8%, transparent);
         `;
 
         case Variant.OUTLINED_WHITE: return `
