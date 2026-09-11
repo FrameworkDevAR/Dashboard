@@ -28,7 +28,7 @@ const Container = Styled.header`
     position: relative;
     display: flex;
     align-items: center;
-    z-index: var(--z-navigation);
+    z-index: var(--z-search);
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         display: none;
@@ -204,7 +204,7 @@ const MenuField = Styled(Field).attrs(({ isOpen, inlineWidth }) => ({ isOpen, in
  */
 function TopSearch(props) {
     const {
-        isHidden, placeholder, value, results, onSelect, onOpen,
+        isHidden, placeholder, value, results, onSelect, onOpen, forCommands,
         onChange, onInput, onSubmit, onClear,
     } = props;
 
@@ -358,14 +358,15 @@ function TopSearch(props) {
             hasClear={isOpen}
         />, searchNode);
     }
-    // The Search only opens the Commands, so it is a Button and not a Field
+    // The Search only opens something else, so it is a Button and not a Field. It shows
+    // the shortcut of the Commands when it opens them, as that one opens them everywhere
     if (onOpen) {
         return <Container className="top-search">
             <Trigger onClick={onOpen}>
                 <Icon icon="search" />
                 {NLS.get(placeholder)}
             </Trigger>
-            <Shortcut>{COMMANDS}</Shortcut>
+            <Shortcut>{forCommands ? COMMANDS : SHORTCUT}</Shortcut>
         </Container>;
     }
 
@@ -414,6 +415,7 @@ TopSearch.propTypes = {
     results     : PropTypes.array,
     onSelect    : PropTypes.func,
     onOpen      : PropTypes.func,
+    forCommands : PropTypes.bool,
     onChange    : PropTypes.func,
     onInput     : PropTypes.func,
     onSubmit    : PropTypes.func,
@@ -429,6 +431,7 @@ TopSearch.defaultProps = {
     placeholder : "GENERAL_SEARCH",
     value       : "",
     results     : [],
+    forCommands : false,
 };
 
 export default TopSearch;
