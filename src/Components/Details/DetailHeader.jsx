@@ -47,13 +47,15 @@ const Container = Styled.div.attrs(({ hasChildren, isCollapsible }) => ({ hasChi
     ${(props) => !props.isCollapsible && stickyStyles}
 `;
 
-const Header = Styled.header.attrs(({ isCollapsible, isCollapsed }) => ({ isCollapsible, isCollapsed }))`
+const Header = Styled.header.attrs(({ isCollapsible, isCollapsed, hasDescription }) => ({ isCollapsible, isCollapsed, hasDescription }))`
     display: flex;
     align-items: flex-start;
     gap: 12px;
     padding: var(--details-spacing) 0 12px;
     border-bottom: 1px solid var(--border-color-light);
     --details-header-border: 1px;
+
+    ${(props) => props.hasDescription && "padding-bottom: calc(12px - (24px + var(--font-size) * 1.4 - 40px));"}
 
     ${(props) => props.isCollapsible && stickyStyles}
 
@@ -218,6 +220,7 @@ function DetailHeader(props) {
         <Header
             isCollapsible={isCollapsible}
             isCollapsed={isCollapsed}
+            hasDescription={!!description}
             onClick={handleClick}
         >
             <HeaderIcon
