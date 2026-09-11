@@ -33,6 +33,12 @@ function Iframe(props) {
             document.documentElement?.scrollHeight ?? 0,
             document.documentElement?.offsetHeight ?? 0,
         );
+
+        // A document with a height or a min height of 100% is as tall as the Iframe, so it only
+        // grows when the content is taller, or each resize would make the other one grow forever
+        if (height <= (document.documentElement?.clientHeight ?? 0)) {
+            return;
+        }
         setHeight(`${height + spacing}px`);
     };
 
