@@ -40,63 +40,135 @@ const Container = Styled.div.attrs(({ withBorder, isDisabled }) => ({ withBorder
     `}
 `;
 
-const Content = Styled.div.attrs(({ withLine }) => ({ withLine }))`
-    --input-height: var(--field-input-height, 44px);
-
+const Content = Styled.div.attrs(({ withTitle, withLine }) => ({ withTitle, withLine }))`
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: ${(props) => props.withLine ? "12px" : "8px"};
+    gap: ${(props) => props.withTitle ? "24px" : (props.withLine ? "20px" : "16px")};
 `;
 
 const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, withLine }) => ({ withSort, withRemove, withTitle, withError, withLine }))`
     width: 100%;
-    display: grid;
-    gap: 4px;
     background-color: var(--content-color);
 
-    ${(props) => props.withSort ? `
+    ${(props) => props.withTitle ? `
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
+        &:not(:first-child)::before {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--border-color-light);
+        }
+        &[style*="position: fixed"]::before {
+            display: none;
+        }
+        .inputfield-label {
+            margin-bottom: 5px;
+            color: var(--font-lighter);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .inputfield-helper {
+            margin: -4px 0 5px 0;
+            font-size: var(--font-size-small);
+        }
+    ` : `
+        display: grid;
+        gap: 4px;
+    `}
+
+    ${(props) => (!props.withTitle && props.withSort) ? `
         grid-template-areas:
-            ${props.withTitle ? '"title title extra"' : ""}
             "sort input remove"
             ${props.withError ? '"error error error"' : ""}
         ;
         grid-template-columns: 16px 1fr 24px;
-    ` : (props.withRemove ? `
+    ` : ((!props.withTitle && props.withRemove) ? `
         grid-template-areas:
-            ${props.withTitle ? '"title extra"' : ""}
             "input remove"
             ${props.withError ? '"error error"' : ""}
         ;
         grid-template-columns: 1fr 24px;
-    ` : `
+    ` : (!props.withTitle ? `
         grid-template-areas:
-            ${props.withTitle ? '"title"' : ""}
             "input"
             ${props.withError ? '"error"' : ""}
         ;
-    `)}
+    ` : ""))}
 
-    ${(props) => props.withLine && `
+    ${(props) => (!props.withTitle && props.withLine) && `
         padding-bottom: 12px;
         border-bottom: 2px solid var(--dark-gray);
     `}
 `;
 
 const Title = Styled.h4`
-    grid-area: title;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin: 0 4px;
-    font-size: var(--input-font);
+    gap: 8px;
+    margin: 0;
+    padding-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--title-color);
+
+    > .icon {
+        padding: 4px;
+        color: var(--darkest-gray);
+        font-size: 14px;
+        border-radius: var(--border-radius-small);
+        transition: background-color 0.2s ease-in-out;
+        cursor: grab;
+
+        &:hover {
+            background-color: var(--hover-overlay, rgba(0, 0, 0, 0.1));
+        }
+    }
 `;
 
-const Inside = Styled.div.attrs(({ columns }) => ({ columns }))`
+const Index = Styled.span`
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--lighter-gray);
+    color: var(--font-lighter);
+    font-size: 11.5px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+`;
+
+const Text = Styled.span`
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+const Actions = Styled.div`
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+`;
+
+const Inside = Styled.div.attrs(({ columns, withTitle }) => ({ columns, withTitle }))`
     grid-area: input;
+    box-sizing: border-box;
     width: 100%;
-    gap: 6px;
+    gap: ${(props) => props.withTitle ? "12px" : "6px"};
+    ${(props) => props.withTitle && "padding-left: 26px;"}
 
     ${(props) => Number(props.columns) > 1 ? `
         display: grid;
@@ -143,8 +215,16 @@ const Error = Styled(InputError)`
     border-radius: var(--border-radius);
 `;
 
-const Add = Styled(Button)`
+const Footer = Styled.footer.attrs(({ withTitle }) => ({ withTitle }))`
+    display: flex;
+    width: 100%;
     margin-top: 8px;
+
+    ${(props) => props.withTitle && `
+        margin-top: 4px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color-light);
+    `}
 `;
 
 
@@ -156,7 +236,7 @@ const Add = Styled(Button)`
  */
 function FieldInput(props) {
     const {
-        className, isDisabled, withBorder, withLine,
+        className, isDisabled, withBorder, withLine, outsideLabel,
         name, value, indexes, addButton, onChange,
         title, getAfterTitle, columns,
         errors, maxAmount, allowEmpty, noneText,
@@ -359,7 +439,7 @@ function FieldInput(props) {
         withBorder={withBorder}
         isDisabled={isDisabled}
     >
-        <Content withLine={withLine}>
+        <Content withTitle={withTitle} withLine={withLine}>
             {partsRef.current.map((elem, index) => <Item
                 key={index}
                 className="inputfield-container"
@@ -369,7 +449,7 @@ function FieldInput(props) {
                 withTitle={withTitle}
                 withLine={withLine && index < partsRef.current.length - 1}
             >
-                {canSort && <Sort>
+                {(canSort && !withTitle) && <Sort>
                     <Icon
                         variant="light"
                         icon="drag"
@@ -379,13 +459,33 @@ function FieldInput(props) {
                 </Sort>}
 
                 {withTitle && <Title>
-                    <span>{NLS.format(title, String(index + 1))}</span>
+                    {canSort && <Icon
+                        icon="drag"
+                        onMouseDown={(e) => handleGrab(e, elem, index)}
+                    />}
+                    <Index>{index + 1}</Index>
+                    <Text>{NLS.format(title, String(index + 1))}</Text>
                     {getAfterTitle?.(elem, index)}
+                    {hasPostIcons && <Actions>
+                        <IconLink
+                            isHidden={!hasExtraIcon}
+                            variant="light"
+                            icon={extraIcon}
+                            onClick={() => onExtraIcon(index)}
+                            isSmall
+                        />
+                        <IconLink
+                            variant="error"
+                            icon="delete"
+                            onClick={() => handleRemove(index)}
+                            isSmall
+                        />
+                    </Actions>}
                 </Title>}
 
                 <Error error={getError(index)} />
 
-                <Inside className="inputfield-items" columns={columns}>
+                <Inside className="inputfield-items" columns={columns} withTitle={withTitle}>
                     {items.map((item, idx) => {
                         const data     = elem || {};
                         const key      = `${item.subKey || item.name}-${index}`;
@@ -394,6 +494,12 @@ function FieldInput(props) {
                         const columns  = item.getColumns?.(data) || item.columns || 1;
                         const isHidden = item.hide?.(data) ?? false;
                         const label    = item.getLabel?.(data) || item.label;
+
+                        // The label of each column goes over the field when it is asked
+                        // outside. The rows that have a title of their own read as a block,
+                        // so each one shows them, and the ones that do not read as a table,
+                        // where only the first does. Inside the field every row shows it
+                        const showLabel = Boolean(label) && (!outsideLabel || withTitle || index === 0);
 
                         if (isHidden) {
                             return <React.Fragment key={key} />;
@@ -404,7 +510,7 @@ function FieldInput(props) {
                                 passedRef={inputRef}
                                 name={`${item.name}-${index}`}
                                 type={item.getType?.(data) || item.type}
-                                label={label}
+                                label={showLabel ? label : ""}
                                 value={value}
                                 options={item.getOptions?.(data) || item.options}
                                 icon={item.getIcon?.(data) || item.icon}
@@ -421,8 +527,7 @@ function FieldInput(props) {
                                 onMedia={() => item.onMedia?.(index, item.name)}
                                 onCreate={item.onCreate ? (value) => item.onCreate(value, index) : undefined}
                                 onCustom={item.onCustom ? (value) => item.onCustom(value, index) : undefined}
-                                withLabel={!!label || (!withTitle && index === 0)}
-                                isSmall={!label && (withTitle || index > 0)}
+                                outsideLabel={outsideLabel && showLabel}
                                 fullWidth
                             >
                                 {Utils.cloneChildren(item.children, () => ({
@@ -435,7 +540,7 @@ function FieldInput(props) {
                     })}
                 </Inside>
 
-                {hasPostIcons && <Remove>
+                {(hasPostIcons && !withTitle) && <Remove>
                     <IconLink
                         isHidden={!hasExtraIcon}
                         variant="light"
@@ -457,14 +562,16 @@ function FieldInput(props) {
             <b>{NLS.get(noneText)}</b>
         </Container>}
 
-        <Add
-            isHidden={!canAdd}
-            variant="outlined"
-            icon="add"
-            message={addButton}
-            onClick={() => handleAdd()}
-            isSmall
-        />
+        {canAdd && <Footer withTitle={withTitle}>
+            <Button
+                variant="outlined"
+                icon="add"
+                message={addButton}
+                onClick={() => handleAdd()}
+                inLowerCase
+                isSmall
+            />
+        </Footer>}
     </Container>;
 }
 
@@ -477,6 +584,7 @@ FieldInput.propTypes = {
     isDisabled    : PropTypes.bool,
     withBorder    : PropTypes.bool,
     withLine      : PropTypes.bool,
+    outsideLabel  : PropTypes.bool,
     name          : PropTypes.string.isRequired,
     value         : PropTypes.any,
     indexes       : PropTypes.any,
