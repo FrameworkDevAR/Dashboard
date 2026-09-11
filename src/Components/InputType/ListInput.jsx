@@ -384,6 +384,7 @@ function ListInput(props) {
                 icon="add"
                 message={addButton}
                 onClick={handleAdd}
+                inLowerCase
                 isSmall
             />
         </Container>

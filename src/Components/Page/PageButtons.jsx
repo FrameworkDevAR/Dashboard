@@ -20,11 +20,12 @@ function PageButtons(props) {
     return <PageFooter>
         <Button
             isHidden={!canEdit}
-            variant="outlined"
+            variant="primary"
             icon="save"
             message="GENERAL_SAVE"
             onClick={() => onSubmit()}
             isDisabled={isDisabled}
+            inLowerCase
         />
         <Button
             isHidden={!canEdit || !isEdit}
@@ -32,6 +33,7 @@ function PageButtons(props) {
             icon="delete"
             message="GENERAL_DELETE"
             onClick={() => onDelete()}
+            inLowerCase
         />
     </PageFooter>;
 }
