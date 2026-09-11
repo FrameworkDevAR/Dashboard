@@ -12,21 +12,32 @@ import Utils                from "../../Utils/Utils";
 
 // Styles
 const Container = Styled.div.attrs(({ size, hasClick }) => ({ size, hasClick }))`
+    position: relative;
     box-sizing: border-box;
     display: block;
     flex-shrink: 0;
     width: ${(props) => `${props.size}px`};
     height: ${(props) => `${props.size}px`};
-    border: 2px solid black;
-    box-shadow: 0 0 4px transparent;
     border-radius: 100%;
-    transition: all 0.5s;
+    transition: transform 0.2s ease;
     overflow: hidden;
-    ${(props) => props.hasClick && "cursor: pointer;"}
 
-    &:hover {
-        box-shadow: 0 0 4px black;
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
     }
+
+    ${(props) => props.hasClick && `
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.08);
+        }
+    `}
 `;
 
 const Image = Styled.img`
