@@ -7,6 +7,7 @@ import Setting              from "../../Hooks/Setting";
 // Components
 import Html                 from "../Common/Html";
 import Icon                 from "../Common/Icon";
+import InputField           from "../Form/InputField";
 import InputItem            from "../Form/InputItem";
 import CircularLoader       from "../Loader/CircularLoader";
 
@@ -165,6 +166,46 @@ function SettingOption(props) {
         });
     };
 
+    // Returns true if the given Child is an Input Field, which can be wrapped in a Styled
+    const isInputField = (child) => {
+        return child.type === InputField || child.type?.target === InputField;
+    };
+
+    // Adds the steps to every Number Input among the Children, going into the fragments and
+    // the wrappers to reach them, as a number in an Option is always changed by small amounts.
+    // The Items of a Field are the fields of a Double or of a list, so a Number among them
+    // gets the steps too. A Field that says what it wants is left alone
+    const addSteps = (children) => {
+        let changed = false;
+        const result  = React.Children.map(children, (child) => {
+            if (!React.isValidElement(child)) {
+                return child;
+            }
+            // @ts-ignore
+            if ((isInputField(child) || child.type === InputItem) && child.props.type === "number") {
+                // @ts-ignore
+                if (child.props.withSteps === undefined) {
+                    changed = true;
+                    // @ts-ignore
+                    return React.cloneElement(child, { withSteps : true });
+                }
+                return child;
+            }
+            // @ts-ignore
+            const inner = child.props.children;
+            if (inner) {
+                const newInner = addSteps(inner);
+                if (newInner !== inner) {
+                    changed = true;
+                    // @ts-ignore
+                    return React.cloneElement(child, { children : newInner });
+                }
+            }
+            return child;
+        });
+        return changed ? result : children;
+    };
+
     // Handles the Header click, which works as the label of the option. A click that ends a
     // selection does nothing, so the title and the description can be picked and copied
     const handleClick = () => {
@@ -227,7 +268,7 @@ function SettingOption(props) {
             isWide={isWide}
             isNarrow={isNarrow}
         >
-            {children}
+            {addSteps(children)}
         </Content>}
 
         {isInline && <Status className="setting-status">
