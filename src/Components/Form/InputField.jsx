@@ -266,6 +266,7 @@ InputField.propTypes = {
     isRequired        : PropTypes.bool,
     isDisabled        : PropTypes.bool,
     getDisabled       : PropTypes.func,
+    getPrefix         : PropTypes.func,
     getContent        : PropTypes.func,
     onChange          : PropTypes.func,
     onInput           : PropTypes.func,

@@ -188,7 +188,7 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch }) => ({ co
 function MultipleInput(props) {
     const {
         className, isFocused, isDisabled, withLabel, withBorder,
-        name, value, placeholder, columns, withSearch, getDisabled,
+        name, value, placeholder, columns, withSearch, getDisabled, getPrefix,
         onChange, onFocus, onBlur,
     } = props;
 
@@ -267,12 +267,13 @@ function MultipleInput(props) {
 
 
     // Do the Render
-    const checkboxes = shownItems.map(({ key, value, badge }) => <CheckboxInput
+    const checkboxes = shownItems.map(({ key, value, badge, ...item }) => <CheckboxInput
         key={key}
         className={parts.includes(String(key)) ? "multiple-selected" : ""}
         name={name}
         value={key}
         label={value}
+        prefix={getPrefix ? getPrefix({ key, value, ...item }) : null}
         isChecked={parts.includes(String(key))}
         isDisabled={getItemDisabled(key)}
         onChange={(name, isChecked) => handleChange(isChecked, String(key))}
@@ -360,6 +361,7 @@ MultipleInput.propTypes = {
     columns     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     withSearch  : PropTypes.bool,
     getDisabled : PropTypes.func,
+    getPrefix   : PropTypes.func,
     onChange    : PropTypes.func.isRequired,
     onFocus     : PropTypes.func.isRequired,
     onBlur      : PropTypes.func.isRequired,

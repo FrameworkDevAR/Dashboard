@@ -81,7 +81,7 @@ const Label = Styled(Html)`
 function CheckboxInput(props) {
     const {
         inputRef, className, isFocused, isDisabled, withBorder,
-        id, name, value, label, isChecked, isIndeterminate,
+        id, name, value, label, prefix, isChecked, isIndeterminate,
         onChange, onClick, onFocus, onBlur, children,
     } = props;
 
@@ -152,6 +152,7 @@ function CheckboxInput(props) {
                 onBlur={onBlur}
             />
             <Span icon={icon} />
+            {prefix}
             {!!label && <Label variant="span">{NLS.get(label)}</Label>}
             {children}
         </Container>
@@ -172,6 +173,7 @@ CheckboxInput.propTypes = {
     name            : PropTypes.string.isRequired,
     value           : PropTypes.any,
     label           : PropTypes.string,
+    prefix          : PropTypes.node,
     isChecked       : PropTypes.bool,
     isIndeterminate : PropTypes.bool,
     onChange        : PropTypes.func.isRequired,
