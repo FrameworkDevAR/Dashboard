@@ -16,7 +16,7 @@ import Pill                 from "../Pill/Pill";
 const ANIMATION_TIME = 320;
 
 // Styles
-const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled, hasSelection }) => ({ isFirst, isSelected, isDisabled, hasSelection }))`
+const Container = Styled.section.attrs(({ isFirst, isCard, isSelected, isDisabled, hasSelection }) => ({ isFirst, isCard, isSelected, isDisabled, hasSelection }))`
     display: flex;
     transition: 0.2s all;
 
@@ -50,6 +50,18 @@ const Container = Styled.section.attrs(({ isFirst, isSelected, isDisabled, hasSe
             transform: translateX(4px);
         }
     }`}
+
+    ${(props) => props.isCard && `
+        && {
+            display: block;
+            margin-top: 0;
+            padding-bottom: 12px;
+        }
+        & + & {
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color-light);
+        }
+    `}
 
     @media (max-width: 500px) {
         display: block;
@@ -101,16 +113,16 @@ const IconItem = Styled(Icon).attrs(({ iconColor }) => ({ iconColor }))`
     }`}
 `;
 
-const Inside = Styled.div.attrs(({ isLast, hasIcon, hideAside, maxWidth }) => ({ isLast, hasIcon, hideAside, maxWidth }))`
+const Inside = Styled.div.attrs(({ isLast, isCard, hasIcon, hideAside, maxWidth }) => ({ isLast, isCard, hasIcon, hideAside, maxWidth }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     flex-grow: 2;
     width: ${(props) => props.hideAside ? "100%" : (props.hasIcon ? "calc(100% - 46px)" : "calc(100% - 56px)")};
-    padding: ${(props) => props.hasIcon ? "0 0 32px 16px" : "6px 12px 32px 12px"};
+    padding: ${(props) => props.isCard ? "0" : (props.hasIcon ? "0 0 32px 16px" : "6px 12px 32px 12px")};
     transition: 0.3s all;
 
-    ${(props) => !props.isLast && "border-bottom: 1px solid var(--border-color-light);"}
+    ${(props) => !props.isLast && !props.isCard && "border-bottom: 1px solid var(--border-color-light);"}
     ${(props) => props.maxWidth && `max-width: ${props.maxWidth}px;`}
 
     @media (max-width: 500px) {
@@ -118,7 +130,7 @@ const Inside = Styled.div.attrs(({ isLast, hasIcon, hideAside, maxWidth }) => ({
     }
 `;
 
-const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled, hideAside }))`
+const Header = Styled.header.attrs(({ isCard, isDisabled, hideAside }) => ({ isCard, isDisabled, hideAside }))`
     grid-area: header;
     display: flex;
     justify-content: space-between;
@@ -128,6 +140,11 @@ const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled,
     width: 100%;
     padding-right: 8px;
     cursor: pointer;
+
+    ${(props) => props.isCard && `
+        gap: 12px;
+        padding: 12px 0;
+    `}
 
     ${(props) => props.isDisabled && `
         cursor: not-allowed;
@@ -141,13 +158,26 @@ const Header = Styled.header.attrs(({ isDisabled, hideAside }) => ({ isDisabled,
     `}
 `;
 
-const Div = Styled.div`
+const Div = Styled.div.attrs(({ isCard }) => ({ isCard }))`
     flex-grow: 2;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: ${(props) => props.isCard ? "2px" : "8px"};
     min-width: 0;
     transition: 0.2s all;
+`;
+
+const CardIcon = Styled(Icon).attrs(({ iconColor }) => ({ iconColor }))`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    color: ${(props) => props.iconColor || "var(--primary-color)"};
+    background-color: color-mix(in srgb, ${(props) => props.iconColor || "var(--primary-color)"} 12%, transparent);
+    border-radius: var(--border-radius);
 `;
 
 const Arrow = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
@@ -160,17 +190,25 @@ const Arrow = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
     transition: transform 320ms cubic-bezier(0.34, 1.2, 0.4, 1);
 `;
 
-const Title = Styled.h2`
+const Title = Styled.h2.attrs(({ isCard }) => ({ isCard }))`
     margin: 0;
     color: var(--title-color);
     font-family: var(--title-font);
     font-size: 18px;
     font-weight: 600;
+
+    ${(props) => props.isCard && `
+        color: var(--black-color);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+    `}
 `;
 
-const Description = Styled.p`
+const Description = Styled.p.attrs(({ isCard }) => ({ isCard }))`
     margin: 0;
     color: var(--font-lighter);
+    ${(props) => props.isCard && "font-size: 12px;"}
 `;
 
 const Error = Styled.p`
@@ -192,8 +230,8 @@ const Clip = Styled.div.attrs(({ isSelected, isExpanded }) => ({ isSelected, isE
     transition: visibility 0s ${(props) => props.isSelected ? "0s" : `${ANIMATION_TIME}ms`};
 `;
 
-const Inner = Styled.div.attrs(({ isSelected, isExpanded, withGap }) => ({ isSelected, isExpanded, withGap }))`
-    padding-top: var(--accordion-gap, 24px);
+const Inner = Styled.div.attrs(({ isCard, isSelected, isExpanded, withGap }) => ({ isCard, isSelected, isExpanded, withGap }))`
+    padding: ${(props) => props.isCard ? "4px 0 12px 36px" : "var(--accordion-gap, 24px) 0 0"};
     opacity: ${(props) => props.isSelected ? "1" : "0"};
     transform: ${(props) => props.isExpanded ? "none" : `translateY(${props.isSelected ? "0" : "-6px"})`};
     transition:
@@ -216,7 +254,7 @@ const Inner = Styled.div.attrs(({ isSelected, isExpanded, withGap }) => ({ isSel
  */
 function AccordionItem(props) {
     const {
-        className, header, message, description, error, errorCount,
+        className, variant, header, message, description, error, errorCount,
         badge, badgeVariant, number, icon, iconColor, withGap, maxWidth, hideAside,
         hasSelection,
         isFirst, isLast, isComplete, isSelected, isDisabled, onClick, children,
@@ -242,8 +280,10 @@ function AccordionItem(props) {
     }, [ isSelected ]);
 
 
-    // Variables
-    const showIcon     = Boolean(!isComplete && icon);
+    // Variables. A card shows its icon inside the header, so it has no aside
+    const isCard       = variant === "card";
+    const withoutAside = hideAside || isCard;
+    const showIcon     = Boolean(!isComplete && icon && !isCard);
     const showNumber   = Boolean(!isComplete && !icon);
     const errorMessage = error || (Number(errorCount) > 0 ? NLS.pluralize("GENERAL_ERROR_SECTION", errorCount) : "");
 
@@ -252,31 +292,35 @@ function AccordionItem(props) {
     return <Container
         className={className}
         isFirst={isFirst}
+        isCard={isCard}
         isSelected={isSelected}
         isDisabled={isDisabled}
         hasSelection={hasSelection}
     >
-        {!hideAside && <Aside hasIcon={showIcon}>
+        {!withoutAside && <Aside hasIcon={showIcon}>
             {isComplete && <Complete icon="check" />}
             {showIcon && <IconItem icon={icon} iconColor={iconColor} />}
             {showNumber && <span>{number}</span>}
         </Aside>}
         <Inside
             isLast={isLast}
+            isCard={isCard}
             hasIcon={showIcon}
-            hideAside={hideAside}
+            hideAside={withoutAside}
             maxWidth={maxWidth}
         >
             <Header
                 className="accordion-header"
+                isCard={isCard}
                 isDisabled={isDisabled}
-                hideAside={hideAside}
+                hideAside={withoutAside}
                 onClick={onClick}
             >
-                <Div className="accordion-titles">
+                {isCard && !!icon && <CardIcon icon={icon} iconColor={iconColor} />}
+                <Div className="accordion-titles" isCard={isCard}>
                     {header ? header : <>
-                        <Title>{NLS.get(message)}</Title>
-                        {!!description && <Description>{NLS.get(description)}</Description>}
+                        <Title isCard={isCard}>{NLS.get(message)}</Title>
+                        {!!description && <Description isCard={isCard}>{NLS.get(description)}</Description>}
                     </>}
                     {!!errorMessage && <Error>{NLS.get(errorMessage)}</Error>}
                 </Div>
@@ -295,6 +339,7 @@ function AccordionItem(props) {
                     isExpanded={isExpanded}
                 >
                     <Inner
+                        isCard={isCard}
                         isSelected={isSelected}
                         isExpanded={isExpanded}
                         withGap={withGap}
@@ -314,6 +359,7 @@ function AccordionItem(props) {
 AccordionItem.propTypes = {
     isHidden     : PropTypes.bool,
     className    : PropTypes.string,
+    variant      : PropTypes.string,
     header       : PropTypes.any,
     message      : PropTypes.string,
     description  : PropTypes.string,
@@ -344,6 +390,7 @@ AccordionItem.propTypes = {
 AccordionItem.defaultProps = {
     isHidden     : false,
     className    : "",
+    variant      : "",
     message      : "",
     badge        : "",
     badgeVariant : "gray",

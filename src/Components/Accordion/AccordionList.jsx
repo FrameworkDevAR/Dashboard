@@ -25,8 +25,8 @@ const Spacer = Styled.div`
  */
 function AccordionList(props) {
     const {
-        isHidden, className, passedRef, initial, selected,
-        maxWidth, hideAside, noClose, onChange, header, children,
+        isHidden, className, passedRef, initial, selected, variant,
+        allowMultiple, allOpen, maxWidth, hideAside, noClose, onChange, header, children,
     } = props;
 
 
@@ -37,8 +37,10 @@ function AccordionList(props) {
     const pinRef    = React.useRef(null);
     const timerRef  = React.useRef(null);
 
-    // The Current State
+    // The Current State. With multiple Items only the ones toggled from how they start
+    // are kept, so it does not need to know the value of every Item
     const [ selection, setSelection ] = React.useState(selected || initial);
+    const [ toggled,   setToggled   ] = React.useState([]);
 
     // Handle the Initial change
     React.useEffect(() => {
@@ -96,7 +98,7 @@ function AccordionList(props) {
             observer.disconnect();
             scroller.removeEventListener("scroll", handleScroll);
         };
-    }, [ selection, React.Children.count(children) ]);
+    }, [ selection, toggled, React.Children.count(children) ]);
 
     // Returns the element that scrolls the List
     const getScroller = (node) => {
@@ -188,9 +190,28 @@ function AccordionList(props) {
     };
 
 
+    // Returns true if the Item with the given ID is open
+    const isOpen = (id) => {
+        if (allowMultiple) {
+            return toggled.includes(id) !== allOpen;
+        }
+        return id === selection;
+    };
+
     // Handle the Click
     const handleClick = (id, isDisabled) => (e) => {
         if (isDisabled) {
+            return;
+        }
+
+        if (allowMultiple) {
+            if (e && e.currentTarget) {
+                pinHeader(e.currentTarget, !isOpen(id));
+            }
+            setToggled(toggled.includes(id) ? toggled.filter((elem) => elem !== id) : [ ...toggled, id ]);
+            if (onChange) {
+                onChange(id);
+            }
             return;
         }
 
@@ -211,14 +232,14 @@ function AccordionList(props) {
         }
     };
 
-    // Generate the Items
-    const hasSelection = selection !== "" && selection !== undefined && selection !== null;
+    // Generate the Items. The open Items only fade the others when one is open at a time
+    const hasSelection = !allowMultiple && selection !== "" && selection !== undefined && selection !== null;
     const items = Utils.cloneChildren(children, (child, index) => {
         const id = child.props.value || index;
         return {
-            maxWidth, hideAside, hasSelection,
+            variant, maxWidth, hideAside, hasSelection,
             number     : index + 1,
-            isSelected : id === selection,
+            isSelected : isOpen(id),
             onClick    : handleClick(id, child.props.isDisabled),
         };
     });
@@ -248,17 +269,20 @@ function AccordionList(props) {
  * @type {object} propTypes
  */
 AccordionList.propTypes = {
-    isHidden  : PropTypes.bool,
-    className : PropTypes.string,
-    passedRef : PropTypes.object,
-    initial   : PropTypes.string,
-    selected  : PropTypes.string,
-    maxWidth  : PropTypes.number,
-    hideAside : PropTypes.bool,
-    noClose   : PropTypes.bool,
-    onChange  : PropTypes.func,
-    header    : PropTypes.any,
-    children  : PropTypes.any,
+    isHidden      : PropTypes.bool,
+    className     : PropTypes.string,
+    passedRef     : PropTypes.object,
+    initial       : PropTypes.string,
+    selected      : PropTypes.string,
+    variant       : PropTypes.string,
+    allowMultiple : PropTypes.bool,
+    allOpen       : PropTypes.bool,
+    maxWidth      : PropTypes.number,
+    hideAside     : PropTypes.bool,
+    noClose       : PropTypes.bool,
+    onChange      : PropTypes.func,
+    header        : PropTypes.any,
+    children      : PropTypes.any,
 };
 
 /**
@@ -266,11 +290,14 @@ AccordionList.propTypes = {
  * @type {object} defaultProps
  */
 AccordionList.defaultProps = {
-    isHidden  : false,
-    className : "",
-    initial   : "",
-    selected  : "",
-    noClose   : false,
+    isHidden      : false,
+    className     : "",
+    initial       : "",
+    selected      : "",
+    variant       : "",
+    allowMultiple : false,
+    allOpen       : false,
+    noClose       : false,
 };
 
 export default AccordionList;
