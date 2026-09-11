@@ -10,26 +10,43 @@ import MediaType            from "../../Core/MediaType";
 
 // Components
 import EditorStyles         from "./EditorStyles";
+import InputLabel           from "../Input/InputLabel";
 import InputError           from "../Input/InputError";
 
 
 
 // Styles
-const Container = Styled.div.attrs(({ maxHeight, fullHeight }) => ({ maxHeight, fullHeight }))`
+const Container = Styled.div.attrs(({ fullHeight }) => ({ fullHeight }))`
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    ${(props) => props.maxHeight && `max-height: ${props.maxHeight}px;`}
+    min-height: 0;
+
     ${(props) => props.fullHeight && `
         flex-grow: 1;
-        min-height: 0;
     `}
 `;
 
+const EditorBox = Styled.div.attrs(({ maxHeight, fullHeight }) => ({ maxHeight, fullHeight }))`
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+
+    ${(props) => props.maxHeight && `max-height: ${props.maxHeight}px;`}
+    ${(props) => props.fullHeight && `
+        flex-grow: 1;
+    `}
+`;
+
+const FieldLabel = Styled(InputLabel)`
+    flex-shrink: 0;
+`;
+
 const FieldHelper = Styled.p`
-    font-size: 0.9em;
-    margin: 4px 0 0 4px;
+    flex-shrink: 0;
+    font-size: var(--font-size-small);
+    margin: -2px 0 6px 0;
     color: var(--darkest-gray);
 `;
 
@@ -42,7 +59,7 @@ const FieldHelper = Styled.p`
  */
 function EditorField(props) {
     const {
-        isHidden, baseUrl, filesUrl,
+        isHidden, baseUrl, filesUrl, label, isRequired,
         name, value, helperText, error, height, maxHeight, fullHeight, language,
         clientID, contentStyle, menubar, menu, toolbar,
         onChange, onMedia, onSetup, isDisabled, isSimple,
@@ -102,54 +119,64 @@ function EditorField(props) {
     }
     return <Container
         className={error ? "editorfield-error" : ""}
-        maxHeight={maxHeight}
         fullHeight={fullHeight}
     >
         <EditorStyles />
-        <Editor
-            tinymceScriptSrc={`${baseUrl}/tinymce/tinymce.min.js`}
-            onEditorChange={handleChange}
-            value={value}
-            init={{
-                document_base_url    : filesUrl,
-                readonly             : isDisabled,
-                height               : height,
-                menu                 : menu,
-                language             : language,
-                resize               : false,
-                statusbar            : false,
-                convert_urls         : false,
-                menubar              : isSimple ? "" : `edit insert view format table tools ${menubar}`,
-                toolbar              : isSimple ? `
-                    undo redo | bold italic underline | link ${toolbar ? `| ${toolbar}` : ""}
-                ` : `
-                    undo redo | blocks |
-                    bold italic forecolor |
-                    alignleft aligncenter alignright |
-                    bullist numlist outdent indent |
-                    image link removeformat fullscreen
-                `,
-                plugins              : [
-                    "advlist", "autolink", "lists", "link", "image", "media", "charmap",
-                    "anchor", "searchreplace", "visualblocks", "code",
-                    "insertdatetime", "media", "table", "wordcount", "fullscreen", "preview",
-                ],
-                content_style        : `
-                    body { font-family:Inter,Lato,Helvetica,Arial,sans-serif; font-size:14px; max-width: 800px; padding: 0 24px; margin: 0 auto; }
-                    ${contentStyle}
-                `,
-                file_picker_callback : handlePicker,
-                setup                : (editor) => {
-                    if (onSetup) {
-                        onSetup(editor);
-                    }
-                },
-            }}
-        />
-        <InputError error={error} />
+        {!!label && <FieldLabel
+            className="inputfield-label"
+            isRequired={isRequired}
+            message={label}
+            withValue
+            isOutside
+        />}
         {hasHelperText && <FieldHelper>
             {NLS.get(helperText)}
         </FieldHelper>}
+        <EditorBox
+            maxHeight={maxHeight}
+            fullHeight={fullHeight}
+        >
+            <Editor
+                tinymceScriptSrc={`${baseUrl}/tinymce/tinymce.min.js`}
+                onEditorChange={handleChange}
+                value={value}
+                init={{
+                    document_base_url    : filesUrl,
+                    readonly             : isDisabled,
+                    height               : height,
+                    menu                 : menu,
+                    language             : language,
+                    resize               : false,
+                    statusbar            : false,
+                    convert_urls         : false,
+                    menubar              : isSimple ? "" : `edit insert view format table tools ${menubar}`,
+                    toolbar              : isSimple ? `
+                        undo redo | bold italic underline | link ${toolbar ? `| ${toolbar}` : ""}
+                    ` : `
+                        undo redo | blocks |
+                        bold italic forecolor align |
+                        bullist numlist outdent indent |
+                        image link removeformat fullscreen
+                    `,
+                    plugins              : [
+                        "advlist", "autolink", "lists", "link", "image", "media", "charmap",
+                        "anchor", "searchreplace", "visualblocks", "code",
+                        "insertdatetime", "media", "table", "wordcount", "fullscreen", "preview",
+                    ],
+                    content_style        : `
+                        body { font-family:Inter,Lato,Helvetica,Arial,sans-serif; font-size:14px; max-width: 800px; padding: 0 24px; margin: 0 auto; }
+                        ${contentStyle}
+                    `,
+                    file_picker_callback : handlePicker,
+                    setup                : (editor) => {
+                        if (onSetup) {
+                            onSetup(editor);
+                        }
+                    },
+                }}
+            />
+            <InputError error={error} />
+        </EditorBox>
     </Container>;
 }
 
@@ -161,6 +188,8 @@ EditorField.propTypes = {
     isHidden     : PropTypes.bool,
     baseUrl      : PropTypes.string.isRequired,
     filesUrl     : PropTypes.string.isRequired,
+    label        : PropTypes.string,
+    isRequired   : PropTypes.bool,
     name         : PropTypes.string.isRequired,
     value        : PropTypes.string,
     helperText   : PropTypes.string,
