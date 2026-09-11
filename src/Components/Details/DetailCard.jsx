@@ -118,6 +118,15 @@ function DetailCard(props) {
     } = props;
 
 
+    // Handles a Click in the Actions. Only the ones in an action are stopped, so the space
+    // between them still clicks the card instead of doing nothing
+    const handleActions = (e) => {
+        if (e.target !== e.currentTarget) {
+            e.stopPropagation();
+        }
+    };
+
+
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
@@ -150,7 +159,7 @@ function DetailCard(props) {
                 {!!error && <ErrorText>{NLS.get(error)}</ErrorText>}
             </>}
         </Content>
-        {!!actions && <Actions onClick={(e) => e.stopPropagation()}>
+        {!!actions && <Actions onClick={handleActions}>
             {actions}
         </Actions>}
         <Go

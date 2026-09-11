@@ -17,7 +17,7 @@ import PillYesNo            from "../Pill/PillYesNo";
 
 
 // Styles
-const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle, smallPill }) => ({ gap, isLink, isSelected, withTitle, smallPill }))`
+const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle }) => ({ gap, isLink, isSelected, withTitle }))`
     position: relative;
     display: flex;
     align-items: center;
@@ -26,7 +26,10 @@ const Container = Styled.div.attrs(({ gap, isLink, isSelected, withTitle, smallP
     border-radius: var(--border-radius);
     transition: all 0.2s;
 
-    ${(props) => props.smallPill && "padding: 4px 8px;"};
+    &:has(> .pill) {
+        padding: 4px 8px;
+    }
+
     ${(props) => !!props.gap && `gap: ${props.gap}px;`};
     ${(props) => props.isLink && "cursor: pointer;"};
     ${(props) => props.withTitle && `
@@ -161,7 +164,6 @@ function DetailItem(props) {
         ref={elementRef}
         className={textColor ? `text-${textColor} ${className}` : className}
         gap={gap}
-        smallPill={hasYesNo && smallPill}
         isLink={isLink}
         isSelected={isSelected}
         withTitle={withTitle}
