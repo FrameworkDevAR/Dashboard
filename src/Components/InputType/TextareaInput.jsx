@@ -47,6 +47,7 @@ const Textarea = Styled.textarea.attrs(({ withLabel }) => ({ withLabel }))`
     font-size: var(--input-font);
     line-height: 20px;
     border: none;
+    background-color: transparent;
     resize: none;
 
     &:focus {
