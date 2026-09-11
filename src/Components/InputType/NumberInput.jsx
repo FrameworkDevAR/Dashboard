@@ -57,7 +57,7 @@ function NumberInput(props) {
     const {
         inputRef, className, icon, postIcon, prefixText, suffixText,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
-        id, name, value, step, minValue, maxValue, placeholder, withSteps,
+        id, name, value, step, decimals, minValue, maxValue, placeholder, withSteps,
         onChange, onInput, onPaste, onClear,
         onFocus, onBlur, onKeyDown, onKeyUp, onSubmit,
     } = props;
@@ -69,6 +69,37 @@ function NumberInput(props) {
     // With steps the suffix is drawn here and not by the Input Content, as that one adds it
     // after the children and the plus has to be the last thing of the field
     const hasStepSuffix = Boolean(withSteps && suffixText);
+
+    // A step with decimals adds up with the errors of the floats, so every value that a step
+    // makes is rounded to the decimals that the field takes, which are those of the step
+    // unless the field says that it takes more
+    const stepDecimals = (String(step).split(".")[1] || "").length;
+    const maxDecimals  = decimals === undefined || decimals === null ? stepDecimals : Math.max(Number(decimals), stepDecimals);
+
+
+    // Returns the Value where a step starts. An empty field starts at the number of the
+    // placeholder, as that is the value it shows, and at zero when it is not a number.
+    // The placeholder can be written with a decimal comma, as the field shows its value so
+    const getBaseValue = () => {
+        if (value !== "" && value !== null && value !== undefined) {
+            return Number(value);
+        }
+        const holder = Number(String(placeholder).replace(",", "."));
+        return placeholder && !isNaN(holder) ? holder : 0;
+    };
+
+    // Returns the size of a step with the modifiers of the Event: a tenth of it with Alt, only
+    // when the field takes more decimals than its step, and a hundred or ten times it with
+    // Cmd or Ctrl and with Shift, so a big value does not have to be reached one at a time
+    const getStepSize = (e) => {
+        if (e.altKey && maxDecimals > stepDecimals) {
+            return Number(step) / 10;
+        }
+        if (e.metaKey || e.ctrlKey) {
+            return Number(step) * 100;
+        }
+        return Number(step) * (e.shiftKey ? 10 : 1);
+    };
 
     // The steps fill the height of the field and pull themselves out by the difference of the
     // two paddings, so the two buttons end up with the same space on their four sides
@@ -90,16 +121,15 @@ function NumberInput(props) {
     const handleKeyDown = (e) => {
         let val = value;
         if (e.keyCode === KeyCode.DOM_VK_UP || e.keyCode === KeyCode.DOM_VK_DOWN) {
-            const mult   = e.metaKey ? 100 : (e.shiftKey ? 10 : 1);
             const amount = e.keyCode === KeyCode.DOM_VK_UP ? 1 : -1;
-            val          = Number(val) + amount * mult * Number(step);
+            val          = getBaseValue() + amount * getStepSize(e);
 
-            if (isNaN(value) || val < minNumber) {
+            if (isNaN(val) || val < minNumber) {
                 val = minNumber;
             } else if (maxNumber !== 0 && val > maxNumber) {
                 val = maxNumber;
             }
-            onChange(name, val);
+            onChange(name, maxDecimals ? Number(val.toFixed(maxDecimals)) : val);
             e.preventDefault();
             e.stopPropagation();
         }
@@ -108,17 +138,16 @@ function NumberInput(props) {
         }
     };
 
-    // Handles the Step, which adds or removes the amount of a step. The modifiers multiply
-    // it as the arrow keys do, so a big value does not have to be reached one step at a time
+    // Handles the Step, which adds or removes the amount of a step, with the same modifiers
+    // as the arrow keys
     const handleStep = (e, amount) => {
-        const mult = e.metaKey ? 100 : (e.shiftKey ? 10 : 1);
-        let   val  = Number(value || 0) + amount * mult * Number(step);
+        let val = getBaseValue() + amount * getStepSize(e);
         if (isNaN(val) || val < minNumber) {
             val = minNumber;
         } else if (maxNumber !== 0 && val > maxNumber) {
             val = maxNumber;
         }
-        onChange(name, val);
+        onChange(name, maxDecimals ? Number(val.toFixed(maxDecimals)) : val);
     };
 
     // Handles the Key Up
@@ -208,6 +237,7 @@ NumberInput.propTypes = {
     placeholder : PropTypes.string,
     value       : PropTypes.any,
     step        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    decimals    : PropTypes.number,
     minValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     maxValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     withSteps   : PropTypes.bool,
