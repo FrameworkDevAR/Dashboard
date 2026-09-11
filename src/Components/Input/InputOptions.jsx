@@ -22,9 +22,10 @@ const Container = Styled.ul.attrs(({ top, bottom, left, gap, width, minWidth, ma
     display: block;
     position: fixed;
     left: ${(props) => `${props.left}px`};
-    width: ${(props) => `${props.width}px`};
+    width: max-content;
+    min-width: ${(props) => `${props.width}px`};
+    max-width: ${(props) => `max(${props.width}px, 200px)`};
     opacity: ${(props) => props.opacity};
-    min-width: 200px;
     margin: 0;
     padding: 8px;
     list-style: none;
