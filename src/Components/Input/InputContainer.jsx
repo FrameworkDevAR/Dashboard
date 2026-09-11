@@ -5,7 +5,7 @@ import Styled               from "styled-components";
 
 
 // Styles
-const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom }) => ({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom }))`
+const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground }) => ({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground }))`
     --input-border: var(--input-border-color);
     position: relative;
     display: block;
@@ -64,23 +64,31 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
         justify-content: flex-end;
     `}
 
+    ${(props) => props.disabledBackground && `
+        .input-content {
+            background-color: var(--lightest-gray);
+        }
+        .input-content input {
+            background-color: transparent;
+        }
+    `}
+
     ${(props) => props.bottomSpace && `
         padding-bottom: 8px;
     `}
 
     &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)) {
         --input-height: var(--input-plain-height, 38px);
+        --input-border-radius: var(--input-border-radius-small);
     }
 
     ${(props) => props.outsideLabel && `
         --input-height: var(--input-plain-height, 38px);
-        --input-border-radius: 12px;
-        --input-vert-padding: 10px;
-        --input-padding: var(--input-vert-padding) var(--input-horiz-padding);
+        --input-border-radius: var(--input-border-radius-small);
 
-        .inputfield-children {
-            margin-top: -4px;
-            margin-bottom: -4px;
+        &.inputfield-textarea {
+            --input-vert-padding: 10px;
+            --input-padding: var(--input-vert-padding) var(--input-horiz-padding);
         }
     `}
 `;
@@ -95,7 +103,7 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
 function InputContainer(props) {
     const {
         className, dataName, width, fullWidth,
-        hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, children,
+        hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground, children,
     } = props;
 
     return <Container
@@ -109,6 +117,7 @@ function InputContainer(props) {
         bottomSpace={bottomSpace}
         rightInput={rightInput}
         atBottom={atBottom}
+        disabledBackground={disabledBackground}
     >
         {children}
     </Container>;
@@ -119,17 +128,18 @@ function InputContainer(props) {
  * @type {object} propTypes
  */
 InputContainer.propTypes = {
-    className    : PropTypes.string,
-    dataName     : PropTypes.string,
-    width        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    fullWidth    : PropTypes.bool,
-    hasError     : PropTypes.bool,
-    bigLabel     : PropTypes.bool,
-    outsideLabel : PropTypes.bool,
-    bottomSpace  : PropTypes.bool,
-    rightInput   : PropTypes.bool,
-    atBottom     : PropTypes.bool,
-    children     : PropTypes.any,
+    className          : PropTypes.string,
+    dataName           : PropTypes.string,
+    width              : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    fullWidth          : PropTypes.bool,
+    hasError           : PropTypes.bool,
+    bigLabel           : PropTypes.bool,
+    outsideLabel       : PropTypes.bool,
+    bottomSpace        : PropTypes.bool,
+    rightInput         : PropTypes.bool,
+    atBottom           : PropTypes.bool,
+    disabledBackground : PropTypes.bool,
+    children           : PropTypes.any,
 };
 
 /**
@@ -137,14 +147,15 @@ InputContainer.propTypes = {
  * @type {object} defaultProps
  */
 InputContainer.defaultProps = {
-    className    : "",
-    dataName     : "",
-    fullWidth    : false,
-    hasError     : false,
-    outsideLabel : false,
-    bottomSpace  : false,
-    rightInput   : false,
-    atBottom     : false,
+    className          : "",
+    dataName           : "",
+    fullWidth          : false,
+    hasError           : false,
+    outsideLabel       : false,
+    bottomSpace        : false,
+    rightInput         : false,
+    atBottom           : false,
+    disabledBackground : false,
 };
 
 export default InputContainer;

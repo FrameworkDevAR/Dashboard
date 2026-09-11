@@ -46,7 +46,7 @@ function InputField(props) {
         error, helperText, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
         autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel,
-        rightToggle, rightInput, atBottom, errorBackground,
+        rightToggle, rightInput, atBottom, errorBackground, disabledBackground, isDisabled,
         suggestID, hasClear, forceClear, hideClear, onClear,
         hasCopy, copyValue, onCopy,
     } = props;
@@ -179,6 +179,7 @@ function InputField(props) {
         bottomSpace={rightToggle}
         rightInput={rightInput}
         atBottom={atBottom}
+        disabledBackground={Boolean(disabledBackground && isDisabled)}
     >
         {hasLabel && <InputLabel
             className="inputfield-label"
@@ -310,6 +311,7 @@ InputField.propTypes = {
     rightToggle       : PropTypes.bool,
     rightInput        : PropTypes.bool,
     atBottom          : PropTypes.bool,
+    disabledBackground : PropTypes.bool,
     dashedBorder      : PropTypes.bool,
     withLine          : PropTypes.bool,
     withEditor        : PropTypes.bool,
