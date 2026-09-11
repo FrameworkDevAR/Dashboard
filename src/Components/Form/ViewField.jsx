@@ -23,7 +23,7 @@ const FieldLabel = Styled(InputLabel).attrs(({ isSelected }) => ({ isSelected })
     ${(props) => props.isSelected && "background-color: var(--lighter-gray);"}
 `;
 
-const FieldContent = Styled.div.attrs(({ withLabel, isSmall, maxHeight, noWrap, withLink, isSelected }) => ({ withLabel, isSmall, maxHeight, noWrap, withLink, isSelected }))`
+const FieldContent = Styled.div.attrs(({ withLabel, isOutside, isSmall, maxHeight, noWrap, withLink, isSelected }) => ({ withLabel, isOutside, isSmall, maxHeight, noWrap, withLink, isSelected }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -58,6 +58,10 @@ const FieldContent = Styled.div.attrs(({ withLabel, isSmall, maxHeight, noWrap, 
         `}
         ${(props) => props.withLabel && `
             padding-top: calc(var(--input-label) + 2px);
+        `}
+        ${(props) => (props.isOutside && !props.isSmall) && `
+            padding-top: calc((var(--input-height) - 2px - var(--input-font) * 1.3) / 2);
+            padding-bottom: calc((var(--input-height) - 2px - var(--input-font) * 1.3) / 2);
         `}
         ${(props) => (!props.withLabel && props.isSmall) && `
             min-height: calc(var(--input-height) - var(--input-label) + 1px);
@@ -188,6 +192,7 @@ function ViewField(props) {
             className="inputview-cnt"
             isSmall={isSmall}
             withLabel={withLabel && !hasOutside}
+            isOutside={hasOutside}
             maxHeight={maxHeight}
             noWrap={noWrap}
             withLink={!!onClick}
