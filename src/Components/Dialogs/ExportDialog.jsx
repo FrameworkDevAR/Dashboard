@@ -17,7 +17,7 @@ import Icon                 from "../Common/Icon";
 // Constants
 const FORMATS = {
     xlsx : { icon : "file-spreadsheet", color : "var(--success-color)", text : "GENERAL_EXPORT_XLSX_TEXT" },
-    csv  : { icon : "file-text",        color : "var(--primary-color)", text : "GENERAL_EXPORT_CSV_TEXT"  },
+    csv  : { icon : "file-csv",         color : "hsl(30, 95%, 48%)",    text : "GENERAL_EXPORT_CSV_TEXT"  },
 };
 
 // Styles
