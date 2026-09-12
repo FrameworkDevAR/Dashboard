@@ -54,14 +54,15 @@ function ScrollFade(props) {
 
     // Returns the sticky element at the child, which can be the child itself or one
     // nested a few levels down, as in a Table with a sticky head or in a Step Content
-    // with a sticky footer. Only the ones pinned to that side count, as a column that
-    // sticks to the top, next to the content, does not cover the bottom
+    // with a sticky footer. Only the ones pinned to that side count, and only when they
+    // span their parent, as a column that sticks next to the content covers neither side
     const getSticky = (child, atEnd) => {
         let elem = child;
         for (let index = 0; elem && index < 3; index += 1) {
             const style = window.getComputedStyle(elem);
             if (style.position === "sticky" && style[atEnd ? "bottom" : "top"] !== "auto") {
-                return elem;
+                const isColumn = elem.offsetWidth < (elem.parentElement?.clientWidth ?? 0) - 1;
+                return isColumn ? null : elem;
             }
             elem = atEnd ? elem.lastElementChild : elem.firstElementChild;
         }
