@@ -35,7 +35,7 @@ function ViewDialog(props) {
     const {
         contentRef, open, title, icon, className, isLoading, headerActions,
         width, isWide, isNarrow, minHeight, fullHeight,
-        withSpacing, bigSpacing, zIndex,
+        withSpacing, bigSpacing, withFade, zIndex,
         hideFooter, primary, primaryVariant, onSubmit,
         secondary, onSecondary, secondaryLoading,
         tertiary, onTertiary, tertiaryLoading,
@@ -62,6 +62,7 @@ function ViewDialog(props) {
             minHeight={minHeight}
             fullHeight={fullHeight}
             withSpacing={withSpacing}
+            withFade={withFade}
             bigSpacing={bigSpacing}
             hideFooter={hideFooter}
         >
@@ -103,6 +104,7 @@ ViewDialog.propTypes = {
     lightHeader      : PropTypes.bool,
     withSpacing      : PropTypes.bool,
     bigSpacing       : PropTypes.bool,
+    withFade         : PropTypes.bool,
     zIndex           : PropTypes.number,
     hideFooter       : PropTypes.bool,
     primary          : PropTypes.string,
@@ -132,6 +134,7 @@ ViewDialog.defaultProps = {
     fullHeight  : false,
     lightHeader : false,
     withSpacing : false,
+    withFade    : false,
     bigSpacing  : false,
     hideFooter  : false,
 };
