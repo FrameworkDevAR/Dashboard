@@ -13,6 +13,7 @@ const SCROLL_SPACE = 16;
 
 // Styles
 const Spacer = Styled.div`
+    display: none;
     height: 0;
 `;
 
@@ -182,7 +183,8 @@ function AccordionList(props) {
         const height  = canGrow ? needed : Math.min(current, needed);
 
         if (height !== current) {
-            spacer.style.height = `${height}px`;
+            spacer.style.display = height > 0 ? "block" : "none";
+            spacer.style.height  = `${height}px`;
         }
         if (canGrow && scroller.scrollTop !== scrollRef.current) {
             scroller.scrollTop = scrollRef.current;
