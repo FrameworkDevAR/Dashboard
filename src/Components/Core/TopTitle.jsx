@@ -11,9 +11,11 @@ import Icon                 from "../Common/Icon";
 
 // Styles
 const Container = Styled.header.attrs(({ onlyForMenu }) => ({ onlyForMenu }))`
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 4px;
+    min-width: 0;
     padding: var(--navigation-title-padding);
     pointer-events: none;
     z-index: 2;
@@ -28,6 +30,7 @@ const Container = Styled.header.attrs(({ onlyForMenu }) => ({ onlyForMenu }))`
 `;
 
 const TitleIcon = Styled(Icon)`
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,6 +41,7 @@ const TitleIcon = Styled(Icon)`
 `;
 
 const Search = Styled.div`
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     margin-left: 4px;
@@ -52,6 +56,9 @@ const Title = Styled.h2`
     letter-spacing: var(--title-letter-spacing);
     color: var(--navigation-title-color, var(--title-color));
     white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
 
 
