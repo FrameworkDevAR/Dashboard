@@ -124,7 +124,7 @@ const Amount = Styled.div`
  */
 function ChipsInput(props) {
     const {
-        className, isFocused, isDisabled, isMultiple, withBorder, withCustom,
+        className, isFocused, isDisabled, isMultiple, withBorder, withCustom, withLabel,
         name, value, minValue, maxValue, onChange,
     } = props;
 
@@ -222,7 +222,7 @@ function ChipsInput(props) {
         isDisabled={isDisabled}
         withBorder={withBorder}
         withPadding={withBorder}
-        withLabel={withBorder}
+        withLabel={withBorder && withLabel}
     >
         <Container isBigger={!withBorder}>
             {!isCustom && chips.map((chip) => <Chip
@@ -277,6 +277,7 @@ ChipsInput.propTypes = {
     isDisabled : PropTypes.bool,
     isMultiple : PropTypes.bool,
     withBorder : PropTypes.bool,
+    withLabel      : PropTypes.bool,
     withCustom : PropTypes.bool,
     name       : PropTypes.string.isRequired,
     value      : PropTypes.any,
