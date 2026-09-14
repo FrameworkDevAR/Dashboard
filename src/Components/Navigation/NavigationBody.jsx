@@ -21,6 +21,8 @@ const Container = Styled.nav.attrs(({ withSpacing }) => ({ withSpacing }))`
     flex-direction: column;
     justify-content: flex-start;
     padding: ${(props) => props.withSpacing && "var(--navigation-body-padding, 0px 16px 16px 6px)"};
+    margin-top: -6px;
+    padding-top: 6px;
     overflow: auto;
 `;
 
