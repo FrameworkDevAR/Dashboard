@@ -19,9 +19,9 @@ const Container = Styled.div.attrs(({ columns, showButton }) => ({ columns, show
     display: grid;
     grid-template-columns: repeat(var(--filter-columns), 1fr);
     gap: var(--main-gap);
-    height: calc(var(--filter-input-height) + 2px);
-    margin: 0 0 var(--main-gap) 0;
-    padding: 1px;
+    height: calc(var(--filter-input-height) + 4px);
+    margin: 0 0 calc(var(--main-gap) - 2px) 0;
+    padding: 3px 1px 1px;
     overflow-y: hidden;
     overflow-x: auto;
 

@@ -29,9 +29,9 @@ const Container = Styled.div.attrs(({ isNarrow }) => ({ isNarrow }))`
     display: flex;
     gap: calc(var(--main-gap) / 2);
     box-sizing: border-box;
-    height: calc(var(--filter-input-height) + 2px);
-    margin: 0 0 var(--main-gap) 0;
-    padding: 1px;
+    height: calc(var(--filter-input-height) + 4px);
+    margin: 0 0 calc(var(--main-gap) - 2px) 0;
+    padding: 3px 1px 1px;
     width: 100%;
 
     ${(props) => props.isNarrow && "overflow: auto;"}
