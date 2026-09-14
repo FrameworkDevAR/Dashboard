@@ -13,7 +13,7 @@ import Html                 from "../Common/Html";
 
 
 // Styles
-const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, inlineChildren }) => ({ variant, topSpace, bottomSpace, noBorder, inlineChildren }))`
+const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, inlineChildren, isTight }) => ({ variant, topSpace, bottomSpace, noBorder, inlineChildren, isTight }))`
     position: relative;
     gap: 8px;
     padding: 12px 16px;
@@ -21,32 +21,66 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, 
     border: 1px solid;
     border-radius: var(--border-radius-medium);
 
+    .banner-content {
+        gap: 12px;
+    }
+    .banner-icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: color-mix(in srgb, currentColor 14%, transparent);
+    }
+    ${(props) => !props.inlineChildren && ".banner-children { padding-left: 48px; }"}
+
     ${(props) => props.variant === Outcome.SUCCESS && `
-        background-color: hsl(170, 61%, 96%);
+        background-color: color-mix(in srgb, var(--success-color) 8%, var(--content-color));
         border-color: var(--success-color);
         .banner-icon {
             color: var(--success-color);
         }
     `}
     ${(props) => props.variant === Outcome.WARNING && `
-        background-color: hsl(43, 100%, 96%);
+        background-color: color-mix(in srgb, var(--warning-color) 10%, var(--content-color));
         border-color: var(--warning-color);
         .banner-icon {
             color: var(--warning-color);
         }
     `}
     ${(props) => props.variant === Outcome.ERROR && `
-        background-color: hsl(0, 62%, 97%);
+        background-color: color-mix(in srgb, var(--error-color) 8%, var(--content-color));
         border-color: var(--error-color);
         .banner-icon {
             color: var(--error-color);
         }
     `}
     ${(props) => props.variant === Outcome.INFO && `
-        border-color: var(--border-color-light);
+        padding: 10px 14px;
+        font-size: 13px;
+        line-height: 1.5;
+        border-color: var(--input-border-color);
+        background-color: ${props.noBorder ? "transparent" : "color-mix(in srgb, var(--font-color) 4%, var(--content-color))"};
+
         .banner-icon {
             color: var(--primary-color);
         }
+    `}
+    ${(props) => props.isTight && `
+        padding: 6px 12px;
+        font-size: 13px;
+        line-height: 1.5;
+
+        .banner-content {
+            gap: 10px;
+        }
+        .banner-icon {
+            width: 28px;
+            height: 28px;
+        }
+        ${!props.inlineChildren ? ".banner-children { padding-left: 38px; }" : ""}
     `}
 
     ${(props) => props.noBorder && `
@@ -88,13 +122,16 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
  */
 function Banner(props) {
     const {
-        isHidden, className, variant, message,
-        topSpace, bottomSpace, noBorder, inlineChildren, children,
+        isHidden, className, variant, icon, message,
+        topSpace, bottomSpace, noBorder, inlineChildren, isTight, children,
     } = props;
 
 
-    // The Icon
-    const icon = React.useMemo(() => {
+    // The Icon, which is the one of the Variant unless another one is given
+    const bannerIcon = React.useMemo(() => {
+        if (icon) {
+            return icon;
+        }
         switch (variant) {
         case Outcome.SUCCESS:
             return "check-circle";
@@ -105,11 +142,11 @@ function Banner(props) {
         default:
             return "info";
         }
-    }, [ variant ]);
+    }, [ variant, icon ]);
 
 
     // Do the Render
-    if (isHidden) {
+    if (isHidden || !message) {
         return <React.Fragment />;
     }
     return <Container
@@ -119,16 +156,17 @@ function Banner(props) {
         bottomSpace={bottomSpace}
         noBorder={noBorder}
         inlineChildren={inlineChildren}
+        isTight={isTight}
     >
-        <Content>
+        <Content className="banner-content">
             <Icon
                 className="banner-icon"
-                icon={icon}
+                icon={bannerIcon}
                 size="20"
             />
             <Html>{NLS.get(message)}</Html>
         </Content>
-        <Children inlineChildren={inlineChildren}>
+        <Children className="banner-children" inlineChildren={inlineChildren}>
             {children}
         </Children>
     </Container>;
@@ -142,11 +180,13 @@ Banner.propTypes = {
     isHidden       : PropTypes.bool,
     className      : PropTypes.string,
     variant        : PropTypes.string.isRequired,
-    message        : PropTypes.string.isRequired,
+    icon           : PropTypes.string,
+    message        : PropTypes.string,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     noBorder       : PropTypes.bool,
     inlineChildren : PropTypes.bool,
+    isTight        : PropTypes.bool,
     children       : PropTypes.any,
 };
 
@@ -157,6 +197,7 @@ Banner.propTypes = {
 Banner.defaultProps = {
     isHidden  : false,
     className : "",
+    isTight   : false,
 };
 
 export default Banner;
