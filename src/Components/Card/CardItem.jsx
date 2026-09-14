@@ -76,7 +76,7 @@ function CardItem(props) {
         {hasCopy && <Copy>
             <InputCopy
                 copyValue={copyValue}
-                inputValue={content}
+                inputValue={typeof content === "string" ? content : ""}
             />
         </Copy>}
     </Container>;
