@@ -1,4 +1,3 @@
-import React                from "react";
 import NLS                  from "../Core/NLS";
 
 // Utils
@@ -318,7 +317,7 @@ function useGotoUrl() {
 /**
  * Handles the Click
  * @param {object} props
- * @returns {React.MouseEventHandler}
+ * @returns {Function}
  */
 function useClick(props) {
     const { target, onClick, isPhone, isEmail, isWhatsApp, propagate } = props;
@@ -344,7 +343,7 @@ function useClick(props) {
 /**
  * Handles the Link
  * @param {object} props
- * @returns {React.MouseEventHandler}
+ * @returns {Function}
  */
 function useLink(props) {
     const { isDisabled, onClick, isPhone, isEmail, isWhatsApp, target, dontStop } = props;
