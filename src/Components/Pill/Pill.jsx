@@ -4,6 +4,7 @@ import Styled               from "styled-components";
 
 // Core
 import NLS                  from "../../Core/NLS";
+import Store                from "../../Core/Store";
 
 // Components
 import Icon                 from "../Common/Icon";
@@ -82,8 +83,21 @@ const PillIcon = Styled(Icon)`
 function Pill(props) {
     const {
         isHidden, className, variant, isOutlined, isSmall, withDot, smallRadius,
-        icon, message, children,
+        icon, message, tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks,
+        children,
     } = props;
+
+    const elementRef = React.useRef(null);
+
+    const { showTooltip, hideTooltip } = Store.useAction("core");
+
+
+    // Handles the Tooltip
+    const handleTooltip = () => {
+        if (tooltip) {
+            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay, tooltipBreaks);
+        }
+    };
 
 
     // Do the Render
@@ -91,6 +105,9 @@ function Pill(props) {
         return <React.Fragment />;
     }
     return <Container
+        ref={elementRef}
+        onMouseEnter={tooltip ? handleTooltip : undefined}
+        onMouseLeave={tooltip ? hideTooltip : undefined}
         className={`pill ${className}`}
         variant={STATE_VARIANTS[variant] || variant || "gray"}
         isOutlined={isOutlined}
@@ -108,16 +125,21 @@ function Pill(props) {
  * @type {object} propTypes
  */
 Pill.propTypes = {
-    isHidden    : PropTypes.bool,
-    className   : PropTypes.string,
-    variant     : PropTypes.string,
-    isOutlined  : PropTypes.bool,
-    isSmall     : PropTypes.bool,
-    withDot     : PropTypes.bool,
-    smallRadius : PropTypes.bool,
-    icon        : PropTypes.string,
-    message     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    children    : PropTypes.any,
+    isHidden       : PropTypes.bool,
+    className      : PropTypes.string,
+    variant        : PropTypes.string,
+    isOutlined     : PropTypes.bool,
+    isSmall        : PropTypes.bool,
+    withDot        : PropTypes.bool,
+    smallRadius    : PropTypes.bool,
+    icon           : PropTypes.string,
+    message        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    tooltip        : PropTypes.string,
+    tooltipVariant : PropTypes.string,
+    tooltipWidth   : PropTypes.number,
+    tooltipDelay   : PropTypes.number,
+    tooltipBreaks  : PropTypes.bool,
+    children       : PropTypes.any,
 };
 
 /**
