@@ -185,7 +185,9 @@ function ButtonsInput(props) {
 
         const update = () => {
             const item = node.querySelector(".buttons-selected");
-            if (item && item.offsetWidth) {
+            if (!item) {
+                setBounds({ left : 0, width : 0 });
+            } else if (item.offsetWidth) {
                 setBounds({ left : item.offsetLeft, width : item.offsetWidth });
             }
         };
