@@ -77,7 +77,7 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
         padding-bottom: 8px;
     `}
 
-    &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)) {
+    &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)):not(.inputfield-toggle):not(.inputfield-checkbox):not(.inputfield-radiobox) {
         --input-height: var(--input-plain-height, 38px);
         --input-border-radius: var(--input-border-radius-small);
     }
