@@ -153,7 +153,7 @@ const Clip = Styled.div.attrs(({ isCollapsed }) => ({ isCollapsed }))`
 `;
 
 const Inside = Styled.div`
-    padding: 8px 0 20px;
+    padding: 10px 0 20px;
 `;
 
 
