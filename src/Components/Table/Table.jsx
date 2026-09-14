@@ -131,6 +131,7 @@ function Table(props) {
     const [ iconHeight, setIconHeight ] = React.useState(0);
     const [ hasScroll,  setHasScroll  ] = React.useState(false);
     const [ sortField,  setSortField  ] = React.useState("");
+    const [ isPaging,   setIsPaging   ] = React.useState(false);
     const [ showEdit,   setShowEdit   ] = React.useState(false);
 
 
@@ -139,6 +140,13 @@ function Table(props) {
         setSortField(params.orderBy);
         await fetch(params, false);
         setSortField("");
+    };
+
+    // Handles the Paging, showing a loader in the paging and not the main one
+    const handlePaging = async (params) => {
+        setIsPaging(true);
+        await fetch(params, false);
+        setIsPaging(false);
     };
 
     // Handles the Column Edit
@@ -331,6 +339,7 @@ function Table(props) {
             items.push(React.cloneElement(child, {
                 key, fetch, sort, columns,
                 handleSort, sortField,
+                handlePaging, isPaging,
                 hasSorting, hasPaging, hasFooter, notFixed,
                 hasChecks, checked, setChecked,
                 hasCheckAll, isCheckedAll, isCheckedSome, handleCheckAll,

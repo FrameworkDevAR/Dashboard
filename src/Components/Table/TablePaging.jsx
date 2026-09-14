@@ -53,7 +53,7 @@ const PagingCell = Styled.td`
  * @returns {React.ReactElement}
  */
 function TablePaging(props) {
-    const { sort, total, fetch } = props;
+    const { sort, total, fetch, handlePaging, isPaging } = props;
 
 
     // Do the Render
@@ -64,7 +64,8 @@ function TablePaging(props) {
                 <PagingContent
                     sort={sort}
                     total={total}
-                    fetch={fetch}
+                    fetch={handlePaging ?? fetch}
+                    isPaging={isPaging}
                 />
             </PagingCell>
         </TRow>
@@ -76,9 +77,11 @@ function TablePaging(props) {
  * @type {object} propTypes
  */
 TablePaging.propTypes = {
-    fetch : PropTypes.func,
-    sort  : PropTypes.object,
-    total : PropTypes.number.isRequired,
+    fetch        : PropTypes.func,
+    handlePaging : PropTypes.func,
+    isPaging     : PropTypes.bool,
+    sort         : PropTypes.object,
+    total        : PropTypes.number.isRequired,
 };
 
 export default TablePaging;
