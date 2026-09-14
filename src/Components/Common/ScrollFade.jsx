@@ -24,11 +24,13 @@ const Container = Styled.div.attrs(({ showTop, showBottom }) => ({ showTop, show
     }
     &::before {
         top: var(--fade-top, 0px);
+        border-radius: var(--fade-radius, 0px) var(--fade-radius, 0px) 0 0;
         background: linear-gradient(to bottom, var(--fade-color, var(--content-color)), transparent);
         opacity: ${(props) => props.showTop ? 1 : 0};
     }
     &::after {
         bottom: var(--fade-bottom, 0px);
+        border-radius: 0 0 var(--fade-radius, 0px) var(--fade-radius, 0px);
         background: linear-gradient(to top, var(--fade-color, var(--content-color)), transparent);
         opacity: ${(props) => props.showBottom ? 1 : 0};
     }
