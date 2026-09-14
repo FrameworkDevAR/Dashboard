@@ -91,6 +91,7 @@ const Text = Styled.p`
     margin: 0;
     font-size: 12px;
     color: var(--font-lighter);
+    white-space: nowrap;
 `;
 
 const InputClear = Styled(IconLink).attrs(({ smallInput, withLabel }) => ({ smallInput, withLabel }))`
