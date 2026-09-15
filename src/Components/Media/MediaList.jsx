@@ -22,7 +22,7 @@ import PillTab              from "../Pill/PillTab";
 const GAP_SPACE   = 16;
 const CRUMB_SPACE = 28 + GAP_SPACE;
 const DROP_SPACE  = 60 + GAP_SPACE;
-const TIP_SPACE   = 46 + GAP_SPACE;
+const TIP_SPACE   = 42 + GAP_SPACE;
 
 // Styles
 const Container = Styled.div.attrs(({ inDialog, isCentered }) => ({ inDialog, isCentered }))`

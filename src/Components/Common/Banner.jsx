@@ -62,7 +62,7 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, 
         font-size: 13px;
         line-height: 1.5;
         border-color: var(--input-border-color);
-        background-color: ${props.noBorder ? "transparent" : "color-mix(in srgb, var(--font-color) 4%, var(--content-color))"};
+        background-color: ${props.noBorder ? "transparent" : "var(--lightest-gray)"};
 
         .banner-icon {
             color: var(--primary-color);
