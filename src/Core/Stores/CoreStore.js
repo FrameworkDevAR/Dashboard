@@ -19,6 +19,10 @@ const initialState = {
         message : "",
         param   : "",
     },
+    unsaved     : {
+        url     : "",
+        replace : false,
+    },
     tooltip     : {
         open      : false,
         targetRef : null,
@@ -106,13 +110,35 @@ const actions = {
     },
 
     /**
+     * Asks before leaving with unsaved changes, keeping the url to go to
+     * @param {Function} dispatch
+     * @param {string}   url
+     * @param {boolean=} replace
+     * @returns {void}
+     */
+    askUnsaved(dispatch, url, replace = false) {
+        const unsaved = { url, replace };
+        return dispatch({ type : "CORE_UNSAVED", unsaved });
+    },
+
+    /**
+     * Closes the Unsaved changes dialog
+     * @param {Function} dispatch
+     * @returns {void}
+     */
+    closeUnsaved(dispatch) {
+        const unsaved = { ...initialState.unsaved };
+        return dispatch({ type : "CORE_UNSAVED", unsaved });
+    },
+
+    /**
      * Shows the Tooltip
      * @param {Function} dispatch
      * @param {object}   targetRef
      * @param {string}   variant
      * @param {string}   message
-     * @param {number}   maxWidth
-     * @param {number}   delay
+     * @param {number=}  maxWidth
+     * @param {number=}  delay
      * @param {boolean=} hasBreaks
      * @param {boolean=} isDark
      * @returns {void}
@@ -268,6 +294,12 @@ const reducer = (state = initialState, action = {}) => {
             ...state,
             result   : action.result,
         };
+    case "CORE_UNSAVED":
+        return {
+            ...state,
+            unsaved  : action.unsaved,
+        };
+
     case "CORE_TOOLTIP":
         return {
             ...state,

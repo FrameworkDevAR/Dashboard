@@ -2,6 +2,7 @@ import React                from "react";
 
 // Core & Utils
 import Store                from "../Core/Store";
+import Navigate             from "../Core/Navigate";
 import Utils                from "../Utils/Utils";
 
 
@@ -14,6 +15,7 @@ import Utils                from "../Utils/Utils";
  * @param {Function=} onSubmit
  * @param {boolean=}  startInLoading
  * @param {boolean=}  open
+ * @param {boolean=}  withUnsaved
  *
  * @typedef {object}    FormType
  * @property {boolean}  loading
@@ -27,11 +29,12 @@ import Utils                from "../Utils/Utils";
  * @property {Function} setErrors
  * @property {Function} resetErrors
  * @property {Function} setElem
+ * @property {boolean} hasChanges
  * @property {(...args: any[]) => any} handleChange
  * @property {(...args: any[]) => any} handleSubmit
  * @returns {FormType}
  */
-function useForm(slice, initialData, edit = undefined, onSubmit = undefined, startInLoading = true, open = true) {
+function useForm(slice, initialData, edit = undefined, onSubmit = undefined, startInLoading = true, open = true, withUnsaved = false) {
     const { loaders                } = Store.useState("core");
     const { startLoader, endLoader } = Store.useAction("core");
 
@@ -42,8 +45,17 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
         initialErrors[key] = "";
     }
 
-    const [ data,   setDataInt   ] = React.useState(Utils.clone(initialData));
-    const [ errors, setErrorsInt ] = React.useState({ ...initialErrors });
+    const [ data,     setDataInt   ] = React.useState(Utils.clone(initialData));
+    const [ errors,   setErrorsInt ] = React.useState({ ...initialErrors });
+    const [ snapshot, setSnapshot  ] = React.useState(Utils.clone(initialData));
+
+    // The changes are the difference with the data that was loaded or saved last, so a
+    // value that goes back to what it was counts as no change
+    const hasChanges = Boolean(open && !Utils.areSameData(data, snapshot));
+
+    // Only the forms that ask for it warn before leaving with changes, as a form in a dialog
+    // keeps its data after closing and would ask on the next navigation
+    Navigate.useUnsaved(withUnsaved && hasChanges);
 
     // Reset the Loader
     React.useEffect(() => {
@@ -70,7 +82,9 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
 
     // Resets the Data
     const resetData = (fields) => {
-        setDataInt({ ...Utils.clone(initialData), ...fields });
+        const newData = { ...Utils.clone(initialData), ...fields };
+        setDataInt(newData);
+        setSnapshot(Utils.clone(newData));
     };
 
 
@@ -101,6 +115,7 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
             }
         }
         setDataInt(fields);
+        setSnapshot(Utils.clone(fields));
         resetErrors();
         endLoading();
     };
@@ -164,6 +179,13 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
         try {
             const response = await edit({ ...data, ...extraData });
             endLoading();
+
+            // What was saved is the new base, and the flag is cleared right away, as the
+            // submit usually navigates before the effect gets to run
+            setSnapshot(Utils.clone(data));
+            if (withUnsaved) {
+                Navigate.setUnsaved(false);
+            }
             if (onSubmit) {
                 onSubmit(response);
             }
@@ -177,7 +199,7 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
     // The API
     return {
         loading, startLoading, endLoading,
-        data, setData, resetData,
+        data, setData, resetData, hasChanges,
         errors, setError, setErrors, resetErrors,
         setElem, handleChange, handleSubmit,
     };

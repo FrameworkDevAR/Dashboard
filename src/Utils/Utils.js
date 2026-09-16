@@ -929,6 +929,46 @@ function areEqual(object1, object2) {
 }
 
 /**
+ * Returns true if 2 values hold the same data, taking a number and its text, or a
+ * boolean and its 1 or 0, as the same
+ * @param {*} value1
+ * @param {*} value2
+ * @returns {boolean}
+ */
+function areSameData(value1, value2) {
+    return JSON.stringify(normalizeData(value1)) === JSON.stringify(normalizeData(value2));
+}
+
+/**
+ * Returns the given data with every scalar as a text, as the inputs give texts and the
+ * loaded data can hold numbers or booleans for the same values
+ * @param {*} value
+ * @returns {*}
+ */
+function normalizeData(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+    if (typeof value === "boolean") {
+        return value ? "1" : "0";
+    }
+    if (typeof value === "number") {
+        return String(value);
+    }
+    if (Array.isArray(value)) {
+        return value.map((elem) => normalizeData(elem));
+    }
+    if (typeof value === "object") {
+        const result = {};
+        for (const [ key, elem ] of Object.entries(value)) {
+            result[key] = normalizeData(elem);
+        }
+        return result;
+    }
+    return value;
+}
+
+/**
  * Returns true if both given objects are the same at 1 level deep
  * @param {object} a
  * @param {object} b
@@ -1894,6 +1934,7 @@ export default {
     jsonToHtml,
     createArrayOf,
     areEqual,
+    areSameData,
     areObjectsEqual,
     extend,
     merge,

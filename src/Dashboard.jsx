@@ -9,6 +9,7 @@ import Initializer          from "./Core/Initializer";
 // Components
 import Result               from "./Components/Core/Result";
 import Tooltip              from "./Components/Core/Tooltip";
+import Unsaved              from "./Components/Core/Unsaved";
 import Error                from "./Components/Core/Error";
 
 
@@ -28,6 +29,7 @@ function Dashboard(props) {
             <Initializer {...props} />
             <Result />
             <Tooltip />
+            <Unsaved />
             {children}
             <Error />
         </Store.Provider>

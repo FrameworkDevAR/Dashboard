@@ -76,6 +76,7 @@ const Search = Styled.label`
 
 const Selected = Styled.button.attrs(({ isActive }) => ({ isActive }))`
     flex-shrink: 0;
+    display: grid;
     padding: 4px 8px;
     border: none;
     border-radius: var(--border-radius-small, var(--border-radius));
@@ -97,8 +98,19 @@ const Selected = Styled.button.attrs(({ isActive }) => ({ isActive }))`
     }
 `;
 
-const List = Styled(ScrollFade)`
-    max-height: 260px;
+const SelectedText = Styled.span`
+    grid-area: 1 / 1;
+    text-align: center;
+`;
+
+const SelectedGhost = Styled.span`
+    grid-area: 1 / 1;
+    visibility: hidden;
+    font-weight: 600;
+`;
+
+const List = Styled(ScrollFade).attrs(({ noScroll }) => ({ noScroll }))`
+    max-height: ${(props) => props.noScroll ? "none" : "260px"};
 `;
 
 const Badge = Styled.span`
@@ -120,7 +132,7 @@ const None = Styled.p`
     color: var(--font-lighter);
 `;
 
-const Container = Styled.div.attrs(({ columns, withLabel, withSearch }) => ({ columns, withLabel, withSearch }))`
+const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll }) => ({ columns, withLabel, withSearch, noScroll }))`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: ${(props) => `repeat(${props.columns}, 1fr)`};
@@ -151,10 +163,10 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch }) => ({ co
 
     ${(props) => props.withSearch && `
         width: 100%;
-        max-height: 260px;
+        max-height: ${props.noScroll ? "none" : "260px"};
         margin: 0;
         gap: 6px 16px;
-        overflow-y: auto;
+        overflow-y: ${props.noScroll ? "visible" : "auto"};
 
         > .input-content {
             min-width: 0;
@@ -188,7 +200,7 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch }) => ({ co
 function MultipleInput(props) {
     const {
         className, isFocused, isDisabled, withLabel, withBorder,
-        name, value, placeholder, columns, withSearch, getDisabled, getPrefix,
+        name, value, placeholder, columns, withSearch, noScroll, getDisabled, getPrefix,
         onChange, onFocus, onBlur,
     } = props;
 
@@ -316,16 +328,20 @@ function MultipleInput(props) {
                     isActive={onlySelected}
                     onClick={() => setOnlySelected(!onlySelected)}
                 >
-                    {NLS.pluralize("GENERAL_SELECTED", parts.length)}
+                    <SelectedText>{NLS.pluralize("GENERAL_SELECTED", parts.length)}</SelectedText>
+                    <SelectedGhost aria-hidden="true">
+                        {NLS.pluralize("GENERAL_SELECTED", items.length)}
+                    </SelectedGhost>
                 </Selected>
             </Header>}
 
-            {withSearch ? <List passedRef={listRef}>
+            {withSearch ? <List passedRef={listRef} noScroll={noScroll}>
                 <Container
                     ref={listRef}
                     columns={columns}
                     withLabel={withLabel}
                     withSearch
+                    noScroll={noScroll}
                 >
                     {checkboxes}
                 </Container>
@@ -360,6 +376,7 @@ MultipleInput.propTypes = {
     placeholder : PropTypes.string,
     columns     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     withSearch  : PropTypes.bool,
+    noScroll    : PropTypes.bool,
     getDisabled : PropTypes.func,
     getPrefix   : PropTypes.func,
     onChange    : PropTypes.func.isRequired,
@@ -379,6 +396,7 @@ MultipleInput.defaultProps = {
     noneText    : "",
     columns     : 2,
     withSearch  : false,
+    noScroll    : false,
 };
 
 export default MultipleInput;

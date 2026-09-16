@@ -45,7 +45,7 @@ function Header(props) {
     const {
         isHidden, className, icon, iconColor, emoji,
         message, fallback, href, backIcon,
-        subTitle, subCircle, children,
+        subTitle, subCircle, hasChanges, children,
     } = props;
 
 
@@ -63,10 +63,13 @@ function Header(props) {
             href={href}
             backIcon={backIcon}
         />
-        <Subtitle
+        {hasChanges ? <Subtitle
+            message="GENERAL_UNSAVED_CHANGES"
+            circle="orange"
+        /> : <Subtitle
             message={subTitle}
             circle={subCircle}
-        />
+        />}
         <Child className="header-child">
             {children}
         </Child>
@@ -78,18 +81,19 @@ function Header(props) {
  * @type {object} propTypes
  */
 Header.propTypes = {
-    isHidden  : PropTypes.bool,
-    className : PropTypes.string,
-    icon      : PropTypes.string,
-    iconColor : PropTypes.string,
-    emoji     : PropTypes.string,
-    message   : PropTypes.string.isRequired,
-    fallback  : PropTypes.string,
-    href      : PropTypes.string,
-    backIcon  : PropTypes.string,
-    subTitle  : PropTypes.string,
-    subCircle : PropTypes.string,
-    children  : PropTypes.any,
+    isHidden   : PropTypes.bool,
+    className  : PropTypes.string,
+    icon       : PropTypes.string,
+    iconColor  : PropTypes.string,
+    emoji      : PropTypes.string,
+    message    : PropTypes.string.isRequired,
+    fallback   : PropTypes.string,
+    href       : PropTypes.string,
+    backIcon   : PropTypes.string,
+    subTitle   : PropTypes.string,
+    subCircle  : PropTypes.string,
+    hasChanges : PropTypes.bool,
+    children   : PropTypes.any,
 };
 
 /**

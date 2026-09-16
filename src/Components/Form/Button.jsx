@@ -321,6 +321,16 @@ function Button(props) {
         }
     };
 
+    // Handles the Click, hiding the Tooltip as the pointer stays over the button
+    const handleClick = (e) => {
+        if (tooltip) {
+            hideTooltip();
+        }
+        if (onClick) {
+            onClick(e);
+        }
+    };
+
 
     // Do the Render
     if (isHidden) {
@@ -346,7 +356,7 @@ function Button(props) {
         withIcon={withIcon}
         onlyIcon={onlyIcon}
         smallRadius={smallRadius}
-        onClick={onClick}
+        onClick={handleClick}
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >

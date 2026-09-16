@@ -28,6 +28,7 @@ function DeleteDialog(props) {
         isLoading={isLoading}
         isWide={isWide}
         primary="GENERAL_DELETE"
+        primaryVariant="error"
         onSubmit={onSubmit}
         onClose={onClose}
     />;

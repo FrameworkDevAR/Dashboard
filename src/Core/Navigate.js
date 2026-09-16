@@ -1,3 +1,4 @@
+import React                from "react";
 import NLS                  from "../Core/NLS";
 
 // Utils
@@ -9,6 +10,14 @@ import {
     useParams as useRouterParams,
     useNavigate as useRouteNavigate,
 } from "react-router-dom";
+
+// Core
+import Store                from "../Core/Store";
+
+
+
+// Variables
+let hasUnsaved = false;
 
 // All the params
 let   appUrl     = "";
@@ -244,22 +253,66 @@ function getWhatsApp(whatsapp) {
  */
 function useNavigate() {
     const navigate = useRouteNavigate();
+    const { askUnsaved } = Store.useAction("core");
 
     return (url, replace = false) => {
         if (!url || url === "#") {
             return false;
         }
 
+        // With unsaved changes the url is kept and the dialog asks before leaving
+        let internalUrl = "";
         if (url.startsWith(appUrl)) {
-            navigate(url.replace(appUrl, "/"), { replace });
-            return true;
+            internalUrl = url.replace(appUrl, "/");
+        } else if (!url.startsWith("http")) {
+            internalUrl = url;
         }
-        if (!url.startsWith("http")) {
-            navigate(url, { replace });
-            return true;
+        if (!internalUrl) {
+            return false;
         }
-        return false;
+
+        if (hasUnsaved) {
+            askUnsaved(internalUrl, replace);
+        } else {
+            navigate(internalUrl, { replace });
+        }
+        return true;
     };
+}
+
+/**
+ * Asks before leaving the page while there are unsaved changes
+ * @param {boolean} hasChanges
+ * @returns {void}
+ */
+function useUnsaved(hasChanges) {
+    // The navigation asks before leaving with changes, and the browser does the same when
+    // the tab is closed. The flag is cleared when the page goes away
+    React.useEffect(() => {
+        setUnsaved(hasChanges);
+        if (!hasChanges) {
+            return undefined;
+        }
+        const handleUnload = (e) => {
+            e.preventDefault();
+            e.returnValue = "";
+        };
+        window.addEventListener("beforeunload", handleUnload);
+        return () => {
+            setUnsaved(false);
+            window.removeEventListener("beforeunload", handleUnload);
+        };
+    }, [ hasChanges ]);
+}
+
+/**
+ * Sets if there are unsaved changes, which is kept outside of the state so a navigation
+ * right after a save sees it cleared before the components render again
+ * @param {boolean} unsaved
+ * @returns {void}
+ */
+function setUnsaved(unsaved) {
+    hasUnsaved = unsaved;
 }
 
 /**
@@ -435,6 +488,8 @@ export default {
     useGotoUrl,
     useClick,
     useLink,
+    useUnsaved,
+    setUnsaved,
 
     gotoBlank,
     gotoUrl,
