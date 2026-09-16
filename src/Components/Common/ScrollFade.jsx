@@ -46,6 +46,8 @@ const Container = Styled.div.attrs(({ showTop, showBottom }) => ({ showTop, show
 function ScrollFade(props) {
     const { className, passedRef, children } = props;
 
+    const containerRef = React.useRef(null);
+
 
     // The Current State
     const [ showTop,    setShowTop    ] = React.useState(false);
@@ -93,16 +95,30 @@ function ScrollFade(props) {
         return Math.max(0, Math.round(space));
     };
 
-    // Shows a fade on each side that the content can be scrolled to. Each fade starts
-    // next to the sticky element of its side, if there is one, so that stays visible
+    // Returns the space between the node and the start or the end of the container, as
+    // the node can have a margin that leaves it shorter than the container
+    const getNodeSpace = (node, atEnd) => {
+        const container = containerRef.current;
+        if (!container) {
+            return 0;
+        }
+        const nodeRect      = node.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const space         = atEnd ? containerRect.bottom - nodeRect.bottom : nodeRect.top - containerRect.top;
+        return Math.max(0, Math.round(space));
+    };
+
+    // Shows a fade on each side that the content can be scrolled to. Each fade starts at
+    // the edge of the node, next to the sticky element of its side if there is one, so
+    // the fade covers the content and the sticky element stays visible
     const updateFades = () => {
         const node = passedRef.current;
         if (!node) {
             return;
         }
 
-        setTopSpace(getStickySpace(node, false));
-        setBottomSpace(getStickySpace(node, true));
+        setTopSpace(getNodeSpace(node, false) + getStickySpace(node, false));
+        setBottomSpace(getNodeSpace(node, true) + getStickySpace(node, true));
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };
@@ -129,6 +145,7 @@ function ScrollFade(props) {
 
     // Do the Render
     return <Container
+        ref={containerRef}
         className={className}
         style={{
             "--fade-top"    : `${topSpace}px`,
