@@ -306,10 +306,11 @@ function getName(value) {
 /**
  * Returns a Periods Select
  * @param {string[]=} periods
+ * @param {string[]=} extraPeriods
  * @returns {object[]}
  */
-function getSelect(periods) {
-    const entries = periods || PERIODS_COMPLETE;
+function getSelect(periods, extraPeriods = []) {
+    const entries = [ ...(periods || PERIODS_COMPLETE), ...extraPeriods ];
     const result  = [];
     for (const key of entries) {
         const value = getName(key);
@@ -320,27 +321,30 @@ function getSelect(periods) {
 
 /**
  * Returns a Simple Periods Select
+ * @param {string[]=} extraPeriods
  * @returns {object[]}
  */
-function getSimpleSelect() {
-    return getSelect(PERIODS_SIMPLE);
+function getSimpleSelect(extraPeriods = []) {
+    return getSelect(PERIODS_SIMPLE, extraPeriods);
 }
 
 /**
  * Returns a Last Periods Select
- * @param {boolean=} withToday
+ * @param {boolean=}  withToday
+ * @param {string[]=} extraPeriods
  * @returns {object[]}
  */
-function getLastSelect(withToday) {
-    return withToday ? getSelect(PERIODS_LAST_TODAY) : getSelect(PERIODS_LAST);
+function getLastSelect(withToday, extraPeriods = []) {
+    return getSelect(withToday ? PERIODS_LAST_TODAY : PERIODS_LAST, extraPeriods);
 }
 
 /**
  * Returns a Past/Next Periods Select
+ * @param {string[]=} extraPeriods
  * @returns {object[]}
  */
-function getPastNextSelect() {
-    return getSelect(PERIODS_PAST_NEXT);
+function getPastNextSelect(extraPeriods = []) {
+    return getSelect(PERIODS_PAST_NEXT, extraPeriods);
 }
 
 
