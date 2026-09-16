@@ -12,7 +12,7 @@ import InputField           from "../Form/InputField";
 
 
 // Styles
-const Container = Styled.div.attrs(({ withLabel, outsideLabel }) => ({ withLabel, outsideLabel }))`
+const Container = Styled.div.attrs(({ withLabel, outsideLabel, noLabels }) => ({ withLabel, outsideLabel, noLabels }))`
     width: 100%;
     display: flex;
     align-items: center;
@@ -55,9 +55,9 @@ const Container = Styled.div.attrs(({ withLabel, outsideLabel }) => ({ withLabel
         }
     `}
 
-    ${(props) => props.outsideLabel && `
+    ${(props) => (props.outsideLabel || props.noLabels) && `
         .input-content {
-            min-height: 36px;
+            min-height: calc(var(--input-height) - 2px);
             padding: var(--input-padding) !important;
         }
     `}
@@ -81,6 +81,9 @@ function DoubleInput(props) {
         items.push(child.props);
     }
 
+    // Without a label anywhere the fields do not reserve the space of one
+    const noLabels = !withLabel && items.every((item) => !item.label);
+
 
     // Do the Render. The label of a checkbox is the text next to the box and not the label
     // of a field, so it is the one label that stays when the input has its label outside
@@ -92,7 +95,7 @@ function DoubleInput(props) {
         withPadding={withLabel}
         withBorder={withBorder}
     >
-        <Container withLabel={withLabel} outsideLabel={outsideLabel}>
+        <Container withLabel={withLabel} outsideLabel={outsideLabel} noLabels={noLabels}>
             {items.map((item) => <InputField
                 {...item}
                 key={item.name}
