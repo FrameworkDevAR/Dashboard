@@ -70,6 +70,9 @@ function MediaList(props) {
     } = props;
 
 
+    // The References
+    const containerRef = React.useRef(null);
+
     // The Current State
     const [ openElem, setOpenElem ] = React.useState(null);
     const [ view,     setView     ] = React.useState(localStorage.getItem("dashboard-media-view") || "grid");
@@ -165,9 +168,24 @@ function MediaList(props) {
         }
     }, [ isLoading, items ]);
 
+    // Scrolls to the selected Item, as the list can start with it out of the view
+    React.useEffect(() => {
+        if (isLoading || !containerRef.current) {
+            return;
+        }
+        const index = sortedItems.findIndex((elem) => isSelected(elem));
+        if (index < 0) {
+            return;
+        }
+        containerRef.current.querySelector(`.media-item-${index}`)?.scrollIntoView({
+            block : "center",
+        });
+    }, [ isLoading, sortedItems ]);
+
 
     // Do the Render
     return <Container
+        ref={containerRef}
         className={className}
         inDialog={inDialog}
         isCentered={showLoader || showNone}
