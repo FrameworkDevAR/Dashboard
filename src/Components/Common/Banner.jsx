@@ -13,7 +13,7 @@ import Html                 from "../Common/Html";
 
 
 // Styles
-const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, inlineChildren, isTight }) => ({ variant, topSpace, bottomSpace, noBorder, inlineChildren, isTight }))`
+const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace, noBorder, inlineChildren, isTight }) => ({ variant, iconColor, topSpace, bottomSpace, noBorder, inlineChildren, isTight }))`
     position: relative;
     gap: 8px;
     padding: 12px 16px;
@@ -68,6 +68,11 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace, noBorder, 
             color: var(--primary-color);
         }
     `}
+    ${(props) => props.iconColor && `
+        .banner-icon {
+            color: ${props.iconColor};
+        }
+    `}
     ${(props) => props.isTight && `
         padding: 6px 12px;
         font-size: 13px;
@@ -105,6 +110,20 @@ const Content = Styled.div`
     gap: 8px;
 `;
 
+const Text = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+`;
+
+const Title = Styled.h4`
+    margin: 0;
+    color: var(--title-color);
+    font-size: var(--font-size);
+    font-weight: 600;
+`;
+
 const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
     ${(props) => !props.inlineChildren && "padding: 12px 0 0 28px;"}
 
@@ -122,7 +141,7 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
  */
 function Banner(props) {
     const {
-        isHidden, className, variant, icon, message,
+        isHidden, className, variant, icon, iconColor, title, message,
         topSpace, bottomSpace, noBorder, inlineChildren, isTight, children,
     } = props;
 
@@ -146,12 +165,13 @@ function Banner(props) {
 
 
     // Do the Render
-    if (isHidden || !message) {
+    if (isHidden || (!message && !title)) {
         return <React.Fragment />;
     }
     return <Container
         className={className}
         variant={variant}
+        iconColor={iconColor}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
         noBorder={noBorder}
@@ -164,7 +184,10 @@ function Banner(props) {
                 icon={bannerIcon}
                 size="20"
             />
-            <Html>{NLS.get(message)}</Html>
+            {title ? <Text>
+                <Title>{NLS.get(title)}</Title>
+                <Html>{NLS.get(message)}</Html>
+            </Text> : <Html>{NLS.get(message)}</Html>}
         </Content>
         <Children className="banner-children" inlineChildren={inlineChildren}>
             {children}
@@ -181,6 +204,8 @@ Banner.propTypes = {
     className      : PropTypes.string,
     variant        : PropTypes.string.isRequired,
     icon           : PropTypes.string,
+    iconColor      : PropTypes.string,
+    title          : PropTypes.string,
     message        : PropTypes.string,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
