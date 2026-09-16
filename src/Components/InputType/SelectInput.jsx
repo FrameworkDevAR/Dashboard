@@ -55,12 +55,7 @@ const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     margin-top: -4px;
     margin-right: -6px;
 
-    ${(props) => props.withLabel ? `
-        margin-top: -4px;
-    ` : `
-        margin-top: 0;
-        margin-bottom: -4px;
-    `}
+    ${(props) => !props.withLabel && "margin-top: 0;"}
 `;
 
 const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`

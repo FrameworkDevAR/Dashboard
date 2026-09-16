@@ -106,7 +106,7 @@ function DoubleInput(props) {
                 onFocus={onFocus}
                 onBlur={onBlur}
                 withPadding
-                withLabel={!outsideLabel}
+                withLabel={!outsideLabel && !noLabels}
                 fullWidth
             />)}
         </Container>
