@@ -22,6 +22,7 @@ const Container = Styled.div`
     justify-content: center;
     flex-wrap: wrap;
     gap: 12px 24px;
+    margin-bottom: 16px;
     padding: 12px 16px;
     color: var(--black-color);
     background-color: var(--dropzone-background);
