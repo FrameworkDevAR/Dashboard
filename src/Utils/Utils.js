@@ -1813,6 +1813,38 @@ function download(source, fileName, signal = null) {
 }
 
 /**
+ * Opens the given File in a new Tab
+ * @param {string}       source
+ * @param {AbortSignal=} signal
+ * @returns {Promise}
+ */
+function openFile(source, signal = null) {
+    // The Tab has to be opened while the click is handled or the browser blocks it,
+    // so it stays empty until the content is fetched
+    const tab = window.open("", "_blank");
+    if (!tab) {
+        return Promise.resolve();
+    }
+
+    // The params are sent in the body, as the access token can make the url too long
+    const sourceUrl = new URL(source);
+    const params    = new URLSearchParams(sourceUrl.search);
+    const options   = { method : "POST", body : params };
+
+    sourceUrl.search = "";
+    if (signal) {
+        options.signal = signal;
+    }
+
+    return fetch(sourceUrl.href, options)
+        .then((response) => response.text())
+        .then((content) => {
+            const blob = new Blob([ content ], { type : "text/html;charset=utf-8" });
+            tab.location.href = window.URL.createObjectURL(blob);
+        });
+}
+
+/**
  * Returns true if the User is in macOS, where the modifier key is the Command
  * @returns {boolean}
  */
@@ -1979,6 +2011,7 @@ export default {
     isValidFile,
     formatSize,
     download,
+    openFile,
     isMacOS,
     getShortcutKeys,
     getShortcutText,
