@@ -13,7 +13,7 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
     ${(props) => props.fullWidth && `
         width: 100%;
     `}
-    ${(props) => (props.width && !props.rightInput) && `
+    ${(props) => (Boolean(props.width) && !props.rightInput) && `
         width: ${props.width}px;
     `}
 
