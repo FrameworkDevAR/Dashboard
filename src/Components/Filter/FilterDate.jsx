@@ -15,7 +15,10 @@ import InputField           from "../Form/InputField";
  * @returns {React.ReactElement}
  */
 function FilterDate(props) {
-    const { open, withHour, onlyHour, currData, datesName, onSubmit, onClose } = props;
+    const {
+        open, withHour, onlyHour, outsideLabel,
+        currData, datesName, onSubmit, onClose,
+    } = props;
 
 
     // The Initial Data
@@ -80,6 +83,7 @@ function FilterDate(props) {
                 maxValue="2999-12-31"
                 value={data.fromDate}
                 onChange={handleChange}
+                outsideLabel={outsideLabel}
                 hasClear
             />
             <InputField
@@ -89,6 +93,7 @@ function FilterDate(props) {
                 label="GENERAL_FROM_HOUR"
                 value={data.fromHour}
                 onChange={handleChange}
+                outsideLabel={outsideLabel}
                 hasClear
             />
 
@@ -100,6 +105,7 @@ function FilterDate(props) {
                 maxValue="2999-12-31"
                 value={data.toDate}
                 onChange={handleChange}
+                outsideLabel={outsideLabel}
                 hasClear
             />
             <InputField
@@ -109,6 +115,7 @@ function FilterDate(props) {
                 label="GENERAL_TO_HOUR"
                 value={data.toHour}
                 onChange={handleChange}
+                outsideLabel={outsideLabel}
                 hasClear
             />
         </Columns>
@@ -120,13 +127,14 @@ function FilterDate(props) {
  * @type {object} propTypes
  */
 FilterDate.propTypes = {
-    open      : PropTypes.bool.isRequired,
-    withHour  : PropTypes.bool,
-    onlyHour  : PropTypes.bool,
-    currData  : PropTypes.object.isRequired,
-    datesName : PropTypes.string,
-    onSubmit  : PropTypes.func.isRequired,
-    onClose   : PropTypes.func.isRequired,
+    open         : PropTypes.bool.isRequired,
+    withHour     : PropTypes.bool,
+    onlyHour     : PropTypes.bool,
+    outsideLabel : PropTypes.bool,
+    currData     : PropTypes.object.isRequired,
+    datesName    : PropTypes.string,
+    onSubmit     : PropTypes.func.isRequired,
+    onClose      : PropTypes.func.isRequired,
 };
 
 export default FilterDate;

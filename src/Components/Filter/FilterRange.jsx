@@ -17,7 +17,10 @@ import InputField           from "../Form/InputField";
  * @returns {React.ReactElement}
  */
 function FilterRange(props) {
-    const { open, currData, name, label, prefix, suffix, onSubmit, onClose } = props;
+    const {
+        open, currData, name, label, prefix, suffix,
+        outsideLabel, onSubmit, onClose,
+    } = props;
 
 
     // The Initial Data
@@ -71,6 +74,7 @@ function FilterRange(props) {
             prefixText={prefix}
             suffixText={suffix}
             onChange={handleChange}
+            outsideLabel={outsideLabel}
             hasClear
         />
         <InputField
@@ -81,6 +85,7 @@ function FilterRange(props) {
             prefixText={prefix}
             suffixText={suffix}
             onChange={handleChange}
+            outsideLabel={outsideLabel}
             hasClear
         />
     </EditDialog>;
@@ -91,14 +96,15 @@ function FilterRange(props) {
  * @type {object} propTypes
  */
 FilterRange.propTypes = {
-    open     : PropTypes.bool.isRequired,
-    currData : PropTypes.object.isRequired,
-    name     : PropTypes.string,
-    label    : PropTypes.string,
-    prefix   : PropTypes.string,
-    suffix   : PropTypes.string,
-    onSubmit : PropTypes.func.isRequired,
-    onClose  : PropTypes.func.isRequired,
+    open         : PropTypes.bool.isRequired,
+    currData     : PropTypes.object.isRequired,
+    name         : PropTypes.string,
+    label        : PropTypes.string,
+    prefix       : PropTypes.string,
+    suffix       : PropTypes.string,
+    outsideLabel : PropTypes.bool,
+    onSubmit     : PropTypes.func.isRequired,
+    onClose      : PropTypes.func.isRequired,
 };
 
 export default FilterRange;

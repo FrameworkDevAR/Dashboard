@@ -87,7 +87,7 @@ const Chips = Styled(ChipList).attrs(({ isNarrow }) => ({ isNarrow }))`
 function Filter(props) {
     const {
         className, icon, message, values, initialValues,
-        showRefresh, onFilter, children,
+        showRefresh, outsideLabel, onFilter, children,
     } = props;
 
 
@@ -801,6 +801,7 @@ function Filter(props) {
             datesName={editItem.name}
             withHour={editItem.withHour}
             onlyHour={editItem.onlyHour}
+            outsideLabel={outsideLabel}
             onSubmit={handleDates}
             onClose={() => setShowDates(false)}
         />
@@ -811,6 +812,7 @@ function Filter(props) {
             label={editItem.message}
             prefix={editItem.prefix}
             suffix={editItem.suffix}
+            outsideLabel={outsideLabel}
             onSubmit={handleRange}
             onClose={() => setShowRange(false)}
         />
@@ -829,6 +831,7 @@ Filter.propTypes = {
     initialValues : PropTypes.object,
     onFilter      : PropTypes.func.isRequired,
     showRefresh   : PropTypes.bool,
+    outsideLabel  : PropTypes.bool,
     children      : PropTypes.any,
 };
 
