@@ -95,11 +95,15 @@ const Status = Styled.div`
     width: 18px;
 `;
 
-const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }))`
+const Content = Styled.div.attrs(({ isWide, isNarrow, isHalf }) => ({ isWide, isNarrow, isHalf }))`
     display: flex;
     flex-wrap: wrap;
     gap: var(--main-gap);
     max-width: ${(props) => props.isWide ? "none" : `var(${props.isNarrow ? "--setting-narrow-width" : "--setting-width"})`};
+
+    ${(props) => props.isHalf && `
+        max-width: calc((var(--setting-width) - var(--main-gap)) / 2);
+    `}
 
     &:has(> .inputfield > .inputfield-label) {
         margin-top: 6px;
@@ -126,7 +130,7 @@ const Content = Styled.div.attrs(({ isWide, isNarrow }) => ({ isWide, isNarrow }
  */
 function SettingOption(props) {
     const {
-        isHidden, className, isWide, isNarrow, noLabel, isInline,
+        isHidden, className, isWide, isNarrow, isHalf, noLabel, isInline,
         message, description, helperText, toggle, children,
     } = props;
 
@@ -267,6 +271,7 @@ function SettingOption(props) {
             className="setting-content"
             isWide={isWide}
             isNarrow={isNarrow}
+            isHalf={isHalf}
         >
             {addSteps(children)}
         </Content>}
@@ -286,6 +291,7 @@ SettingOption.propTypes = {
     className   : PropTypes.string,
     isWide      : PropTypes.bool,
     isNarrow    : PropTypes.bool,
+    isHalf      : PropTypes.bool,
     noLabel     : PropTypes.bool,
     isInline    : PropTypes.bool,
     message     : PropTypes.string.isRequired,
