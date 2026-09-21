@@ -113,6 +113,9 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         --loader-font-color: var(--button-hover-color);
     }
 
+    .btn-loader {
+        --loader-size: ${(props) => props.isSmall ? "14px" : "18px"};
+    }
     .btn-preicon {
         display: inline-block;
         height: ${(props) => props.isSmall ? "14px" : "18px"};
@@ -360,9 +363,13 @@ function Button(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
-        {!!icon && <Icon
+        {!!icon && !isLoading && <Icon
             className="btn-preicon"
             icon={icon}
+        />}
+        {!!icon && isLoading && <CircularLoader
+            className="btn-loader"
+            isTiny
         />}
         {!!content && <span className="btn-content">
             {content}
@@ -371,7 +378,7 @@ function Button(props) {
             className="btn-aftericon"
             icon={afterIcon}
         />}
-        {isLoading && <CircularLoader
+        {!icon && isLoading && <CircularLoader
             className="btn-loader"
             isTiny
         />}
