@@ -46,10 +46,11 @@ const Container = Styled.header.attrs(({ smallNav, onlyIcon }) => ({ smallNav, o
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         flex-wrap: wrap;
+        align-items: flex-start;
     }
 `;
 
-const HeaderIcon = Styled(Icon)`
+const HeaderIcon = Styled(Icon).attrs(({ withBack }) => ({ withBack }))`
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -58,6 +59,12 @@ const HeaderIcon = Styled(Icon)`
     height: 24px;
     font-size: var(--navigation-title-icon, 20px);
     color: var(--navigation-title-color, var(--title-color));
+
+    ${(props) => props.withBack && `
+        @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+            display: none;
+        }
+    `}
 `;
 
 const BackLink = Styled(IconLink)`
@@ -78,7 +85,7 @@ const Title = Styled.h2.attrs(({ hasSubTitle }) => ({ hasSubTitle }))`
         width: max-content;
 
         @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
-            flex-shrink: 1;
+            flex: 1 1 0;
             width: auto;
             min-width: 0;
         }
@@ -125,6 +132,9 @@ const SubTitle = Styled.h3.attrs(({ withBorder }) => ({ withBorder }))`
     `}
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
+        --pill-padding: 2px 8px;
+        --pill-font-size: 12px;
+
         flex-grow: 0;
         flex-basis: 100%;
         margin-left: 28px;
@@ -194,7 +204,7 @@ function NavigationTitle(props) {
             onClick={onClick}
             isSmall
         />
-        {!!icon && <HeaderIcon icon={icon} />}
+        {!!icon && <HeaderIcon icon={icon} withBack={!noBack} />}
 
         {showTitle && <Title hasSubTitle={Boolean(subTitle)}>
             {!message ? NLS.get(fallback) : <>
