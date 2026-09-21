@@ -1,12 +1,28 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
 
 // Components
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
 
+// Styled
+import Styled, {
+    keyframes,
+} from "styled-components";
 
+
+
+// Animations
+const pop = keyframes`
+    from { transform: scale(0.5); opacity: 0; }
+    60%  { transform: scale(1.1); opacity: 1; }
+    to   { transform: scale(1); }
+`;
+
+const draw = keyframes`
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+`;
 
 // Styles
 const Container = Styled.div.attrs(({ topSpace, bottomSpace }) => ({ topSpace, bottomSpace }))`
@@ -31,6 +47,7 @@ const Circle = Styled.div.attrs(({ variant }) => ({ variant }))`
     width: 88px;
     height: 88px;
     border-radius: 50%;
+    animation: ${pop} 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
 
     ${(props) => props.variant === "success" && `
         color: var(--success-color);
@@ -50,6 +67,11 @@ const Content = Styled.div`
     display: flex;
     flex-direction: column;
     gap: 8px;
+`;
+
+const Symbol = Styled.span`
+    display: flex;
+    animation: ${draw} 0.45s 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 `;
 
 const Message = Styled(Html)`
@@ -95,7 +117,9 @@ function DialogResult(props) {
         bottomSpace={bottomSpace}
     >
         <Circle variant={variant}>
-            <Icon icon={iconName} size="44" />
+            <Symbol>
+                <Icon icon={iconName} size="44" />
+            </Symbol>
         </Circle>
         <Content>
             <Message
