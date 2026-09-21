@@ -5,11 +5,15 @@ import Styled               from "styled-components";
 // Core
 import Responsive           from "../../Core/Responsive";
 import Store                from "../../Core/Store";
+import Utils                from "../../Utils/Utils";
 
 
+
+// Constants
+const ANIMATION_TIME = 200;
 
 // Styles
-const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails }) => ({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails }))`
+const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isAnimated }) => ({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isAnimated }))`
     --main-navigation: ${(props) => props.withNavigation ? (props.isCollapsed ? "calc(var(--navigation-small-width) + 16px)" : "var(--navigation-width)") : "0px"};
     --main-details: ${(props) => props.withDetails ? `calc(${props.wideDetails ? "var(--details-width-wide)" : (props.largeDetails ? "var(--details-width-large)" : "var(--details-width)")} + var(--main-margin))` : "0px"};
 
@@ -18,7 +22,7 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
     flex-direction: column;
     height: var(--main-height, var(--full-height));
     width: calc(100vw - var(--sidebar-width) - var(--main-navigation) - var(--main-details) - var(--main-margin));
-    transition: width 0.2s ease;
+    ${(props) => props.isAnimated && `transition: width ${ANIMATION_TIME}ms ease;`}
     margin-right: var(--main-margin);
     margin-bottom: var(--main-margin);
     border-radius: var(--main-radius);
@@ -48,14 +52,55 @@ function Main(props) {
     const { smallNav } = Store.useState("core");
 
 
+    // The References
+    const timerRef       = React.useRef(0);
+    const interactionRef = React.useRef(false);
+
+    // The Current State
+    const isCollapsed = smallNav && !isForMenu;
+    const panels      = `${withDetails}-${isCollapsed}`;
+    const [ shownPanels, setShownPanels ] = React.useState(panels);
+    const [ isAnimated,  setAnimated    ] = React.useState(false);
+
+    // The width only animates when the user shows or hides the Details or the Navigation, so
+    // it does not animate when a page sets them while it loads. It is set while rendering, so
+    // the transition is there when the width changes
+    if (panels !== shownPanels) {
+        setShownPanels(panels);
+        setAnimated(interactionRef.current);
+    }
+
+    // Listens to the interactions of the user since the page was shown
+    React.useEffect(() => {
+        const handleInteraction = () => {
+            interactionRef.current = true;
+        };
+        window.addEventListener("pointerdown", handleInteraction, true);
+        window.addEventListener("keydown", handleInteraction, true);
+        return () => {
+            window.removeEventListener("pointerdown", handleInteraction, true);
+            window.removeEventListener("keydown", handleInteraction, true);
+        };
+    }, []);
+
+    // Removes the transition once the animation ends
+    React.useEffect(() => {
+        if (isAnimated) {
+            Utils.setTimeout(timerRef, () => setAnimated(false), ANIMATION_TIME);
+        }
+        return () => Utils.clearTimeout(timerRef);
+    }, [ isAnimated, shownPanels ]);
+
+
     // Do the Render
     return <Content
         className={`main ${className}`}
         withNavigation={withNavigation}
-        isCollapsed={smallNav && !isForMenu}
+        isCollapsed={isCollapsed}
         withDetails={withDetails}
         largeDetails={largeDetails}
         wideDetails={wideDetails}
+        isAnimated={isAnimated}
     >
         {children}
     </Content>;

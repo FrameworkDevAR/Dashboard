@@ -137,19 +137,25 @@ const Actions = Styled.div`
     gap: 4px;
 `;
 
-const Body = Styled.section.attrs(({ isCollapsed }) => ({ isCollapsed }))`
+const Body = Styled.section.attrs(({ isCollapsed, isAnimated }) => ({ isCollapsed, isAnimated }))`
     display: grid;
     grid-template-rows: ${(props) => props.isCollapsed ? "0fr" : "1fr"};
     margin: 0;
     color: var(--font-lighter);
-    transition: grid-template-rows ${ANIMATION_TIME}ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    ${(props) => props.isAnimated && `
+        transition: grid-template-rows ${ANIMATION_TIME}ms cubic-bezier(0.4, 0, 0.2, 1);
+    `}
 `;
 
-const Clip = Styled.div.attrs(({ isCollapsed }) => ({ isCollapsed }))`
+const Clip = Styled.div.attrs(({ isCollapsed, isAnimated }) => ({ isCollapsed, isAnimated }))`
     min-height: 0;
     overflow: hidden;
     opacity: ${(props) => props.isCollapsed ? "0" : "1"};
-    transition: opacity ${(props) => props.isCollapsed ? "120ms" : "240ms"} ease;
+
+    ${(props) => props.isAnimated && `
+        transition: opacity ${props.isCollapsed ? "120ms" : "240ms"} ease;
+    `}
 `;
 
 const Inside = Styled.div`
@@ -172,22 +178,31 @@ function DetailHeader(props) {
     } = props;
 
 
-    // The Current State
-    const [ isCollapsed, setCollapsed ] = React.useState(false);
-
-
-    // Handles the Initial Collapsed state
-    React.useEffect(() => {
-        if (collapsible) {
-            const collapsed = localStorage.getItem(`dashboard-collapsed-${collapsible}-${message}`);
-            setCollapsed(Boolean(Number(collapsed)));
+    // Returns the stored Collapsed state
+    const getCollapsed = () => {
+        if (!collapsible) {
+            return false;
         }
+        return Boolean(Number(localStorage.getItem(`dashboard-collapsed-${collapsible}-${message}`)));
+    };
+
+
+    // The Current State
+    const [ isCollapsed, setCollapsed ] = React.useState(getCollapsed);
+    const [ isAnimated,  setAnimated  ] = React.useState(false);
+
+
+    // Restores the Collapsed state without the transition, which is only for a click
+    React.useEffect(() => {
+        setCollapsed(getCollapsed());
+        setAnimated(false);
     }, [ collapsible, message ]);
 
     // Handles the Collapsed click
     const handleClick = () => {
         if (collapsible) {
             setCollapsed(!isCollapsed);
+            setAnimated(true);
             localStorage.setItem(`dashboard-collapsed-${collapsible}-${message}`, isCollapsed ? "0" : "1");
         }
     };
@@ -265,8 +280,8 @@ function DetailHeader(props) {
                 {!!description && <Description>{NLS.get(description)}</Description>}
             </Content>
         </Header>
-        {!!children && (isCollapsible ? <Body className="details-content" isCollapsed={isCollapsed}>
-            <Clip isCollapsed={isCollapsed}>
+        {!!children && (isCollapsible ? <Body className="details-content" isCollapsed={isCollapsed} isAnimated={isAnimated}>
+            <Clip isCollapsed={isCollapsed} isAnimated={isAnimated}>
                 <Inside>
                     {children}
                 </Inside>
