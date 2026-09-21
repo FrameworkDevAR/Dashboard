@@ -46,7 +46,7 @@ function Badge(props) {
  * @type {object} propTypes
  */
 Badge.propTypes = {
-    value     : PropTypes.number,
+    value     : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     className : PropTypes.string,
 };
 
