@@ -9,6 +9,7 @@ import ButtonsInput         from "../InputType/ButtonsInput";
 import CheckboxInput        from "../InputType/CheckboxInput";
 import ChipsInput           from "../InputType/ChipsInput";
 import ChooserInput         from "../InputType/ChooserInput";
+import CodeInput            from "../InputType/CodeInput";
 import ColorInput           from "../InputType/ColorInput";
 import DoubleInput          from "../InputType/DoubleInput";
 import EmailsInput          from "../InputType/EmailsInput";
@@ -47,6 +48,8 @@ function Input(props) {
         return <ChipsInput {...props} />;
     case InputType.CHOOSER:
         return <ChooserInput {...props} />;
+    case InputType.CODE:
+        return <CodeInput {...props} />;
     case InputType.COLOR:
         return <ColorInput {...props} />;
     case InputType.DOUBLE:
@@ -106,6 +109,7 @@ Input.propTypes = {
     autoComplete : PropTypes.string,
     spellCheck   : PropTypes.string,
     isDisabled   : PropTypes.bool,
+    isValid      : PropTypes.bool,
     withBorder   : PropTypes.bool,
     addButton    : PropTypes.string,
     options      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),

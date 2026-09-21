@@ -9,6 +9,7 @@ const BUTTONS  = "buttons";
 const CHECKBOX = "checkbox";
 const CHIPS    = "chips";
 const CHOOSER  = "chooser";
+const CODE     = "code";
 const COLOR    = "color";
 const DOUBLE   = "double";
 const EMAILS   = "emails";
@@ -61,7 +62,7 @@ function hasClear(type) {
  */
 function canShrink(type) {
     return ![
-        BUTTONS, CHIPS, DOUBLE, MULTIPLE, FILE, MEDIA,
+        BUTTONS, CHIPS, CODE, DOUBLE, MULTIPLE, FILE, MEDIA,
         CHECKBOX, RADIO, RADIOBOX,
         TOGGLE, FIELDS, LIST, COLOR, DATE, TIME,
     ].includes(type);
@@ -185,6 +186,7 @@ export default {
     CHECKBOX,
     CHIPS,
     CHOOSER,
+    CODE,
     COLOR,
     DOUBLE,
     EMAILS,
