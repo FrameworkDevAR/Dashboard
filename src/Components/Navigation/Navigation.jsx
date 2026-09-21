@@ -61,6 +61,7 @@ const Content = Styled.nav`
 `;
 
 const Body = Styled(ScrollFade).attrs(({ isCollapsed }) => ({ isCollapsed }))`
+    --fade-height: var(--navigation-fade, 0px);
     --fade-color: var(--navigation-background, var(--background-color));
     --fade-right: ${(props) => props.isCollapsed ? "0px" : "16px"};
 `;

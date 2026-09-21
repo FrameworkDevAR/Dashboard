@@ -20,9 +20,11 @@ const Container = Styled.nav.attrs(({ withSpacing }) => ({ withSpacing }))`
     flex-grow: 2;
     flex-direction: column;
     justify-content: flex-start;
+    --navigation-body-offset: 6px;
+
     padding: ${(props) => props.withSpacing && "var(--navigation-body-padding, 0px 16px 16px 6px)"};
-    margin-top: -6px;
-    padding-top: 6px;
+    margin-top: calc(var(--navigation-body-offset) * -1);
+    padding-top: var(--navigation-body-offset);
     overflow: auto;
 `;
 
