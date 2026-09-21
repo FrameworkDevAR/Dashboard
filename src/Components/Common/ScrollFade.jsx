@@ -73,13 +73,19 @@ function ScrollFade(props) {
         return null;
     };
 
-    // Returns the space taken by the sticky elements at the start or the end. Several
-    // children can stack their sticky elements, as in a Dashboard with a sticky header
-    // followed by a chart with a sticky title, so the space ends where the last one does
+    // Returns the space taken by the sticky elements at the start or the end, or null
+    // when there is none. Several children can stack their sticky elements, as in a
+    // Dashboard with a sticky header followed by a chart with a sticky title, so the
+    // space ends where the last one does. It is measured from the container, as the
+    // node can start outside of it
     const getStickySpace = (node, atEnd) => {
-        const children = [ ...node.children ];
-        const nodeRect = node.getBoundingClientRect();
-        let   space    = 0;
+        const container = containerRef.current;
+        if (!container) {
+            return null;
+        }
+        const children      = [ ...node.children ];
+        const containerRect = container.getBoundingClientRect();
+        let   space         = null;
 
         if (atEnd) {
             children.reverse();
@@ -90,13 +96,14 @@ function ScrollFade(props) {
                 break;
             }
             const rect = sticky.getBoundingClientRect();
-            space = atEnd ? nodeRect.bottom - rect.top : rect.bottom - nodeRect.top;
+            space = atEnd ? containerRect.bottom - rect.top : rect.bottom - containerRect.top;
         }
-        return Math.max(0, Math.round(space));
+        return space === null ? null : Math.max(0, Math.round(space));
     };
 
     // Returns the space between the node and the start or the end of the container, as
-    // the node can have a margin that leaves it shorter than the container
+    // the node can have a margin that leaves it shorter than the container, or a
+    // negative one that takes it past the container, which gives a negative space
     const getNodeSpace = (node, atEnd) => {
         const container = containerRef.current;
         if (!container) {
@@ -105,7 +112,7 @@ function ScrollFade(props) {
         const nodeRect      = node.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const space         = atEnd ? containerRect.bottom - nodeRect.bottom : nodeRect.top - containerRect.top;
-        return Math.max(0, Math.round(space));
+        return Math.round(space);
     };
 
     // Shows a fade on each side that the content can be scrolled to. Each fade starts at
@@ -117,8 +124,8 @@ function ScrollFade(props) {
             return;
         }
 
-        setTopSpace(getNodeSpace(node, false) + getStickySpace(node, false));
-        setBottomSpace(getNodeSpace(node, true) + getStickySpace(node, true));
+        setTopSpace(getStickySpace(node, false) ?? getNodeSpace(node, false));
+        setBottomSpace(getStickySpace(node, true) ?? getNodeSpace(node, true));
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };
