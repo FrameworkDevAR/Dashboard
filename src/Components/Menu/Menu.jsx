@@ -368,7 +368,14 @@ function Menu(props) {
                         if (newMaxHeight > minHeight) {
                             maxHeight = newMaxHeight;
                         } else {
-                            top -= (targetHeight + boundHeight + 8);
+                            // It opens above the Target instead, where it can only take the
+                            // space there is up to the top of the window, and scrolls the rest
+                            const targetTop = top - gap - targetHeight;
+                            const available = targetTop - gap - 8;
+                            if (boundHeight > available) {
+                                maxHeight = available;
+                            }
+                            top   = targetTop - gap - Math.min(boundHeight, available);
                             toTop = true;
                         }
                     } else {
