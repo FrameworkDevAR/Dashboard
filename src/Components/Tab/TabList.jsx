@@ -145,13 +145,22 @@ function TabList(props) {
         }
     };
 
-    // Sets the Selection
+    // Sets the Selection. The line is inside the content that scrolls, so its
+    // position includes the scroll, and the selected item is scrolled into view
     const setSelection = (item) => {
+        const content       = contentRef.current;
         const itemBounds    = item.getBoundingClientRect();
-        const contentBounds = contentRef.current.getBoundingClientRect();
+        const contentBounds = content.getBoundingClientRect();
+        const itemLeft      = itemBounds.left - contentBounds.left + content.scrollLeft;
 
-        setLineLeft(itemBounds.left - contentBounds.left);
+        setLineLeft(itemLeft);
         setLineWidth(itemBounds.width);
+
+        if (itemLeft < content.scrollLeft) {
+            content.scrollTo({ left : itemLeft, behavior : "smooth" });
+        } else if (itemLeft + itemBounds.width > content.scrollLeft + contentBounds.width) {
+            content.scrollTo({ left : itemLeft + itemBounds.width - contentBounds.width, behavior : "smooth" });
+        }
     };
 
 
