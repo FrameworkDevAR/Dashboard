@@ -123,7 +123,7 @@ const Inside = Styled.div.attrs(({ isLast, isCard, hasIcon, hideAside, maxWidth 
     transition: 0.3s all;
 
     ${(props) => !props.isLast && !props.isCard && "border-bottom: 1px solid var(--border-color-light);"}
-    ${(props) => props.maxWidth && `max-width: ${props.maxWidth}px;`}
+    ${(props) => props.maxWidth > 0 && `max-width: ${props.maxWidth}px;`}
 
     @media (max-width: 500px) {
         width: 100%;
@@ -153,6 +153,7 @@ const Header = Styled.header.attrs(({ isCard, isDisabled, hideAside }) => ({ isC
 
     ${(props) => !props.hideAside && `
         @media (max-width: 500px) {
+            width: calc(100% - 38px);
             margin-left: 38px;
         }
     `}
