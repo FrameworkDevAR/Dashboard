@@ -84,7 +84,7 @@ function NavigationItem(props) {
         elemID, isSelected, useExact, isDisabled, smallNav,
         onAction, onClick, onClose, noClose,
         hideActions, canEdit, canDelete,
-        canCollapse, isCollapsed, collapseOnSelect, children,
+        canCollapse, isCollapsed, collapseOnSelect, markExpanded, children,
     } = props;
 
     const isSelect   = Navigate.useSelect();
@@ -158,7 +158,7 @@ function NavigationItem(props) {
                 variant="light"
                 className={className}
                 isSelected={selected}
-                isExpanded={canCollapse && !isCollapsed && !selected}
+                isExpanded={markExpanded && canCollapse && !isCollapsed && !selected}
                 isDisabled={isDisabled}
                 message={message}
                 html={html}
@@ -248,6 +248,7 @@ NavigationItem.propTypes = {
     canCollapse      : PropTypes.bool,
     isCollapsed      : PropTypes.bool,
     collapseOnSelect : PropTypes.bool,
+    markExpanded     : PropTypes.bool,
     isSelected       : PropTypes.bool,
     useExact         : PropTypes.bool,
     isDisabled       : PropTypes.bool,
@@ -268,6 +269,7 @@ NavigationItem.defaultProps = {
     canCollapse      : false,
     isCollapsed      : false,
     collapseOnSelect : false,
+    markExpanded     : false,
     isSelected       : false,
     isDisabled       : false,
     smallNav         : false,
