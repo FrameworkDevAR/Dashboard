@@ -79,10 +79,10 @@ const InputIcon = Styled(Icon)`
     color: var(--black-color);
 `;
 
-const PostInputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
+const PostInputIcon = Styled(Icon).attrs(({ withLabel, iconColor }) => ({ withLabel, iconColor }))`
     flex-shrink: 0;
     margin-right: -6px;
-    color: var(--black-color);
+    color: ${(props) => props.iconColor || "var(--black-color)"};
 
     ${(props) => props.withLabel && "margin-top: -8px;"}
 `;
@@ -133,7 +133,7 @@ function InputContent(props) {
         withBorder, dashedBorder,
         withPadding, withLabel, withClick,
         onClick, onClear, showButton, onButton, buttonMessage,
-        prefixText, suffixText, icon, postIcon, children,
+        prefixText, suffixText, icon, postIcon, postIconColor, postTooltip, children,
     } = props;
 
 
@@ -185,6 +185,9 @@ function InputContent(props) {
         {!!postIcon && <PostInputIcon
             icon={postIcon}
             size="18"
+            iconColor={postIconColor}
+            tooltip={postTooltip}
+            tooltipWidth={postTooltip ? 300 : undefined}
             withLabel={withLabel}
         />}
 
@@ -231,6 +234,8 @@ InputContent.propTypes = {
     onButton      : PropTypes.func,
     icon          : PropTypes.string,
     postIcon      : PropTypes.string,
+    postIconColor : PropTypes.string,
+    postTooltip   : PropTypes.string,
     prefixText    : PropTypes.string,
     suffixText    : PropTypes.string,
     children      : PropTypes.any,

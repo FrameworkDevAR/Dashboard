@@ -249,6 +249,8 @@ InputField.propTypes = {
     getAfterTitle     : PropTypes.func,
     icon              : PropTypes.string,
     postIcon          : PropTypes.string,
+    postIconColor     : PropTypes.string,
+    postTooltip       : PropTypes.string,
     prefixText        : PropTypes.string,
     suffixText        : PropTypes.string,
     value             : PropTypes.any,
