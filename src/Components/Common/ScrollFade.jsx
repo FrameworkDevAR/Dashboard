@@ -56,16 +56,27 @@ function ScrollFade(props) {
     const [ bottomSpace, setBottomSpace ] = React.useState(0);
 
 
+    // Returns the width of the given element without its padding
+    const getInnerWidth = (elem) => {
+        if (!elem) {
+            return 0;
+        }
+        const style = window.getComputedStyle(elem);
+        return elem.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    };
+
     // Returns the sticky element at the child, which can be the child itself or one
     // nested a few levels down, as in a Table with a sticky head or in a Step Content
     // with a sticky footer. Only the ones pinned to that side count, and only when they
-    // span their parent, as a column that sticks next to the content covers neither side
+    // span their parent, as a column that sticks next to the content covers neither side.
+    // The padding of the parent is left out, as the indent of a Step Content leaves its
+    // footer narrower than the whole parent
     const getSticky = (child, atEnd) => {
         let elem = child;
         for (let index = 0; elem && index < 3; index += 1) {
             const style = window.getComputedStyle(elem);
             if (style.position === "sticky" && style[atEnd ? "bottom" : "top"] !== "auto") {
-                const isColumn = elem.offsetWidth < (elem.parentElement?.clientWidth ?? 0) - 1;
+                const isColumn = elem.offsetWidth < getInnerWidth(elem.parentElement) - 1;
                 return isColumn ? null : elem;
             }
             elem = atEnd ? elem.lastElementChild : elem.firstElementChild;
