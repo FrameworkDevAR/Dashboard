@@ -252,6 +252,7 @@ InputField.propTypes = {
     postIconColor     : PropTypes.string,
     postTooltip       : PropTypes.string,
     prefixText        : PropTypes.string,
+    strongPrefix      : PropTypes.bool,
     suffixText        : PropTypes.string,
     value             : PropTypes.any,
     isChecked         : PropTypes.bool,

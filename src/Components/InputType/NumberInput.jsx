@@ -55,7 +55,7 @@ const Input = Styled(InputBase).attrs(({ withSteps }) => ({ withSteps }))`
  */
 function NumberInput(props) {
     const {
-        inputRef, className, icon, postIcon, prefixText, suffixText,
+        inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
         id, name, value, step, decimals, minValue, maxValue, placeholder, withSteps,
         onChange, onInput, onPaste, onClear,
@@ -168,6 +168,7 @@ function NumberInput(props) {
         icon={icon}
         postIcon={postIcon}
         prefixText={prefixText}
+        strongPrefix={strongPrefix}
         suffixText={hasStepSuffix ? "" : suffixText}
         isFocused={isFocused}
         isDisabled={isDisabled}
@@ -221,35 +222,36 @@ function NumberInput(props) {
  * @type {object} propTypes
  */
 NumberInput.propTypes = {
-    inputRef    : PropTypes.any,
-    className   : PropTypes.string,
-    icon        : PropTypes.string,
-    postIcon    : PropTypes.string,
-    prefixText  : PropTypes.string,
-    suffixText  : PropTypes.string,
-    isFocused   : PropTypes.bool,
-    isDisabled  : PropTypes.bool,
-    isSmall     : PropTypes.bool,
-    withBorder  : PropTypes.bool,
-    withLabel   : PropTypes.bool,
-    id          : PropTypes.string,
-    name        : PropTypes.string.isRequired,
-    placeholder : PropTypes.string,
-    value       : PropTypes.any,
-    step        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    decimals    : PropTypes.number,
-    minValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    maxValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    withSteps   : PropTypes.bool,
-    onChange    : PropTypes.func.isRequired,
-    onInput     : PropTypes.func,
-    onPaste     : PropTypes.func,
-    onClear     : PropTypes.func,
-    onFocus     : PropTypes.func,
-    onBlur      : PropTypes.func,
-    onKeyDown   : PropTypes.func,
-    onKeyUp     : PropTypes.func,
-    onSubmit    : PropTypes.func,
+    inputRef     : PropTypes.any,
+    className    : PropTypes.string,
+    icon         : PropTypes.string,
+    postIcon     : PropTypes.string,
+    prefixText   : PropTypes.string,
+    strongPrefix : PropTypes.bool,
+    suffixText   : PropTypes.string,
+    isFocused    : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    isSmall      : PropTypes.bool,
+    withBorder   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
+    id           : PropTypes.string,
+    name         : PropTypes.string.isRequired,
+    placeholder  : PropTypes.string,
+    value        : PropTypes.any,
+    step         : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    decimals     : PropTypes.number,
+    minValue     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxValue     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    withSteps    : PropTypes.bool,
+    onChange     : PropTypes.func.isRequired,
+    onInput      : PropTypes.func,
+    onPaste      : PropTypes.func,
+    onClear      : PropTypes.func,
+    onFocus      : PropTypes.func,
+    onBlur       : PropTypes.func,
+    onKeyDown    : PropTypes.func,
+    onKeyUp      : PropTypes.func,
+    onSubmit     : PropTypes.func,
 };
 
 /**

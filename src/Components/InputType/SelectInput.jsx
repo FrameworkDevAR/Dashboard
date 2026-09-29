@@ -73,7 +73,7 @@ const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`
  */
 function SelectInput(props) {
     const {
-        inputRef, className, icon, postIcon, prefixText, suffixText,
+        inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
         id, name, placeholder, value, allowMultiple,
         defaultText, emptyText, noneText, noneValue,
@@ -505,6 +505,7 @@ function SelectInput(props) {
         icon={showOptions ? "" : (icon || optionIcon)}
         postIcon={postIcon}
         prefixText={prefixText}
+        strongPrefix={strongPrefix}
         suffixText={suffixText}
         isFocused={isFocused}
         isDisabled={showDisabled}
@@ -589,6 +590,7 @@ SelectInput.propTypes = {
     icon              : PropTypes.string,
     postIcon          : PropTypes.string,
     prefixText        : PropTypes.string,
+    strongPrefix      : PropTypes.bool,
     suffixText        : PropTypes.string,
     isFocused         : PropTypes.bool,
     isDisabled        : PropTypes.bool,

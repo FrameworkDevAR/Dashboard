@@ -87,11 +87,17 @@ const PostInputIcon = Styled(Icon).attrs(({ withLabel, iconColor }) => ({ withLa
     ${(props) => props.withLabel && "margin-top: -8px;"}
 `;
 
-const Text = Styled.p`
+const Text = Styled.p.attrs(({ isStrong }) => ({ isStrong }))`
     margin: 0;
     font-size: 12px;
     color: var(--font-lighter);
     white-space: nowrap;
+
+    ${(props) => props.isStrong && `
+        padding-right: 10px;
+        font-weight: 600;
+        border-right: 1px solid var(--border-color-light);
+    `}
 `;
 
 const InputClear = Styled(IconLink).attrs(({ smallInput, withLabel }) => ({ smallInput, withLabel }))`
@@ -133,7 +139,7 @@ function InputContent(props) {
         withBorder, dashedBorder,
         withPadding, withLabel, withClick,
         onClick, onClear, showButton, onButton, buttonMessage,
-        prefixText, suffixText, icon, postIcon, postIconColor, postTooltip, children,
+        prefixText, suffixText, strongPrefix, icon, postIcon, postIconColor, postTooltip, children,
     } = props;
 
 
@@ -177,7 +183,7 @@ function InputContent(props) {
         onClick={handleClick}
     >
         {!!icon && <InputIcon icon={icon} size="18" />}
-        {!!prefixText && <Text>{NLS.get(prefixText)}</Text>}
+        {!!prefixText && <Text isStrong={strongPrefix}>{NLS.get(prefixText)}</Text>}
 
         {children}
 
@@ -238,6 +244,7 @@ InputContent.propTypes = {
     postTooltip   : PropTypes.string,
     prefixText    : PropTypes.string,
     suffixText    : PropTypes.string,
+    strongPrefix  : PropTypes.bool,
     children      : PropTypes.any,
 };
 
