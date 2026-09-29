@@ -65,23 +65,16 @@ function ScrollFade(props) {
         return elem.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
     };
 
-    // Returns the sticky element at the child, which can be the child itself or one
-    // nested a few levels down, as in a Table with a sticky head or in a Step Content
-    // with a sticky footer. Only the ones pinned to that side count, and only when they
-    // span their parent, as a column that sticks next to the content covers neither side.
-    // The padding of the parent is left out, as the indent of a Step Content leaves its
-    // footer narrower than the whole parent
-    const getSticky = (child, atEnd) => {
-        let elem = child;
-        for (let index = 0; elem && index < 3; index += 1) {
-            const style = window.getComputedStyle(elem);
-            if (style.position === "sticky" && style[atEnd ? "bottom" : "top"] !== "auto") {
-                const isColumn = elem.offsetWidth < getInnerWidth(elem.parentElement) - 1;
-                return isColumn ? null : elem;
-            }
-            elem = atEnd ? elem.lastElementChild : elem.firstElementChild;
+    // Returns true if the element is sticky at the given side. Only the ones pinned to that
+    // side count, and only when they span their parent, as a column that sticks next to the
+    // content covers neither side. The padding of the parent is left out, as the indent of
+    // a Step Content leaves its footer narrower than the whole parent
+    const isSticky = (elem, atEnd) => {
+        const style = window.getComputedStyle(elem);
+        if (style.position !== "sticky" || style[atEnd ? "bottom" : "top"] === "auto") {
+            return false;
         }
-        return null;
+        return elem.offsetWidth >= getInnerWidth(elem.parentElement) - 1;
     };
 
     // Returns the space taken by the sticky elements at the start or the end, or null
@@ -94,22 +87,46 @@ function ScrollFade(props) {
         if (!container) {
             return null;
         }
-        const children      = [ ...node.children ];
-        const containerRect = container.getBoundingClientRect();
-        let   space         = null;
+        const { space } = getStack(node, atEnd, container.getBoundingClientRect(), 0);
+        return space === null ? null : Math.max(0, Math.round(space));
+    };
+
+    // Returns where the sticky elements stacked at the side of the given node end, and if
+    // the node is only made of them. A child that is not sticky is looked into, as the
+    // stack can be nested, as in a Table with a sticky head, in a Step Content with a sticky
+    // footer or in a Dialog with sticky tabs followed by a tab with a sticky filter. The
+    // stack goes on after the child only when every element in it was sticky
+    const getStack = (node, atEnd, containerRect, depth) => {
+        const children = [ ...node.children ];
+        let   space    = null;
 
         if (atEnd) {
             children.reverse();
         }
         for (const child of children) {
-            const sticky = getSticky(child, atEnd);
-            if (!sticky || !sticky.offsetHeight) {
-                break;
+            if (isSticky(child, atEnd)) {
+                if (child.offsetHeight) {
+                    const rect = child.getBoundingClientRect();
+                    space = atEnd ? containerRect.bottom - rect.top : rect.bottom - containerRect.top;
+                }
+                continue;
             }
-            const rect = sticky.getBoundingClientRect();
-            space = atEnd ? containerRect.bottom - rect.top : rect.bottom - containerRect.top;
+            if (!child.offsetHeight) {
+                continue;
+            }
+            if (depth >= 3 || !child.children.length) {
+                return { space, isFull : false };
+            }
+
+            const inner = getStack(child, atEnd, containerRect, depth + 1);
+            if (inner.space !== null) {
+                space = inner.space;
+            }
+            if (!inner.isFull) {
+                return { space, isFull : false };
+            }
         }
-        return space === null ? null : Math.max(0, Math.round(space));
+        return { space, isFull : true };
     };
 
     // Returns the space between the node and the start or the end of the container, as
