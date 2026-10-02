@@ -1743,11 +1743,15 @@ function isValidEmail(email) {
  * @param {object}  file
  * @param {boolean} onlyImages
  * @param {number}  maxSize
+ * @param {boolean} withSVG    Optional.
  * @returns {boolean}
  */
-function isValidFile(file, onlyImages, maxSize) {
+function isValidFile(file, onlyImages, maxSize, withSVG = false) {
     if (onlyImages) {
-        const imageTypes = [ "image/png", "image/gif", "image/bmp", "image/jpg", "image/jpeg" ];
+        const imageTypes = [ "image/png", "image/gif", "image/bmp", "image/jpg", "image/jpeg", "image/webp", "image/avif" ];
+        if (withSVG) {
+            imageTypes.push("image/svg+xml");
+        }
         if (!imageTypes.includes(file.type.toLowerCase())) {
             return false;
         }

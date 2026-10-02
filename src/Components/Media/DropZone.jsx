@@ -82,7 +82,7 @@ const Input = Styled.input`
  */
 function DropZone(props) {
     const {
-        isHidden, onlyImages, maxSize,
+        isHidden, onlyImages, withSVG, maxSize,
         onDrop, onError, onUrl,
     } = props;
 
@@ -109,7 +109,7 @@ function DropZone(props) {
         const result = [];
 
         for (const file of files) {
-            if (Utils.isValidFile(file, onlyImages, maxSize)) {
+            if (Utils.isValidFile(file, onlyImages, maxSize, withSVG)) {
                 result.push(file);
             }
         }
@@ -159,6 +159,7 @@ function DropZone(props) {
         <DragDrop
             isHidden={isHidden}
             onlyImages={onlyImages}
+            withSVG={withSVG}
             maxSize={maxSize}
             onDrop={onDrop}
             onError={onError}
@@ -226,6 +227,7 @@ function DropZone(props) {
 DropZone.propTypes = {
     isHidden   : PropTypes.bool,
     onlyImages : PropTypes.bool,
+    withSVG    : PropTypes.bool,
     maxSize    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onDrop     : PropTypes.func.isRequired,
     onError    : PropTypes.func,

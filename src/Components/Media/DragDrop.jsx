@@ -32,7 +32,7 @@ const Container = Styled.div.attrs(({ isUploading }) => ({ isUploading }))`
  * @returns {React.ReactElement}
  */
 function DragDrop(props) {
-    const { isHidden, message, onlyImages, maxSize, onDrop, onError } = props;
+    const { isHidden, message, onlyImages, withSVG, maxSize, onDrop, onError } = props;
 
 
     // The References
@@ -84,7 +84,7 @@ function DragDrop(props) {
         if (e.dataTransfer.items) {
             totalFiles = e.dataTransfer.items.length;
             for (const item of e.dataTransfer.items) {
-                if (item.kind === "file" && Utils.isValidFile(item, onlyImages, maxSize)) {
+                if (item.kind === "file" && Utils.isValidFile(item, onlyImages, maxSize, withSVG)) {
                     const file = item.getAsFile();
                     files.push(file);
                 }
@@ -95,7 +95,7 @@ function DragDrop(props) {
         if (!files.length) {
             totalFiles = e.dataTransfer.files.length;
             for (const file of e.dataTransfer.files) {
-                if (Utils.isValidFile(file, onlyImages, maxSize)) {
+                if (Utils.isValidFile(file, onlyImages, maxSize, withSVG)) {
                     files.push(file);
                 }
             }
@@ -165,6 +165,7 @@ DragDrop.propTypes = {
     isHidden   : PropTypes.bool,
     message    : PropTypes.string,
     onlyImages : PropTypes.bool,
+    withSVG    : PropTypes.bool,
     maxSize    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onDrop     : PropTypes.func.isRequired,
     onError    : PropTypes.func,

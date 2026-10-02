@@ -2,6 +2,7 @@
 const ANY   = "";
 const MEDIA = "media";
 const IMAGE = "image";
+const LOGO  = "logo";
 const VIDEO = "video";
 const AUDIO = "audio";
 const PDF   = "pdf";
@@ -16,7 +17,26 @@ const FILE  = "file";
  * @returns {boolean}
  */
 function onlyImages(mediaType) {
-    return mediaType === IMAGE;
+    // A Logo also takes the SVGs, which the browser counts as images too
+    return mediaType === IMAGE || mediaType === LOGO;
+}
+
+/**
+ * Returns true if the type also takes the SVGs
+ * @param {string} mediaType
+ * @returns {boolean}
+ */
+function withSVG(mediaType) {
+    return mediaType === LOGO;
+}
+
+/**
+ * Returns true if the type is only for Videos
+ * @param {string} mediaType
+ * @returns {boolean}
+ */
+function isVideo(mediaType) {
+    return mediaType === VIDEO;
 }
 
 
@@ -26,6 +46,7 @@ export default {
     ANY,
     MEDIA,
     IMAGE,
+    LOGO,
     VIDEO,
     AUDIO,
     PDF,
@@ -33,4 +54,6 @@ export default {
     FILE,
 
     onlyImages,
+    withSVG,
+    isVideo,
 };
