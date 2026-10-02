@@ -10,6 +10,12 @@ import Utils                from "../../Utils/Utils";
 
 
 
+// Constants
+const COLORS = [
+    "#4573d2", "#8d84e8", "#b36bd4", "#f06a6a", "#ec8d71",
+    "#f1bd6c", "#5da283", "#4ecbc4", "#e362b5", "#5a9bd5",
+];
+
 // Styles
 const Container = Styled.div.attrs(({ size, hasClick }) => ({ size, hasClick }))`
     position: relative;
@@ -40,6 +46,20 @@ const Container = Styled.div.attrs(({ size, hasClick }) => ({ size, hasClick }))
     `}
 `;
 
+const Initials = Styled.span.attrs(({ size, color }) => ({ size, color }))`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: ${(props) => `${Math.round(props.size * 0.42)}px`};
+    font-weight: 600;
+    line-height: 1;
+    color: white;
+    background-color: ${(props) => props.color};
+    user-select: none;
+`;
+
 const Image = Styled.img`
     display: block;
     box-sizing: border-box;
@@ -56,7 +76,7 @@ const Image = Styled.img`
 function Avatar(props) {
     const {
         passedRef, className, size, name, email, avatar, edition, withReload,
-        url, href, target, onClick, defaultValue,
+        url, href, target, onClick, defaultValue, withInitials,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
     } = props;
 
@@ -64,6 +84,9 @@ function Avatar(props) {
     const elementRef = passedRef || defaultRef;
 
     const { showTooltip, hideTooltip } = Store.useAction("core");
+
+    // The Current State
+    const [ hasError, setHasError ] = React.useState(false);
 
 
     // Variables
@@ -96,14 +119,39 @@ function Avatar(props) {
     const source = React.useMemo(() => {
         let source = avatar;
         if (!source) {
-            source = Utils.getGravatarUrl(email, defaultValue);
+            // With the initials the Gravatar answers an error when there is none, to show them
+            source = Utils.getGravatarUrl(email, withInitials ? "404" : defaultValue);
         } else if (edition) {
             source += `?rdm=${edition}`;
         } else if (withReload) {
             source += `?rdm=${new Date().getTime()}`;
         }
         return source;
-    }, [ avatar, email, defaultValue, edition, withReload ]);
+    }, [ avatar, email, defaultValue, edition, withReload, withInitials ]);
+
+    // The Initials are the first letter of the first two words of the name
+    const initials = React.useMemo(() => {
+        const words = String(name || "").split(" ").filter(Boolean);
+        return words.slice(0, 2).map((word) => word.charAt(0).toUpperCase()).join("");
+    }, [ name ]);
+
+    // The color depends on the name, so it is always the same one for each person
+    const color = React.useMemo(() => {
+        let total = 0;
+        for (const char of String(name || "")) {
+            total += char.codePointAt(0);
+        }
+        return COLORS[total % COLORS.length];
+    }, [ name ]);
+
+    // Try the image again when it changes
+    React.useEffect(() => {
+        setHasError(false);
+    }, [ source ]);
+
+
+    // Variables
+    const showInitials = Boolean(withInitials && initials && (hasError || (!avatar && !email)));
 
 
     // Do the Render
@@ -119,12 +167,15 @@ function Avatar(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
-        <Image
+        {showInitials ? <Initials size={size} color={color}>
+            {initials}
+        </Initials> : <Image
             alt={name}
             src={source}
             width={size}
             height={size}
-        />
+            onError={() => setHasError(true)}
+        />}
     </Container>;
 }
 
@@ -145,6 +196,7 @@ Avatar.propTypes = {
     defaultValue   : PropTypes.string,
     edition        : PropTypes.number,
     withReload     : PropTypes.bool,
+    withInitials   : PropTypes.bool,
     onClick        : PropTypes.func,
     tooltip        : PropTypes.string,
     tooltipVariant : PropTypes.string,
@@ -161,6 +213,7 @@ Avatar.defaultProps = {
     size           : 36,
     target         : "_self",
     withReload     : false,
+    withInitials   : false,
     defaultValue   : "mp",
     tooltip        : "",
     tooltipVariant : "bottom",
