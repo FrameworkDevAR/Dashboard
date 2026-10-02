@@ -12,6 +12,7 @@ import InputContainer       from "../Input/InputContainer";
 import InputLabel           from "../Input/InputLabel";
 import InputError           from "../Input/InputError";
 import InputCopy            from "../Input/InputCopy";
+import Html                 from "../Common/Html";
 
 
 
@@ -32,6 +33,31 @@ const FieldHelper = Styled.p.attrs(({ isOutside }) => ({ isOutside }))`
     `}
 `;
 
+const FieldSteps = Styled.ol.attrs(({ isOutside }) => ({ isOutside }))`
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 4px 0 0 4px;
+    padding: 0;
+    list-style: none;
+    font-size: var(--font-size-small);
+    color: var(--darkest-gray);
+
+    ${(props) => props.isOutside && `
+        margin: -2px 0 6px 0;
+    `}
+`;
+
+const FieldStep = Styled.li`
+    display: flex;
+    gap: 6px;
+`;
+
+const FieldNumber = Styled.span`
+    flex-shrink: 0;
+    font-weight: 600;
+`;
+
 
 
 /**
@@ -43,7 +69,7 @@ function InputField(props) {
     const {
         passedRef, isHidden, className, type, name,
         label, icon, postIcon, prefixText, suffixText, value,
-        error, helperText, width, fullWidth, isRequired,
+        error, helperText, helperSteps, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
         autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel,
         rightToggle, rightInput, atBottom, errorBackground, disabledBackground, isDisabled,
@@ -154,6 +180,8 @@ function InputField(props) {
     const withClear     = forceClear || (hasValue && !hideClear && (hasClear || InputType.hasClear(type)));
     const hasError      = Boolean(error);
     const hasHelperText = !hasError && Boolean(helperText);
+    const hasSteps      = !hasError && Boolean(helperSteps && helperSteps.length);
+    const stepsAbove    = hasOutside || !hasLabel;
 
 
     // Handles the Label Click, which focuses the input as a real label does
@@ -195,6 +223,12 @@ function InputField(props) {
         {(hasHelperText && hasOutside) && <FieldHelper className="inputfield-helper" isOutside>
             {NLS.get(helperText)}
         </FieldHelper>}
+        {(hasSteps && stepsAbove) && <FieldSteps className="inputfield-steps" isOutside>
+            {helperSteps.map((step, index) => <FieldStep key={step}>
+                <FieldNumber>{`${index + 1}.`}</FieldNumber>
+                <Html variant="span" message={step} />
+            </FieldStep>)}
+        </FieldSteps>}
         <FieldContent className="inputfield-content" ref={containerRef}>
             <Input
                 {...props}
@@ -228,6 +262,12 @@ function InputField(props) {
         {(hasHelperText && !hasOutside && !rightToggle) && <FieldHelper className="inputfield-helper">
             {NLS.get(helperText)}
         </FieldHelper>}
+        {(hasSteps && !stepsAbove && !rightToggle) && <FieldSteps className="inputfield-steps">
+            {helperSteps.map((step, index) => <FieldStep key={step}>
+                <FieldNumber>{`${index + 1}.`}</FieldNumber>
+                <Html variant="span" message={step} />
+            </FieldStep>)}
+        </FieldSteps>}
     </InputContainer>;
 }
 
@@ -290,6 +330,7 @@ InputField.propTypes = {
     error             : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     errors            : PropTypes.object,
     helperText        : PropTypes.string,
+    helperSteps       : PropTypes.array,
     counterText       : PropTypes.string,
     options           : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     extraOptions      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
