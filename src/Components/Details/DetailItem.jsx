@@ -78,7 +78,7 @@ const ItemTitle = Styled.h4`
 
 const DetailCopy = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
     flex-shrink: 0;
-    margin-left: auto;
+    margin: -6px 0 -2px auto;
 
     ${(props) => props.isFloating && `
         position: absolute;
