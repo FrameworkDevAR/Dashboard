@@ -60,10 +60,16 @@ const Initials = Styled.span.attrs(({ size, color }) => ({ size, color }))`
     user-select: none;
 `;
 
-const Image = Styled.img`
+const Image = Styled.img.attrs(({ isOver }) => ({ isOver }))`
     display: block;
     box-sizing: border-box;
     width: 100%;
+
+    ${(props) => props.isOver && `
+        position: absolute;
+        inset: 0;
+        height: 100%;
+    `}
 `;
 
 
@@ -119,8 +125,9 @@ function Avatar(props) {
     const source = React.useMemo(() => {
         let source = avatar;
         if (!source) {
-            // With the initials the Gravatar answers an error when there is none, to show them
-            source = Utils.getGravatarUrl(email, withInitials ? "404" : defaultValue);
+            // With the initials the Gravatar is transparent when there is none, as it goes
+            // over them, which shows them without a request that fails
+            source = Utils.getGravatarUrl(email, withInitials ? "blank" : defaultValue);
         } else if (edition) {
             source += `?rdm=${edition}`;
         } else if (withReload) {
@@ -151,7 +158,9 @@ function Avatar(props) {
 
 
     // Variables
-    const showInitials = Boolean(withInitials && initials && (hasError || (!avatar && !email)));
+    const hasInitials  = Boolean(withInitials && initials);
+    const showInitials = hasInitials && (hasError || !avatar);
+    const showImage    = !hasError && Boolean(avatar || email || !hasInitials);
 
 
     // Do the Render
@@ -167,10 +176,12 @@ function Avatar(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
-        {showInitials ? <Initials size={size} color={color}>
+        {showInitials && <Initials size={size} color={color}>
             {initials}
-        </Initials> : <Image
-            alt={name}
+        </Initials>}
+        {showImage && <Image
+            isOver={showInitials}
+            alt={showInitials ? "" : name}
             src={source}
             width={size}
             height={size}
