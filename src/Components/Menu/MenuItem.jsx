@@ -11,6 +11,7 @@ import Utils                from "../../Utils/Utils";
 // Components
 import Menu                 from "./Menu";
 import Icon                 from "../Common/Icon";
+import Avatar               from "../Avatar/Avatar";
 import Circle               from "../Common/Circle";
 import Html                 from "../Common/Html";
 
@@ -126,7 +127,7 @@ const MenuShortcut = Styled.span`
  */
 function MenuItem(props) {
     const {
-        className, action, icon, circle, title, message, description, shortcut,
+        className, action, icon, avatar, circle, title, message, description, shortcut,
         url, href, target,
         isDisabled, isSelected, isSmall, leftSpace,
         onAction, onClick, dontClose, onClose,
@@ -217,6 +218,13 @@ function MenuItem(props) {
                 icon={icn}
                 size="18"
             />
+            {Boolean(avatar) && <Avatar
+                name={avatar.name}
+                email={avatar.email}
+                avatar={avatar.avatar}
+                size={20}
+                withInitials
+            />}
             <MenuCircle
                 isHidden={!hasCircle}
                 color={circle}
@@ -263,6 +271,7 @@ MenuItem.propTypes = {
     className   : PropTypes.string,
     action      : PropTypes.string,
     icon        : PropTypes.string,
+    avatar      : PropTypes.object,
     circle      : PropTypes.string,
     title       : PropTypes.string,
     message     : PropTypes.string,
