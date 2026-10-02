@@ -52,6 +52,10 @@ function SettingList(props) {
     } = props;
 
 
+    // The Current State
+    const [ , setOrder ] = React.useState(0);
+
+
     // Handles the Item Grab
     const handleGrab = (e, itemID, index) => {
         const node = e.target.parentElement;
@@ -67,8 +71,9 @@ function SettingList(props) {
         swap(list);
 
         // The Items are sorted in place too, as the list is drawn from them and
-        // the new order has to stay while the server is saving it
+        // the new order has to stay while the server is saving it, so it is drawn again
         swap(items);
+        setOrder((order) => order + 1);
         await onSort(list);
     };
 
@@ -76,8 +81,13 @@ function SettingList(props) {
     const { pick, orderChanged, swap } = useDrag(handleDrop);
 
 
-    // Clone the Children
-    const list = Utils.cloneChildren(children, (child, index) => {
+    // Clone the Children, in the order of the Items, which a drop changes before the
+    // parent draws them again
+    const order  = items.map(({ id }) => id);
+    const sorted = React.Children.toArray(children).sort((a, b) => (
+        order.indexOf(a.props.elemID) - order.indexOf(b.props.elemID)
+    ));
+    const list = Utils.cloneChildren(sorted, (child, index) => {
         return { index, onGrab : handleGrab };
     });
 
