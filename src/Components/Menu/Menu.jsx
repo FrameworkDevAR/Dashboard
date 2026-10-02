@@ -293,6 +293,7 @@ function Menu(props) {
         let   toTop        = dir.includes("top");
         const toBottom     = dir.includes("bottom");
         const toLeft       = dir.includes("left");
+        const toUp         = dir.includes("up");
         let   targetHeight = 0;
 
         // Calculate the Bounds of the Menu without Styles
@@ -314,6 +315,12 @@ function Menu(props) {
                 top = bounds.bottom + gap;
             } else {
                 top = bounds.top;
+            }
+
+            // A Menu to the side of its target can grow up from the bottom of it
+            if (toUp && !toTop && !toBottom) {
+                top    = 0;
+                bottom = winHeight - bounds.bottom;
             }
 
             if (toTop || toBottom) {
@@ -363,7 +370,11 @@ function Menu(props) {
                 if (top && top < 0) {
                     top = 0;
                 } else if (top && boundHeight && top + boundHeight > winHeight) {
-                    if (targetHeight) {
+                    // A Menu that opens to the side of its target stays next to it, so it is
+                    // only moved up, while one that opens under it goes over it instead
+                    if (targetHeight && !toTop && !toBottom) {
+                        top = Math.max(winHeight - boundHeight - 8, 0);
+                    } else if (targetHeight) {
                         const newMaxHeight = winHeight - top - 8;
                         if (newMaxHeight > minHeight) {
                             maxHeight = newMaxHeight;
