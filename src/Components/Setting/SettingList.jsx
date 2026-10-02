@@ -97,16 +97,17 @@ function SettingList(props) {
         return <React.Fragment />;
     }
     return <Container className={className}>
-        <Header>
+        {Boolean(message || onAdd) && <Header>
             <Title>{NLS.get(message)}</Title>
             <Button
+                isHidden={!onAdd}
                 variant="outlined"
                 message={addMessage}
                 icon="add"
                 onClick={onAdd}
                 inLowerCase
             />
-        </Header>
+        </Header>}
 
         <NoneAvailable
             isHidden={list.length > 0}
@@ -123,11 +124,11 @@ function SettingList(props) {
 SettingList.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
-    message     : PropTypes.string.isRequired,
+    message     : PropTypes.string,
     addMessage  : PropTypes.string,
     noneMessage : PropTypes.string.isRequired,
     items       : PropTypes.array.isRequired,
-    onAdd       : PropTypes.func.isRequired,
+    onAdd       : PropTypes.func,
     onSort      : PropTypes.func.isRequired,
     children    : PropTypes.any,
 };
