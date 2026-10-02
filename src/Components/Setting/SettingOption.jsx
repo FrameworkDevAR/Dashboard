@@ -130,7 +130,7 @@ const Content = Styled.div.attrs(({ isWide, isNarrow, isHalf }) => ({ isWide, is
  */
 function SettingOption(props) {
     const {
-        isHidden, className, isWide, isNarrow, isHalf, noLabel, isInline,
+        isHidden, className, isWide, isNarrow, isHalf, noLabel, isInline, isRequired,
         message, description, helperText, toggle, children,
     } = props;
 
@@ -250,7 +250,7 @@ function SettingOption(props) {
         <Top className="setting-top">
             <Header noLabel={noLabel} onClick={handleClick}>
                 <Titles>
-                    <Title isRequired={hasRequired(children)}>
+                    <Title isRequired={isRequired || hasRequired(children)}>
                         {NLS.get(message)}
                     </Title>
                     {!isInline && statusNode}
@@ -294,6 +294,7 @@ SettingOption.propTypes = {
     isHalf      : PropTypes.bool,
     noLabel     : PropTypes.bool,
     isInline    : PropTypes.bool,
+    isRequired  : PropTypes.bool,
     message     : PropTypes.string.isRequired,
     description : PropTypes.string,
     helperText  : PropTypes.string,
