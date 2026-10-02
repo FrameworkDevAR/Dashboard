@@ -193,7 +193,7 @@ function TextareaInput(props) {
 
     React.useEffect(() => {
         handleAutoGrow();
-    }, [ value ]);
+    }, [ value, minRows ]);
 
     React.useEffect(() => {
         const observer = new IntersectionObserver(([ entry ]) => {
