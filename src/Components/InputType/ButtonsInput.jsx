@@ -2,10 +2,11 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
+// Core & Utils
 import NLS                  from "../../Core/NLS";
 import Store                from "../../Core/Store";
 import InputType            from "../../Core/InputType";
+import Utils                from "../../Utils/Utils";
 
 // Components
 import InputContent         from "../Input/InputContent";
@@ -14,7 +15,8 @@ import Icon                 from "../Common/Icon";
 
 
 // Constants
-const TOOLTIP_DELAY = 0.2;
+const TOOLTIP_DELAY  = 0.2;
+const ANIMATION_TIME = 320;
 
 // Styles
 const Content = Styled(InputContent)`
@@ -35,7 +37,7 @@ const Container = Styled.div`
     gap: 4px;
 `;
 
-const Indicator = Styled.div.attrs(({ left, width, color }) => ({ left, width, color }))`
+const Indicator = Styled.div.attrs(({ left, width, color, isAnimated }) => ({ left, width, color, isAnimated }))`
     position: absolute;
     top: 0;
     bottom: 0;
@@ -43,8 +45,10 @@ const Indicator = Styled.div.attrs(({ left, width, color }) => ({ left, width, c
     width: ${(props) => props.width}px;
     translate: ${(props) => props.left}px;
     border-radius: calc(var(--input-border-radius, var(--border-radius)) - var(--buttons-padding));
-    background: ${(props) => props.color ? `color-mix(in srgb, var(--${props.color}-color) 12%, transparent)` : "rgb(237, 241, 250)"};
-    transition: translate 320ms cubic-bezier(0.34, 1.4, 0.4, 1), width 320ms cubic-bezier(0.34, 1.4, 0.4, 1);
+    background: ${(props) => props.color ? `color-mix(in srgb, var(--${props.color}-color) 12%, transparent)` : "var(--buttons-sel-background, rgb(237, 241, 250))"};
+    ${(props) => props.isAnimated && `
+        transition: translate ${ANIMATION_TIME}ms cubic-bezier(0.34, 1.4, 0.4, 1), width ${ANIMATION_TIME}ms cubic-bezier(0.34, 1.4, 0.4, 1);
+    `}
 `;
 
 const Item = Styled.div.attrs(({ withTexts, isDisabled, isSelected, color }) => ({ withTexts, isDisabled, isSelected, color }))`
@@ -165,9 +169,12 @@ function ButtonsInput(props) {
 
     // The References
     const containerRef = React.useRef(null);
+    const timerRef     = React.useRef(null);
 
-    // The Current State
-    const [ bounds, setBounds ] = React.useState({ left : 0, width : 0 });
+    // The Current State. The Indicator only moves animated after a click, as the value
+    // that is loaded and the size that is measured have to show it in place at once
+    const [ bounds,     setBounds     ] = React.useState({ left : 0, width : 0 });
+    const [ isAnimated, setIsAnimated ] = React.useState(false);
 
     // Variables
     const items    = InputType.useOptions(props);
@@ -199,8 +206,16 @@ function ButtonsInput(props) {
     }, [ val, items.length ]);
 
 
+    // Clears the Timer
+    React.useEffect(() => {
+        return () => Utils.clearTimeout(timerRef);
+    }, []);
+
+
     // Handles the Radio Change
     const handleClick = (newValue) => {
+        setIsAnimated(true);
+        Utils.setTimeout(timerRef, () => setIsAnimated(false), ANIMATION_TIME);
         onChange(name, newValue);
     };
 
@@ -219,6 +234,7 @@ function ButtonsInput(props) {
                 left={bounds.left}
                 width={bounds.width}
                 color={selected?.color}
+                isAnimated={isAnimated}
             />
             {items.map(({ key, value, icon, color }) => <ButtonsItem
                 key={key}
