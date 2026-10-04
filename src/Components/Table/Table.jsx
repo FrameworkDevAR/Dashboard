@@ -120,6 +120,7 @@ function Table(props) {
 
     // The References
     const tableRef = React.useRef(null);
+    const checkRef = React.useRef(null);
     const navigate = Navigate.useGoto();
     const path     = Navigate.usePath();
 
@@ -183,11 +184,38 @@ function Table(props) {
         }
     };
 
+    // Handles the Check with the modifier keys. The Shift checks all the rows from the last
+    // one that was clicked, and the Ctrl or Cmd checks or unchecks only the clicked one
+    const handleKeyCheck = (elemID, isShift) => {
+        const fromIndex = elemIDs.indexOf(checkRef.current);
+        const toIndex   = elemIDs.indexOf(elemID);
+        if (isShift && fromIndex >= 0 && toIndex >= 0) {
+            const range = elemIDs.slice(Math.min(fromIndex, toIndex), Math.max(fromIndex, toIndex) + 1);
+            setChecked([ ...new Set([ ...checked, ...range ]) ]);
+        } else if (checked.includes(elemID)) {
+            setChecked(checked.filter((id) => id !== elemID));
+        } else {
+            setChecked([ ...checked, elemID ]);
+        }
+        checkRef.current = elemID;
+
+        // The Shift click selects the text between both rows
+        Utils.unselectAll();
+    };
+
     // Handles the Row Click
     const handleRowClick = (elemID, e) => {
-        if (noClick || menuID !== null || Utils.hasSelection()) {
+        if (noClick || menuID !== null) {
             return;
         }
+        if (hasChecks && e && (e.shiftKey || e.metaKey || e.ctrlKey)) {
+            handleKeyCheck(elemID, e.shiftKey);
+            return;
+        }
+        if (Utils.hasSelection()) {
+            return;
+        }
+        checkRef.current = elemID;
         if (onRowClick) {
             onRowClick(elemID, e);
             return;
