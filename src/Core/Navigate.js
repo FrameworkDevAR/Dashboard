@@ -133,13 +133,28 @@ function useChildPath() {
 }
 
 /**
+ * Replaces the Child Path at the end of the given Path, as the same words can be in
+ * the parent too, like the products list in "/products/products"
+ * @param {string} path
+ * @param {string} childPath
+ * @param {string} value
+ * @returns {string}
+ */
+function replaceChild(path, childPath, value) {
+    if (!childPath || !path.endsWith(childPath)) {
+        return path.replace(childPath, value);
+    }
+    return path.slice(0, path.length - childPath.length) + value;
+}
+
+/**
  * Returns the From Path
  * @returns {string}
  */
 function useFrom() {
     const path       = usePath();
     const childPath  = useChildPath();
-    const basePath   = path.replace(childPath, "");
+    const basePath   = replaceChild(path, childPath, "");
     const parentPath = basePath.split("/").slice(0, -2).join("/");
     return parentPath;
 }
@@ -156,7 +171,7 @@ function useMenuUrl(url) {
     const childPath = useChildPath();
 
     if (childPath) {
-        return path.replace(childPath, route);
+        return replaceChild(path, childPath, route);
     }
     return `${parent}/${route}`;
 }
