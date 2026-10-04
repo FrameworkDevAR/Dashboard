@@ -13,6 +13,7 @@ import InputContent         from "../Input/InputContent";
 import InputBase            from "../Input/InputBase";
 import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
+import IconLink             from "../Link/IconLink";
 
 
 
@@ -23,6 +24,11 @@ const Children = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
     margin-right: -6px;
 
     ${(props) => props.withLabel && "margin-top: -4px;"}
+`;
+
+// A masked value is hidden with dots without being a password, which a browser offers to save
+const Base = Styled(InputBase).attrs(({ isMasked }) => ({ isMasked }))`
+    ${(props) => props.isMasked && "-webkit-text-security: disc;"}
 `;
 
 const Text = Styled.p.attrs(({ atMaxLength, hasButtons }) => ({ atMaxLength, hasButtons }))`
@@ -42,7 +48,7 @@ const Text = Styled.p.attrs(({ atMaxLength, hasButtons }) => ({ atMaxLength, has
 function TextInput(props) {
     const {
         inputRef, className, icon, postIcon, postIconColor, postTooltip, prefixText, suffixText, strongPrefix,
-        isFocused, isDisabled, isSmall, withBorder, withLabel, withInsideCnt,
+        isFocused, isDisabled, isSmall, isMasked, withBorder, withLabel, withInsideCnt,
         id, type, name, value, minValue, maxValue,
         placeholder, autoComplete, spellCheck,
         generateCode, codeLength, codeSets,
@@ -57,6 +63,9 @@ function TextInput(props) {
     const optionsRef     = React.useRef(null);
     const selectedIdxRef = React.useRef(-1);
     const selectedValRef = React.useRef("");
+
+    // The Current State
+    const [ showMasked, setShowMasked ] = React.useState(false);
 
     // The Current State
     const [ showOptions, setShowOptions ] = React.useState(false);
@@ -242,8 +251,9 @@ function TextInput(props) {
         withLabel={withLabel}
         withPadding
     >
-        <InputBase
+        <Base
             inputRef={inputRef}
+            isMasked={isMasked && !showMasked}
             id={id}
             type={type}
             name={name}
@@ -273,6 +283,12 @@ function TextInput(props) {
                 {`${characters}/${maxLength}`}
             </Text>}
             {children}
+            {isMasked && <IconLink
+                variant="black"
+                icon={showMasked ? "hide" : "view"}
+                onClick={() => setShowMasked(!showMasked)}
+                isSmall
+            />}
         </Children>
 
         {hasOptions && <InputOptions
@@ -312,6 +328,7 @@ TextInput.propTypes = {
     isFocused     : PropTypes.bool,
     isDisabled    : PropTypes.bool,
     isSmall       : PropTypes.bool,
+    isMasked      : PropTypes.bool,
     withBorder    : PropTypes.bool,
     withLabel     : PropTypes.bool,
     withInsideCnt : PropTypes.bool,
@@ -349,6 +366,7 @@ TextInput.defaultProps = {
     isFocused    : false,
     isDisabled   : false,
     isSmall      : false,
+    isMasked     : false,
     withBorder   : true,
     withLabel    : true,
     placeholder  : "",
