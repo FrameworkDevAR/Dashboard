@@ -100,10 +100,16 @@ function Details(props) {
         passedRef, className, isHidden, isInside, isWide, isLarge,
         hasInternalTabs, hasExternalTabs, withBorder,
         isLoading, isEmpty, hasError, error,
-        canEdit, onAction, collapsible, stickyBottom, children,
+        canEdit, onAction, collapsible, canCollapse, stickyBottom, children,
     } = props;
 
-    const { setDetails } = Store.useAction("core");
+    const { isCollapsed } = Store.useState("core");
+    const { setDetails, setCanCollapse } = Store.useAction("core");
+
+    // Under the width of the details the panel floats over the page and is opened from
+    // the Top Bar, so the collapse does not take it away
+    const isForDetails = Responsive.useIsForDetails();
+    const isShown      = !isHidden && (!canCollapse || !isCollapsed || isForDetails);
 
 
     // The References
@@ -137,7 +143,7 @@ function Details(props) {
             node.removeEventListener("scroll", updateFades);
             observer.disconnect();
         };
-    }, [ isHidden ]);
+    }, [ isShown ]);
 
     // The content changes without resizing the node, so this runs on every render
     React.useEffect(() => {
@@ -145,13 +151,17 @@ function Details(props) {
     });
 
 
-    // Set/Unset the Details on Load/Unload
+    // Set/Unset the Details on Load/Unload, and if they can be collapsed from the Top Bar
     React.useEffect(() => {
         if (!isHidden) {
             setDetails(true);
+            setCanCollapse(canCollapse);
         }
-        return () => setDetails(false);
-    }, [ isHidden ]);
+        return () => {
+            setDetails(false);
+            setCanCollapse(false);
+        };
+    }, [ isHidden, canCollapse ]);
 
 
     // Parse the Items
@@ -168,7 +178,7 @@ function Details(props) {
 
 
     // Do the Render
-    if (isHidden) {
+    if (!isShown) {
         return <React.Fragment />;
     }
     return <Container
@@ -211,6 +221,7 @@ Details.propTypes = {
     canEdit         : PropTypes.bool,
     onAction        : PropTypes.func,
     collapsible     : PropTypes.string,
+    canCollapse     : PropTypes.bool,
     stickyBottom    : PropTypes.bool,
     children        : PropTypes.any,
 };
@@ -231,6 +242,7 @@ Details.defaultProps = {
     isLoading       : false,
     isEmpty         : false,
     hasError        : false,
+    canCollapse     : false,
     stickyBottom    : false,
 };
 

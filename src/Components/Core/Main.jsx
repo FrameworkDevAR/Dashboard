@@ -48,8 +48,9 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
 function Main(props) {
     const { className, withNavigation, withDetails, wideDetails, largeDetails, children } = props;
 
-    const isForMenu = Responsive.useIsForMenu();
-    const { smallNav } = Store.useState("core");
+    const isForMenu    = Responsive.useIsForMenu();
+    const isForDetails = Responsive.useIsForDetails();
+    const { smallNav, isCollapsed : detailsCollapsed } = Store.useState("core");
 
 
     // The References
@@ -58,7 +59,8 @@ function Main(props) {
 
     // The Current State
     const isCollapsed = smallNav && !isForMenu;
-    const panels      = `${withDetails}-${isCollapsed}`;
+    const showDetails = withDetails && (!detailsCollapsed || isForDetails);
+    const panels      = `${showDetails}-${isCollapsed}`;
     const [ shownPanels, setShownPanels ] = React.useState(panels);
     const [ isAnimated,  setAnimated    ] = React.useState(false);
 
@@ -97,7 +99,7 @@ function Main(props) {
         className={`main ${className}`}
         withNavigation={withNavigation}
         isCollapsed={isCollapsed}
-        withDetails={withDetails}
+        withDetails={showDetails}
         largeDetails={largeDetails}
         wideDetails={wideDetails}
         isAnimated={isAnimated}
