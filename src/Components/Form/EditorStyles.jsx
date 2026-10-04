@@ -13,6 +13,27 @@ const EditorStyle = createGlobalStyle`
     .editorfield-error .tox-tinymce {
         border-color: var(--error-color);
     }
+
+    // The editor takes the colors of the content, as the dark skin has its own
+    .tox.tox-tinymce.tox-tinymce,
+    .tox.tox-tinymce.tox-tinymce .tox-editor-container,
+    .tox.tox-tinymce.tox-tinymce .tox-sidebar-wrap,
+    .tox.tox-tinymce.tox-tinymce .tox-edit-area,
+    .tox.tox-tinymce.tox-tinymce .tox-editor-header,
+    .tox.tox-tinymce.tox-tinymce .tox-menubar,
+    .tox.tox-tinymce.tox-tinymce .tox-toolbar-overlord,
+    .tox.tox-tinymce.tox-tinymce .tox-toolbar__primary {
+        background-color: var(--content-color);
+    }
+    .tox.tox-tinymce.tox-tinymce:not(.tox-tinymce-inline) .tox-editor-header {
+        border-bottom: 1px solid var(--input-border-color);
+        box-shadow: none;
+    }
+    .tox.tox-tinymce .tox-mbtn:not(:hover):not(.tox-mbtn--active),
+    .tox.tox-tinymce .tox-tbtn:not(:hover):not(.tox-tbtn--enabled),
+    .tox.tox-tinymce .tox-split-button:not(:hover) {
+        background-color: transparent;
+    }
     .tox-promotion {
         display: none;
     }

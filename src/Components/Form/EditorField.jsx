@@ -108,9 +108,17 @@ function EditorField(props) {
     };
 
 
-    // Variables
+    // Variables. The Editor follows the dark mode when it is created, and its content
+    // takes the colors of the theme, as the dark one of TinyMCE has its own
     const hasError      = Boolean(error);
     const hasHelperText = !hasError && Boolean(helperText);
+    const isDark        = document.body.classList.contains("dark-mode");
+    const bodyStyle     = getComputedStyle(document.body);
+    const contentColor  = bodyStyle.getPropertyValue("--content-color").trim();
+    const fontColor     = bodyStyle.getPropertyValue("--font-color").trim();
+    const themeStyle    = isDark && contentColor && fontColor
+        ? `body { background-color: ${contentColor}; color: ${fontColor}; }`
+        : "";
 
 
     // Do the Render
@@ -142,6 +150,8 @@ function EditorField(props) {
                 value={value}
                 init={{
                     document_base_url    : filesUrl,
+                    skin                 : isDark ? "oxide-dark" : "oxide",
+                    content_css          : isDark ? "dark" : "default",
                     readonly             : isDisabled,
                     height               : height,
                     menu                 : menu,
@@ -165,6 +175,7 @@ function EditorField(props) {
                     ],
                     content_style        : `
                         body { font-family:Inter,Lato,Helvetica,Arial,sans-serif; font-size:14px; max-width: 800px; padding: 0 24px; margin: 0 auto; }
+                        ${themeStyle}
                         ${contentStyle}
                     `,
                     file_picker_callback : handlePicker,
