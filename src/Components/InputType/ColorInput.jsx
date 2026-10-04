@@ -31,16 +31,19 @@ const Item = Styled.li.attrs(({ color, isSelected }) => ({ color, isSelected }))
     font-size: 18px;
     border: 1px solid var(--input-border-color);
     border-radius: var(--border-radius);
-    background-color: ${(props) => props.color};
-    color: ${(props) => Utils.getContrastColor(props.color)};
+    background-color: ${(props) => props.color || "transparent"};
+    color: ${(props) => props.color ? Utils.getContrastColor(props.color) : "var(--font-lighter)"};
     transition: box-shadow 0.2s;
     cursor: pointer;
 
     &:hover, &:focus {
-        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${(props) => props.color};
+        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${(props) => props.color || "var(--input-border-color)"};
     }
     ${(props) => props.isSelected && `
-        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${props.color};
+        box-shadow: 0 0 0 1px var(--content-color), 0 0 0 2px ${props.color || "var(--input-border-color)"};
+    `}
+    ${(props) => !props.color && `
+        background-image: linear-gradient(to top left, transparent calc(50% - 1px), var(--error-color), transparent calc(50% + 1px));
     `}
 `;
 
@@ -125,7 +128,7 @@ function ColorInput(props) {
                 isSelected={value === color}
                 onClick={() => onChange(name, color)}
             >
-                {value === color && <Icon icon="check" size="18" />}
+                {value === color && Boolean(color) && <Icon icon="check" size="18" />}
             </Item>)}
         </List> : <>
             <Swatch
