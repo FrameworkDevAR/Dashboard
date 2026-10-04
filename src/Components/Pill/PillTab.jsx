@@ -63,6 +63,19 @@ const PillBadge = Styled(Badge)`
     flex-shrink: 0;
 `;
 
+const Amount = Styled.span`
+    flex-shrink: 0;
+    min-width: 16px;
+    padding: 0 4px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+`;
+
 
 
 /**
@@ -72,7 +85,7 @@ const PillBadge = Styled(Badge)`
  */
 function PillTab(props) {
     const {
-        isHidden, className, icon, message, badge,
+        isHidden, className, icon, message, badge, amount,
         tooltip, tooltipVariant, tooltipWidth,
         url, value, index, selected, isDisabled, isFit, onClick,
     } = props;
@@ -120,6 +133,7 @@ function PillTab(props) {
     >
         {!!icon && <Icon icon={icon} />}
         {!!message && NLS.get(message)}
+        {amount !== undefined && <Amount>{amount}</Amount>}
         <PillBadge value={badge} />
     </Container>;
 }
@@ -134,6 +148,7 @@ PillTab.propTypes = {
     icon       : PropTypes.string,
     message    : PropTypes.string,
     badge      : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    amount     : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     tooltip        : PropTypes.string,
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
