@@ -127,7 +127,7 @@ const MenuShortcut = Styled.span`
  */
 function MenuItem(props) {
     const {
-        className, action, icon, avatar, circle, title, message, description, shortcut,
+        className, action, icon, iconColor, avatar, circle, title, message, description, shortcut,
         url, href, target,
         isDisabled, isSelected, isSmall, leftSpace,
         onAction, onClick, dontClose, onClose,
@@ -216,6 +216,7 @@ function MenuItem(props) {
             <Icon
                 isHidden={!hasIcon}
                 icon={icn}
+                color={isSelection ? "" : iconColor}
                 size="18"
             />
             {Boolean(avatar) && <Avatar
@@ -271,6 +272,7 @@ MenuItem.propTypes = {
     className   : PropTypes.string,
     action      : PropTypes.string,
     icon        : PropTypes.string,
+    iconColor   : PropTypes.string,
     avatar      : PropTypes.object,
     circle      : PropTypes.string,
     title       : PropTypes.string,
