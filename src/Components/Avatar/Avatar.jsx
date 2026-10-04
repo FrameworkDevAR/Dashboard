@@ -46,7 +46,7 @@ const Container = Styled.div.attrs(({ size, hasClick }) => ({ size, hasClick }))
     `}
 `;
 
-const Initials = Styled.span.attrs(({ size, color }) => ({ size, color }))`
+const Initials = Styled.span.attrs(({ size, color, textColor }) => ({ size, color, textColor }))`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,7 +55,7 @@ const Initials = Styled.span.attrs(({ size, color }) => ({ size, color }))`
     font-size: ${(props) => `${Math.round(props.size * 0.42)}px`};
     font-weight: 600;
     line-height: 1;
-    color: white;
+    color: ${(props) => props.textColor};
     background-color: ${(props) => props.color};
     user-select: none;
 `;
@@ -81,7 +81,7 @@ const Image = Styled.img.attrs(({ isOver }) => ({ isOver }))`
  */
 function Avatar(props) {
     const {
-        passedRef, className, size, name, email, avatar, edition, withReload,
+        passedRef, className, size, name, email, avatar, color, edition, withReload,
         url, href, target, onClick, defaultValue, withInitials,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
     } = props;
@@ -121,35 +121,40 @@ function Avatar(props) {
     };
 
 
-    // Calculate the Source
-    const source = React.useMemo(() => {
-        let source = avatar;
-        if (!source) {
-            // With the initials the Gravatar is transparent when there is none, as it goes
-            // over them, which shows them without a request that fails
-            source = Utils.getGravatarUrl(email, withInitials ? "blank" : defaultValue);
-        } else if (edition) {
-            source += `?rdm=${edition}`;
-        } else if (withReload) {
-            source += `?rdm=${new Date().getTime()}`;
-        }
-        return source;
-    }, [ avatar, email, defaultValue, edition, withReload, withInitials ]);
-
     // The Initials are the first letter of the first two words of the name
     const initials = React.useMemo(() => {
         const words = String(name || "").split(" ").filter(Boolean);
         return words.slice(0, 2).map((word) => word.charAt(0).toUpperCase()).join("");
     }, [ name ]);
 
-    // The color depends on the name, so it is always the same one for each person
-    const color = React.useMemo(() => {
+    // Calculate the Source
+    const source = React.useMemo(() => {
+        let source = avatar;
+        if (!source) {
+            // With the initials the Gravatar is transparent when there is none, as it goes
+            // over them, which shows them without a request that fails. Without a name there
+            // are no initials to show under it, so the default one is used
+            source = Utils.getGravatarUrl(email, withInitials && initials ? "blank" : defaultValue);
+        } else if (edition) {
+            source += `?rdm=${edition}`;
+        } else if (withReload) {
+            source += `?rdm=${new Date().getTime()}`;
+        }
+        return source;
+    }, [ avatar, email, defaultValue, edition, withReload, withInitials, initials ]);
+
+    // The color is the given one, or it depends on the name, so it is always the same
+    // one for each person. The text over a color of the person is the one that is read
+    const [ backColor, textColor ] = React.useMemo(() => {
+        if (color) {
+            return [ color, Utils.getContrastColor(color) ];
+        }
         let total = 0;
         for (const char of String(name || "")) {
             total += char.codePointAt(0);
         }
-        return COLORS[total % COLORS.length];
-    }, [ name ]);
+        return [ COLORS[total % COLORS.length], "white" ];
+    }, [ name, color ]);
 
     // Try the image again when it changes
     React.useEffect(() => {
@@ -176,7 +181,7 @@ function Avatar(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
-        {showInitials && <Initials size={size} color={color}>
+        {showInitials && <Initials size={size} color={backColor} textColor={textColor}>
             {initials}
         </Initials>}
         {showImage && <Image
@@ -199,6 +204,7 @@ Avatar.propTypes = {
     className      : PropTypes.string,
     size           : PropTypes.number,
     name           : PropTypes.string,
+    color          : PropTypes.string,
     email          : PropTypes.string,
     avatar         : PropTypes.string,
     url            : PropTypes.string,
