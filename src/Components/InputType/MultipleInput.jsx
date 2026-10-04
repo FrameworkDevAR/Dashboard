@@ -200,7 +200,7 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll }
 function MultipleInput(props) {
     const {
         className, isFocused, isDisabled, withLabel, withBorder,
-        name, value, placeholder, columns, withSearch, noScroll, getDisabled, getPrefix,
+        name, value, placeholder, columns, withSearch, searchToShow, noScroll, getDisabled, getPrefix,
         onChange, onFocus, onBlur,
     } = props;
 
@@ -248,11 +248,13 @@ function MultipleInput(props) {
         return String(NLS.get(value)).replace(/<[^>]*>/g, "").trim();
     };
 
-    // The Items that match the search, or only the selected ones when asked. The label is
-    // searched without its html, as it can have a status next to the name
+    // The Items that match the search, or only the selected ones when asked or when the
+    // others are only shown when searching. The label is searched without its html, as it
+    // can have a status next to the name
     const shownItems = React.useMemo(() => {
+        const onlyParts = onlySelected || (searchToShow && !search);
         return items.filter(({ key, value }) => {
-            if (onlySelected && !parts.includes(String(key))) {
+            if (onlyParts && !parts.includes(String(key))) {
                 return false;
             }
             if (!search) {
@@ -260,7 +262,7 @@ function MultipleInput(props) {
             }
             return Utils.searchValue(getText(value), search);
         });
-    }, [ JSON.stringify(items), JSON.stringify(parts), search, onlySelected ]);
+    }, [ JSON.stringify(items), JSON.stringify(parts), search, onlySelected, searchToShow ]);
 
     // Returns true if is Disabled
     const getItemDisabled = (key) => {
@@ -352,7 +354,7 @@ function MultipleInput(props) {
                 {checkboxes}
             </Container>}
             {(withSearch && !shownItems.length) && <None>
-                {NLS.get("GENERAL_NONE_RESULTS")}
+                {NLS.get(searchToShow && !search ? "GENERAL_SEARCH_TO_ADD" : "GENERAL_NONE_RESULTS")}
             </None>}
         </Content>
     </InputContent>;
@@ -363,25 +365,26 @@ function MultipleInput(props) {
  * @type {object} propTypes
  */
 MultipleInput.propTypes = {
-    className   : PropTypes.string,
-    isFocused   : PropTypes.bool,
-    isDisabled  : PropTypes.bool,
-    withLabel   : PropTypes.bool,
-    withBorder  : PropTypes.bool,
-    name        : PropTypes.string.isRequired,
-    value       : PropTypes.any,
-    options     : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
-    noneText    : PropTypes.string,
-    noneValue   : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    placeholder : PropTypes.string,
-    columns     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    withSearch  : PropTypes.bool,
-    noScroll    : PropTypes.bool,
-    getDisabled : PropTypes.func,
-    getPrefix   : PropTypes.func,
-    onChange    : PropTypes.func.isRequired,
-    onFocus     : PropTypes.func.isRequired,
-    onBlur      : PropTypes.func.isRequired,
+    className    : PropTypes.string,
+    isFocused    : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
+    withBorder   : PropTypes.bool,
+    name         : PropTypes.string.isRequired,
+    value        : PropTypes.any,
+    options      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
+    noneText     : PropTypes.string,
+    noneValue    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    placeholder  : PropTypes.string,
+    columns      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    withSearch   : PropTypes.bool,
+    searchToShow : PropTypes.bool,
+    noScroll     : PropTypes.bool,
+    getDisabled  : PropTypes.func,
+    getPrefix    : PropTypes.func,
+    onChange     : PropTypes.func.isRequired,
+    onFocus      : PropTypes.func.isRequired,
+    onBlur       : PropTypes.func.isRequired,
 };
 
 /**
@@ -389,14 +392,15 @@ MultipleInput.propTypes = {
  * @type {object} defaultProps
  */
 MultipleInput.defaultProps = {
-    className   : "",
-    isFocused   : false,
-    isDisabled  : false,
-    withBorder  : true,
-    noneText    : "",
-    columns     : 2,
-    withSearch  : false,
-    noScroll    : false,
+    className    : "",
+    isFocused    : false,
+    isDisabled   : false,
+    withBorder   : true,
+    noneText     : "",
+    columns      : 2,
+    withSearch   : false,
+    searchToShow : false,
+    noScroll     : false,
 };
 
 export default MultipleInput;
