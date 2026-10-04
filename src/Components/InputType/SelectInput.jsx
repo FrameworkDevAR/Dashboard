@@ -14,6 +14,7 @@ import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
 import Html                 from "../Common/Html";
 import Icon                 from "../Common/Icon";
+import Avatar               from "../Avatar/Avatar";
 
 
 
@@ -51,6 +52,20 @@ const Input = Styled(InputBase).attrs(({ isDisabled, isPlaceholder, inlineDescri
     `}
 `;
 
+const Dot = Styled.span.attrs(({ dotColor }) => ({ dotColor }))`
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background-color: ${(props) => props.dotColor};
+`;
+
+const OptionAvatar = Styled(Avatar)`
+    flex-shrink: 0;
+    margin-right: 8px;
+`;
+
 const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     margin-top: -4px;
     margin-right: -6px;
@@ -75,7 +90,7 @@ function SelectInput(props) {
     const {
         inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
-        id, name, placeholder, value, allowMultiple,
+        id, name, placeholder, value, allowMultiple, withColors, withAvatars,
         defaultText, emptyText, noneText, noneValue,
         withCustom, customFirst, customText, customKey,
         options, extraOptions, descriptions, showDescription, inlineDescription,
@@ -144,11 +159,15 @@ function SelectInput(props) {
             }
             const { key, value, icon : itemIcon, description, isTitle } = itemData;
 
+            // The color and the avatar of an option are only shown when the input asks for them
+            const avatar = { name : NLS.get(value), email : itemData.email || "", avatar : itemData.avatar || "" };
             result.push({
                 key         : `item-${key}`,
                 value       : key,
                 message     : NLS.get(value),
                 text        : "",
+                color       : withColors ? (itemData.color || "") : "",
+                avatar      : withAvatars ? avatar : null,
                 icon        : itemIcon || "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
                 isTitle     : Boolean(isTitle),
@@ -177,7 +196,7 @@ function SelectInput(props) {
             });
         }
         return result;
-    }, [ noneText, noneValue, withCustom, customFirst, customText, customKey, JSON.stringify(items), JSON.stringify(extraItems) ]);
+    }, [ noneText, noneValue, withCustom, customFirst, customText, customKey, withColors, withAvatars, JSON.stringify(items), JSON.stringify(extraItems) ]);
 
     // Get the Filtered Options
     const filteredOptions = React.useMemo(() => {
@@ -491,6 +510,9 @@ function SelectInput(props) {
     };
 
 
+    // The option that is selected, to show its color or its avatar next to its name
+    const current = allowMultiple ? null : optionList.find((item) => !item.isTitle && String(item.value) === valueKey);
+
     // More Variables
     const showDisabled   = Boolean(isDisabled || (emptyText && optionList.length === 0));
     const hasDescription = Boolean(!showOptions && showDescription && optionDesc);
@@ -518,6 +540,14 @@ function SelectInput(props) {
         withClick
         bottomSpace={showOptions ? bottomSpace : 0}
     >
+        {!showOptions && Boolean(current && current.color) && <Dot dotColor={current.color} />}
+        {!showOptions && Boolean(current && current.avatar) && <OptionAvatar
+            name={current.avatar.name}
+            email={current.avatar.email}
+            avatar={current.avatar.avatar}
+            size={20}
+            withInitials
+        />}
         <Inside inlineDescription={inlineDescription}>
             <Input
                 inputRef={inputRef}
@@ -559,7 +589,7 @@ function SelectInput(props) {
             maxHeight={style.maxHeight}
             opacity={style.opacity}
         >
-            {filteredOptions.map(({ key, value, text, message, icon : optionIcon, description, isTitle }, index) => <InputOption
+            {filteredOptions.map(({ key, value, text, message, icon : optionIcon, color, avatar, description, isTitle }, index) => <InputOption
                 key={key}
                 className={`input-option-${index}`}
                 hasCreate={hasCreate}
@@ -568,6 +598,8 @@ function SelectInput(props) {
                 isTitle={isTitle}
                 leftSpace={hasTitles && !isTitle && !optionIcon}
                 icon={optionIcon}
+                color={color}
+                avatar={avatar}
                 content={text || message}
                 description={description}
                 inlineDescription={inlineDescription}
@@ -602,6 +634,8 @@ SelectInput.propTypes = {
     placeholder       : PropTypes.string,
     value             : PropTypes.any,
     allowMultiple     : PropTypes.bool,
+    withColors        : PropTypes.bool,
+    withAvatars       : PropTypes.bool,
     options           : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     extraOptions      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     descriptions      : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),

@@ -16,7 +16,7 @@ const Variant = {
 
 
 // Styles
-const Container = Styled.li.attrs(({ variant, hasClick, hasClose, isDisabled }) => ({ variant, hasClick, hasClose, isDisabled }))`
+const Container = Styled.li.attrs(({ variant, chipColor, hasClick, hasClose, isDisabled }) => ({ variant, chipColor, hasClick, hasClose, isDisabled }))`
     padding: 1px 8px;
     font-size: 12px;
     line-height: 16px;
@@ -47,6 +47,16 @@ const Container = Styled.li.attrs(({ variant, hasClick, hasClose, isDisabled }) 
             background-color: var(--lighter-gray);
         }
     `}
+
+    ${(props) => props.chipColor && `
+        && {
+            color: color-mix(in srgb, ${props.chipColor} 60%, var(--black-color));
+            background-color: color-mix(in srgb, ${props.chipColor} 14%, transparent);
+        }
+        &&:hover {
+            background-color: color-mix(in srgb, ${props.chipColor} 24%, transparent);
+        }
+    `}
 `;
 
 const Content = Styled.div`
@@ -66,7 +76,7 @@ const Content = Styled.div`
  */
 function ChipItem(props) {
     const {
-        isHidden, className, variant, icon, iconSize,
+        isHidden, className, variant, color, icon, iconSize,
         message, secMessage,
         isDisabled, canClick, onClick, canClose, onClose,
     } = props;
@@ -84,6 +94,7 @@ function ChipItem(props) {
     return <Container
         className={className}
         variant={variant}
+        chipColor={color}
         hasClick={hasClick}
         hasClose={hasClose}
         isDisabled={isDisabled}
@@ -125,6 +136,7 @@ ChipItem.propTypes = {
     isHidden   : PropTypes.bool,
     className  : PropTypes.string,
     variant    : PropTypes.string,
+    color      : PropTypes.string,
     icon       : PropTypes.string,
     iconSize   : PropTypes.string,
     message    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),

@@ -52,7 +52,7 @@ function ChooserInput(props) {
     const {
         inputRef, className, isFocused, isDisabled, withLabel,
         id, name, value, placeholder, noValueText, emptyText, createOption, onCreate,
-        minHeight, onChange, onClear, onFocus, onBlur,
+        minHeight, withColors, onChange, onClear, onFocus, onBlur,
     } = props;
 
 
@@ -271,11 +271,13 @@ function ChooserInput(props) {
         for (const key of values) {
             const value = Utils.getValue(options, "key", key, "value");
             if (value) {
-                result.push({ key, value });
+                // The color of an option is only used when the input asks for it
+                const color = withColors ? Utils.getValue(options, "key", key, "color") : "";
+                result.push({ key, value, color : color || "" });
             }
         }
         return result;
-    }, [ JSON.stringify(values), JSON.stringify(options) ]);
+    }, [ JSON.stringify(values), JSON.stringify(options), withColors ]);
 
 
     // Variables
@@ -299,8 +301,9 @@ function ChooserInput(props) {
         withLabel={withLabel}
     >
         <ChipList>
-            {chips.map(({ key, value }) => <ChipItem
+            {chips.map(({ key, value, color }) => <ChipItem
                 key={key}
+                color={color}
                 message={value}
                 onClick={(e) => handleRemove(e, key)}
                 isDisabled={isDisabled}
@@ -346,8 +349,9 @@ function ChooserInput(props) {
             width={bounds.width}
             maxHeight={bounds.maxHeight}
         >
-            {filteredOptions.map(({ key, value, text }, index) => <InputOption
+            {filteredOptions.map(({ key, value, text, color }, index) => <InputOption
                 key={key}
+                color={withColors ? color : ""}
                 className={`input-chooser-${index}`}
                 forCreate={key === "__create__"}
                 isOnlyOption={isOnlyOption}
@@ -382,6 +386,7 @@ ChooserInput.propTypes = {
     createOption : PropTypes.string,
     onCreate     : PropTypes.func,
     minHeight    : PropTypes.number,
+    withColors   : PropTypes.bool,
     onChange     : PropTypes.func,
     onClear      : PropTypes.func,
     onFocus      : PropTypes.func,

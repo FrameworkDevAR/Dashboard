@@ -6,6 +6,7 @@ import Styled               from "styled-components";
 import Menu                 from "../Menu/Menu";
 import Html                 from "../Common/Html";
 import Icon                 from "../Common/Icon";
+import Avatar               from "../Avatar/Avatar";
 
 
 
@@ -125,6 +126,14 @@ const Option = Styled.div`
     gap: 8px;
 `;
 
+const Dot = Styled.span.attrs(({ dotColor }) => ({ dotColor }))`
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: ${(props) => props.dotColor};
+`;
+
 const Text = Styled(Html)`
     flex-grow: 2;
     white-space: nowrap;
@@ -153,7 +162,7 @@ function InputOption(props) {
         isHidden, className,
         hasValue, forValue,
         hasCreate, forCreate, isOnlyOption, isTitle, leftSpace,
-        icon, content, message, description, inlineDescription,
+        icon, color, avatar, content, message, description, inlineDescription,
         isSelected, hasChecks, isChecked, onMouseDown,
         direction, onClose, children,
     } = props;
@@ -200,6 +209,14 @@ function InputOption(props) {
                     icon={iconValue}
                     size="20"
                 />
+                {Boolean(color) && <Dot dotColor={color} />}
+                {Boolean(avatar) && <Avatar
+                    name={avatar.name}
+                    email={avatar.email}
+                    avatar={avatar.avatar}
+                    size={20}
+                    withInitials
+                />}
                 <Inside inlineDescription={inlineDescription}>
                     <Option>
                         <Text
@@ -249,6 +266,8 @@ InputOption.propTypes = {
     isTitle           : PropTypes.bool,
     leftSpace         : PropTypes.bool,
     icon              : PropTypes.string,
+    color             : PropTypes.string,
+    avatar            : PropTypes.object,
     content           : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     message           : PropTypes.string,
     description       : PropTypes.string,
