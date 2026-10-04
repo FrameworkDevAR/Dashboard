@@ -69,7 +69,7 @@ const Amount = Styled.span`
     padding: 0 4px;
     font-size: 11px;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 16px;
     text-align: center;
     font-variant-numeric: tabular-nums;
     border-radius: 999px;
