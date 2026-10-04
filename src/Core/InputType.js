@@ -16,6 +16,7 @@ const EMAILS   = "emails";
 const EMOJI    = "emoji";
 const FIELDS   = "fields";
 const FILE     = "file";
+const ICON     = "icon";
 const LIST     = "list";
 const MEDIA    = "media";
 const MULTIPLE = "multiple";
@@ -64,7 +65,7 @@ function canShrink(type) {
     return ![
         BUTTONS, CHIPS, CODE, DOUBLE, MULTIPLE, FILE, MEDIA,
         CHECKBOX, RADIO, RADIOBOX,
-        TOGGLE, FIELDS, LIST, COLOR, DATE, TIME,
+        TOGGLE, FIELDS, LIST, COLOR, ICON, DATE, TIME,
     ].includes(type);
 }
 
@@ -76,7 +77,7 @@ function canShrink(type) {
 function canFocus(type) {
     return ![
         BUTTONS, CHECKBOX, CHIPS, COLOR, DOUBLE, EMOJI, FIELDS,
-        FILE, LIST, MEDIA, MULTIPLE, RADIO, RADIOBOX, TOGGLE,
+        FILE, ICON, LIST, MEDIA, MULTIPLE, RADIO, RADIOBOX, TOGGLE,
     ].includes(type);
 }
 
@@ -193,6 +194,7 @@ export default {
     EMOJI,
     FIELDS,
     FILE,
+    ICON,
     LIST,
     MEDIA,
     MULTIPLE,

@@ -16,6 +16,7 @@ import EmailsInput          from "../InputType/EmailsInput";
 import EmojiInput           from "../InputType/EmojiInput";
 import FieldInput           from "../InputType/FieldInput";
 import FileInput            from "../InputType/FileInput";
+import IconInput            from "../InputType/IconInput";
 import ListInput            from "../InputType/ListInput";
 import MediaInput           from "../InputType/MediaInput";
 import MultipleInput        from "../InputType/MultipleInput";
@@ -62,6 +63,8 @@ function Input(props) {
         return <FieldInput {...props} />;
     case InputType.FILE:
         return <FileInput {...props} />;
+    case InputType.ICON:
+        return <IconInput {...props} />;
     case InputType.LIST:
         return <ListInput {...props} />;
     case InputType.MEDIA:
