@@ -71,7 +71,7 @@ function SubNavigationItem(props) {
     const {
         action, isSelected, message, url, href, emoji, icon, iconColor, afterIcon,
         amount, badge, onAction, onClick, onClose, noClose,
-        hideActions, canEdit, canDelete, elemID, children,
+        hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, children,
     } = props;
 
 
@@ -124,7 +124,7 @@ function SubNavigationItem(props) {
 
 
     // Variables
-    const hasActions = !isSmallNav && (canEdit || canDelete);
+    const hasActions = !isSmallNav && (canEdit || canDelete || canCollapse);
 
 
     // Do the Render
@@ -152,6 +152,12 @@ function SubNavigationItem(props) {
                 className="subnav-actions"
                 hideActions={hideActions}
             >
+                {canCollapse && <IconLink
+                    variant="black"
+                    icon={isCollapsed ? "closed" : "open"}
+                    onClick={(e) => handleAction(e, "COLLAPSE")}
+                    isTiny
+                />}
                 {canEdit && <IconLink
                     variant="black"
                     icon="edit"
@@ -166,7 +172,7 @@ function SubNavigationItem(props) {
                 />}
             </NavActions>}
         </Content>
-        {children}
+        {!(canCollapse && isCollapsed) && children}
     </li>;
 }
 
@@ -194,6 +200,8 @@ SubNavigationItem.propTypes = {
     hideActions : PropTypes.bool,
     canEdit     : PropTypes.bool,
     canDelete   : PropTypes.bool,
+    canCollapse : PropTypes.bool,
+    isCollapsed : PropTypes.bool,
     elemID      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     children    : PropTypes.any,
 };
