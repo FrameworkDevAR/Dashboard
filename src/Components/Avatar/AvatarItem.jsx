@@ -101,7 +101,7 @@ const IconContent = Styled(Icon).attrs(({ isSelected }) => ({ isSelected }))`
 function AvatarItem(props) {
     const {
         className, isSelected, onClick,
-        name, email, avatar, badge, amount,
+        name, email, avatar, badge, amount, withInitials,
     } = props;
 
 
@@ -116,6 +116,7 @@ function AvatarItem(props) {
             email={email}
             avatar={avatar}
             size={32}
+            withInitials={withInitials}
         />
         <Content>
             <Header>
@@ -148,6 +149,7 @@ AvatarItem.propTypes = {
     name       : PropTypes.string.isRequired,
     email      : PropTypes.string.isRequired,
     avatar     : PropTypes.string.isRequired,
+    withInitials : PropTypes.bool,
     badge      : PropTypes.string,
     amount     : PropTypes.string,
 };

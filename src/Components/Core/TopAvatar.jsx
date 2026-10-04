@@ -91,7 +91,7 @@ const Online = Styled.div.attrs(({ isOnline, isBusy }) => ({ isOnline, isBusy })
  */
 function TopAvatar(props) {
     const {
-        avatarUrl, avatarEmail, avatarAvatar, avatarEdition,
+        avatarUrl, avatarName, avatarEmail, avatarAvatar, avatarEdition,
         showOnline, isOnline, isBusy, showParent, parentTitle, parentName,
         menuItems,
     } = props;
@@ -142,7 +142,9 @@ function TopAvatar(props) {
             <User>
                 <Avatar
                     url={!hasMenu ? avatarUrl : null}
+                    name={avatarName}
                     email={avatarEmail}
+                    withInitials={Boolean(avatarName)}
                     avatar={avatarAvatar}
                     edition={avatarEdition}
                     size={showCredential ? 32 : 36}
@@ -172,6 +174,7 @@ function TopAvatar(props) {
  */
 TopAvatar.propTypes = {
     avatarUrl     : PropTypes.string,
+    avatarName    : PropTypes.string,
     avatarEmail   : PropTypes.string,
     avatarAvatar  : PropTypes.string,
     avatarEdition : PropTypes.number,

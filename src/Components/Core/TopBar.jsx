@@ -111,7 +111,7 @@ const CollapseIcon = Styled(BarIcon)`
 function TopBar(props) {
     const {
         className, withTopBar, withTitle, showDev, showDevBadge, showNightlyBadge, logo,
-        avatarUrl, avatarEmail, avatarAvatar, avatarEdition,
+        avatarUrl, avatarName, avatarEmail, avatarAvatar, avatarEdition,
         showOnline, isOnline, isBusy, showParent, parentTitle, parentName,
         onLogout, menuItems, children,
     } = props;
@@ -166,6 +166,7 @@ function TopBar(props) {
             />}
             <TopAvatar
                 avatarUrl={avatarUrl}
+                avatarName={avatarName}
                 avatarEmail={avatarEmail}
                 avatarAvatar={avatarAvatar}
                 avatarEdition={avatarEdition}
@@ -194,6 +195,7 @@ TopBar.propTypes = {
     showNightlyBadge : PropTypes.bool,
     logo             : PropTypes.string,
     avatarUrl        : PropTypes.string,
+    avatarName       : PropTypes.string,
     avatarEmail      : PropTypes.string,
     avatarAvatar     : PropTypes.string,
     avatarEdition    : PropTypes.number,
