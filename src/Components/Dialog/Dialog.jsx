@@ -227,6 +227,7 @@ function Dialog(props) {
     const content = <Content
         ref={contentRef}
         className={`dialog ${className}`}
+        data-level={level}
         onMouseDown={handleMouseDown}
         width={width}
         isWide={isWide}

@@ -88,7 +88,8 @@ function DropZone(props) {
 
 
     // The References
-    const inputRef = React.useRef(null);
+    const containerRef = React.useRef(null);
+    const inputRef     = React.useRef(null);
 
     // The Current State
     const [ uploading,  setUploading  ] = React.useState(false);
@@ -101,13 +102,9 @@ function DropZone(props) {
         Utils.triggerClick(inputRef);
     };
 
-    // Handles the Submit
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const node   = inputRef.current;
-        const files  = e.target.files;
+    // Sends the valid Files and reports the ones left out
+    const sendFiles = (files) => {
         const result = [];
-
         for (const file of files) {
             if (Utils.isValidFile(file, onlyImages, maxSize, withSVG)) {
                 result.push(file);
@@ -120,10 +117,54 @@ function DropZone(props) {
         if (result.length !== files.length && onError) {
             onError(files.length - result.length);
         }
+    };
+
+    // Handles the Submit
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const node = inputRef.current;
+        sendFiles(e.target.files);
         if (node) {
             node.value = "";
         }
     };
+
+    // Handles the Paste of Files. Only the top Dialog takes it, or the page when there is
+    // no Dialog open, whatever has the focus. The copied images are all named the same,
+    // so they get the time to not replace each other
+    const handlePaste = (e) => {
+        const files = Array.from(e.clipboardData?.files || []);
+        if (!files.length) {
+            return;
+        }
+
+        const ownDialog = containerRef.current?.closest(".dialog");
+        const ownLevel  = ownDialog ? Number(ownDialog.dataset.level) : 0;
+        const levels    = Array.from(document.querySelectorAll(".dialog"), (node) => Number(node.dataset.level));
+        if (ownLevel !== Math.max(0, ...levels)) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        const time = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
+        sendFiles(files.map((file) => {
+            if (!/^image\.\w+$/.test(file.name)) {
+                return file;
+            }
+            const extension = file.name.split(".").pop();
+            return new File([ file ], `image-${time}.${extension}`, { type : file.type });
+        }));
+    };
+
+    // Listens to the Paste before the editors behind a Dialog can take it
+    React.useEffect(() => {
+        if (isHidden) {
+            return undefined;
+        }
+        window.addEventListener("paste", handlePaste, true);
+        return () => window.removeEventListener("paste", handlePaste, true);
+    });
 
     // Handles the Upload Url
     const handleUploadUrl = async (fileUrl, fileName) => {
@@ -165,7 +206,7 @@ function DropZone(props) {
             onError={onError}
         />
 
-        <Container className="dropzone-upload">
+        <Container ref={containerRef} className="dropzone-upload">
             <Content>
                 <UploadIcon icon="upload" />
                 <div>
