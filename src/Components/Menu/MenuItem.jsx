@@ -129,7 +129,7 @@ function MenuItem(props) {
     const {
         className, action, icon, iconColor, avatar, circle, title, message, description, shortcut,
         url, href, target,
-        isDisabled, isSelected, isSmall, leftSpace,
+        isDisabled, isSelected, isSmall, leftSpace, noIcon,
         onAction, onClick, dontClose, onClose,
         direction, index, selectedIdx, filter,
         trigger, setTrigger, children,
@@ -149,7 +149,7 @@ function MenuItem(props) {
     const uri         = url ? NLS.baseUrl(url) : href;
     const navigate    = Navigate.useGotoUrl();
     const isSelection = !isDisabled && (isSelected || selectedIdx === index);
-    const hasIcon     = Boolean(icon);
+    const hasIcon     = Boolean(icn && !noIcon);
     const hasCircle   = Boolean(circle);
     const hasMenu     = Boolean(children && children.length);
 
@@ -286,6 +286,7 @@ MenuItem.propTypes = {
     isSelected  : PropTypes.bool,
     isSmall     : PropTypes.bool,
     leftSpace   : PropTypes.bool,
+    noIcon      : PropTypes.bool,
     onAction    : PropTypes.func,
     onClick     : PropTypes.func,
     dontClose   : PropTypes.bool,
@@ -309,6 +310,7 @@ MenuItem.defaultProps = {
     isDisabled : false,
     isSelected : false,
     isSmall    : false,
+    noIcon     : false,
     dontClose  : false,
     direction  : "right",
     circle     : "",
