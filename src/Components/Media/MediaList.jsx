@@ -20,8 +20,9 @@ import PillTab              from "../Pill/PillTab";
 
 // Constants
 const GAP_SPACE   = 16;
+const DROP_MARGIN = 16;
 const CRUMB_SPACE = 28 + GAP_SPACE;
-const DROP_SPACE  = 60 + GAP_SPACE;
+const DROP_SPACE  = 60 + DROP_MARGIN + GAP_SPACE;
 const TIP_SPACE   = 42 + GAP_SPACE;
 
 // Styles
