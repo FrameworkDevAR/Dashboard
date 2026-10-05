@@ -41,14 +41,16 @@ function Dashboard(props) {
  * @type {object} propTypes
  */
 Dashboard.propTypes = {
-    store    : PropTypes.object.isRequired,
-    url      : PropTypes.string,
-    baseUrl  : PropTypes.string,
-    apiUrl   : PropTypes.string,
-    routeUrl : PropTypes.string,
-    actions  : PropTypes.array,
-    params   : PropTypes.object,
-    children : PropTypes.any,
+    store        : PropTypes.object.isRequired,
+    url          : PropTypes.string,
+    baseUrl      : PropTypes.string,
+    apiUrl       : PropTypes.string,
+    routeUrl     : PropTypes.string,
+    actions      : PropTypes.array,
+    params       : PropTypes.object,
+    maxSize      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxVideoSize : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    children     : PropTypes.any,
 };
 
 export default Dashboard;

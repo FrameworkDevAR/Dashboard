@@ -2,12 +2,13 @@ import React                from "react";
 import PropTypes            from "prop-types";
 
 // Core
-import Store                from "../Core/Store";
-import Ajax                 from "../Core/Ajax";
 import Action               from "../Core/Action";
+import Ajax                 from "../Core/Ajax";
 import Auth                 from "../Core/Auth";
+import Files                from "../Core/Files";
 import Navigate             from "../Core/Navigate";
 import NLS                  from "../Core/NLS";
+import Store                from "../Core/Store";
 
 
 
@@ -17,7 +18,7 @@ import NLS                  from "../Core/NLS";
  * @returns {React.ReactElement}
  */
 function Initializer(props) {
-    const { url, apiUrl, routeUrl, actions, params } = props;
+    const { url, apiUrl, routeUrl, actions, params, maxSize, maxVideoSize } = props;
 
     const { error } = Store.useState("core");
 
@@ -44,6 +45,9 @@ function Initializer(props) {
         }
     };
 
+    // The sizes are set while rendering, as the pages below check them in their first render
+    Files.init(maxSize, maxVideoSize);
+
     // Initialize the Modules once
     React.useEffect(() => {
         Ajax.init(apiUrl, routeUrl, onResult, onError);
@@ -63,11 +67,13 @@ function Initializer(props) {
  * @type {object} propTypes
  */
 Initializer.propTypes = {
-    url      : PropTypes.string,
-    apiUrl   : PropTypes.string,
-    routeUrl : PropTypes.string,
-    actions  : PropTypes.array,
-    params   : PropTypes.object,
+    url          : PropTypes.string,
+    apiUrl       : PropTypes.string,
+    routeUrl     : PropTypes.string,
+    actions      : PropTypes.array,
+    params       : PropTypes.object,
+    maxSize      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxVideoSize : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
 };
 
 /**
@@ -75,11 +81,13 @@ Initializer.propTypes = {
  * @type {object} defaultProps
  */
 Initializer.defaultProps = {
-    url      : "",
-    apiUrl   : "",
-    routeUrl : "",
-    actions  : [],
-    params   : {},
+    url          : "",
+    apiUrl       : "",
+    routeUrl     : "",
+    actions      : [],
+    params       : {},
+    maxSize      : 0,
+    maxVideoSize : 0,
 };
 
 export default Initializer;
