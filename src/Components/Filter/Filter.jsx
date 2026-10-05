@@ -158,6 +158,7 @@ function Filter(props) {
                 anyValue      : child.anyText ? (child.anyValue ?? -1) : 0,
                 allowMultiple : Boolean(child.allowMultiple),
                 dontClose     : Boolean(child.dontClose),
+                showOptions   : Boolean(child.showOptions),
                 withHour      : Boolean(child.withHour),
                 onlyHour      : child.type === "time",
                 prefix        : child.prefix,
@@ -547,8 +548,8 @@ function Filter(props) {
                 continue;
             }
 
-            // If searching show the item options as main items
-            if (search && item.options) {
+            // If searching, or the item asks for it, show the item options as main items
+            if ((search || item.showOptions) && item.options) {
                 let added = false;
                 for (const option of item.options || []) {
                     if (Utils.searchValue(option.value, search)) {
@@ -558,7 +559,7 @@ function Filter(props) {
                             value         : option.key,
                             icon          : item.icon,
                             message       : item.message,
-                            text          : `${NLS.get(item.message)} "${option.value}"`,
+                            text          : search ? `${NLS.get(item.message)} "${option.value}"` : option.value,
                             options       : [],
                             allowMultiple : false,
                             dontClose     : false,
