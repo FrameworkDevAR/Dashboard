@@ -569,6 +569,7 @@ function Filter(props) {
                             icon          : item.icon,
                             message       : item.message,
                             text          : search ? `${NLS.get(item.message)} "${option.value}"` : option.value,
+                            isOption      : true,
                             options       : [],
                             allowMultiple : false,
                             dontClose     : false,
@@ -785,10 +786,10 @@ function Filter(props) {
             minWidth={300}
             gap={4}
         >
-            {optionList.map(({ key, name, value, text, message, options, dontClose }, index) => <InputOption
+            {optionList.map(({ key, name, value, text, message, isOption, options, dontClose }, index) => <InputOption
                 key={key}
                 className={`input-option-${index}`}
-                icon={getIcon(name, value, false)}
+                icon={getIcon(name, value, Boolean(isOption))}
                 content={text || message}
                 isSelected={selectedRef.current === index}
                 onMouseDown={!options.length ? () => handleSelect(name, value) : undefined}
