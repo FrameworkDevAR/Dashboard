@@ -32,6 +32,26 @@ const WIDTH_FOR_WIDE_DETAILS = 1600;
 
 
 /**
+ * The Media Query Lists, shared by every component that uses the same query
+ * @type {{[key: string]: MediaQueryList}}
+ */
+const mediaQueries = {};
+
+
+
+/**
+ * Returns the Media Query List of the given query, created the first time it is asked for
+ * @param {string} query
+ * @returns {MediaQueryList}
+ */
+function getMediaQuery(query) {
+    if (!mediaQueries[query]) {
+        mediaQueries[query] = window.matchMedia(query);
+    }
+    return mediaQueries[query];
+}
+
+/**
  * Hook that answers if the given Media Query matches, which updates when it stops or starts matching
  * @param {string} query
  * @returns {boolean}
@@ -39,12 +59,12 @@ const WIDTH_FOR_WIDE_DETAILS = 1600;
 function useMediaQuery(query) {
     // It only renders again when the width crosses the query, and not on every pixel of a resize
     const subscribe = React.useCallback((onChange) => {
-        const media = window.matchMedia(query);
+        const media = getMediaQuery(query);
         media.addEventListener("change", onChange);
         return () => media.removeEventListener("change", onChange);
     }, [ query ]);
 
-    return React.useSyncExternalStore(subscribe, () => window.matchMedia(query).matches);
+    return React.useSyncExternalStore(subscribe, () => getMediaQuery(query).matches);
 }
 
 /**
