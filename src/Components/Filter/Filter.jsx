@@ -258,6 +258,15 @@ function Filter(props) {
                     newValue = Number(data[name]) === 1 ? 0 : 1;
                 }
                 newData = { ...data, [name] : newValue };
+
+                // A named Period replaces the dates of a custom one, which would win over it
+                if (item.type === "period") {
+                    const prefix = name === "period" ? "" : name;
+                    for (const field of [ "FromDate", "FromHour", "ToDate", "ToHour" ]) {
+                        const key = prefix ? `${prefix}${field}` : `${field.charAt(0).toLowerCase()}${field.slice(1)}`;
+                        newData[key] = "";
+                    }
+                }
             }
             setData(newData);
             handleFilter(newData);
