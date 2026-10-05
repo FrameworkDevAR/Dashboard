@@ -1,5 +1,8 @@
 import React                from "react";
 
+// Core
+import Store                from "./Store";
+
 
 
 /**
@@ -77,6 +80,19 @@ function useIsForWideDetails(width = WIDTH_FOR_WIDE_DETAILS) {
     return useMediaQuery(`(min-width: ${width}px)`);
 }
 
+/**
+ * Hook to determine if the Details of the page take their space, as they can be collapsed
+ * @param {boolean} withDetails
+ * @returns {boolean}
+ */
+function useShowDetails(withDetails) {
+    const { isCollapsed } = Store.useState("core");
+    const isForDetails = useIsForDetails();
+
+    // Under the width of the details they float over the page, so the collapse does not take them away
+    return Boolean(withDetails && (!isCollapsed || isForDetails));
+}
+
 
 
 // The Public API
@@ -91,4 +107,5 @@ export default {
     useIsForMenu,
     useIsForDetails,
     useIsForWideDetails,
+    useShowDetails,
 };
