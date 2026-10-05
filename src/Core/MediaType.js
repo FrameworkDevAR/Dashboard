@@ -31,6 +31,15 @@ function withSVG(mediaType) {
 }
 
 /**
+ * Returns true if the type takes Videos
+ * @param {string} mediaType
+ * @returns {boolean}
+ */
+function withVideos(mediaType) {
+    return [ ANY, MEDIA, VIDEO ].includes(mediaType);
+}
+
+/**
  * Returns true if the type is only for Videos
  * @param {string} mediaType
  * @returns {boolean}
@@ -55,5 +64,6 @@ export default {
 
     onlyImages,
     withSVG,
+    withVideos,
     isVideo,
 };

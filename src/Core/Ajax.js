@@ -85,9 +85,18 @@ async function ajax(url, options = {}, showResult = true, abortController = null
         handleError(responseClone, options);
         throw defError;
     }
-    if (!result) {
-        result = {};
-    }
+    return handleResult(result, showResult);
+}
+
+/**
+ * Handles the JSON Result of a Request and returns its data
+ * @throws {object} The errors
+ * @param {object=}  response
+ * @param {boolean=} showResult
+ * @returns {object}
+ */
+function handleResult(response, showResult = true) {
+    const result = response || {};
 
     // The session ended
     if (result.userLoggedOut) {
@@ -141,6 +150,17 @@ async function ajax(url, options = {}, showResult = true, abortController = null
  */
 async function handleError(response, options) {
     const message = await response.text();
+    reportError(response.url, options, message);
+}
+
+/**
+ * Reports the Error of a Request that did not return a JSON
+ * @param {string} url
+ * @param {object} options
+ * @param {string} message
+ * @returns {void}
+ */
+function reportError(url, options, message) {
     if (!message) {
         return;
     }
@@ -148,7 +168,7 @@ async function handleError(response, options) {
     const method  = options.method ? options.method.toUpperCase() : "GET";
     const payload = options.body ? Object.fromEntries(options.body) : {};
     Object.keys(payload).forEach((key) => key.startsWith("x") && delete payload[key]);
-    setError(response.url, method, payload, message);
+    setError(url, method, payload, message);
 }
 
 /**
@@ -256,7 +276,82 @@ async function get(route, params = {}, showResult = true, abortController = null
  * @returns {Promise}
  */
 function post(route, params = {}, showResult = true, abortController = null, skipAbort = false) {
-    const url          = baseUrl(route);
+    const url  = baseUrl(route);
+    const body = createBody(params);
+    return ajax(url, { method : "post", body }, showResult, abortController, skipAbort);
+}
+
+/**
+ * Does a Post that reports the progress of the upload, which a Fetch can not do
+ * @param {string}    route
+ * @param {object=}   params
+ * @param {Function=} onProgress Gets the uploaded fraction, from 0 to 1
+ * @param {boolean=}  showResult
+ * @returns {Promise}
+ */
+function upload(route, params = {}, onProgress = null, showResult = true) {
+    const defError = { form : "GENERAL_ERROR" };
+    const url      = baseUrl(route);
+    const body     = createBody(params);
+    const options  = { method : "post", body };
+
+    return new Promise((resolve, reject) => {
+        const request    = new XMLHttpRequest();
+        const controller = new window.AbortController();
+
+        // Aborts with the other requests
+        controllers.add(controller);
+        controller.signal.addEventListener("abort", () => request.abort());
+
+        if (onProgress) {
+            request.upload.addEventListener("progress", (e) => {
+                if (e.lengthComputable) {
+                    onProgress(e.loaded / e.total);
+                }
+            });
+        }
+
+        request.addEventListener("load", () => {
+            controllers.delete(controller);
+            if (request.status < 200 || request.status >= 300) {
+                reject(defError);
+                return;
+            }
+
+            let result = null;
+            try {
+                result = JSON.parse(request.responseText);
+            } catch (error) {
+                reportError(url.href, options, request.responseText);
+                reject(defError);
+                return;
+            }
+            try {
+                resolve(handleResult(result, showResult));
+            } catch (errors) {
+                reject(errors);
+            }
+        });
+        request.addEventListener("error", () => {
+            controllers.delete(controller);
+            reject(defError);
+        });
+        request.addEventListener("abort", () => {
+            controllers.delete(controller);
+            resolve({ aborted : true });
+        });
+
+        request.open("post", url.href);
+        request.send(body);
+    });
+}
+
+/**
+ * Creates the Body of a Post, with the params and the data of the session
+ * @param {object=} params
+ * @returns {FormData}
+ */
+function createBody(params = {}) {
     const accessToken  = Auth.getAccessToken();
     const refreshToken = Auth.getRefreshToken();
     const langcode     = Auth.getLanguage();
@@ -278,7 +373,7 @@ function post(route, params = {}, showResult = true, abortController = null, ski
     if (timezone) {
         body.append("xTimezone", timezone);
     }
-    return ajax(url, { method : "post", body }, showResult, abortController, skipAbort);
+    return body;
 }
 
 /**
@@ -316,6 +411,7 @@ export default {
     init,
     get,
     post,
+    upload,
     url,
     route,
     abort,

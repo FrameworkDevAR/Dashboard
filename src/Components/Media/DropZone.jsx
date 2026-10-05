@@ -73,6 +73,33 @@ const Input = Styled.input`
     display: none;
 `;
 
+const Info = Styled.div`
+    min-width: 0;
+`;
+
+const FileName = Styled(Title)`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+`;
+
+const Bar = Styled.div`
+    flex-shrink: 0;
+    width: 240px;
+    max-width: 40%;
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--lighter-gray);
+    overflow: hidden;
+`;
+
+const Fill = Styled.div`
+    height: 100%;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    transition: width 0.2s;
+`;
+
 
 
 /**
@@ -82,7 +109,7 @@ const Input = Styled.input`
  */
 function DropZone(props) {
     const {
-        isHidden, onlyImages, withSVG, maxSize,
+        isHidden, onlyImages, withSVG, maxSize, maxVideoSize, upload,
         onDrop, onError, onUrl,
     } = props;
 
@@ -104,18 +131,24 @@ function DropZone(props) {
 
     // Sends the valid Files and reports the ones left out
     const sendFiles = (files) => {
-        const result = [];
+        if (upload) {
+            return;
+        }
+        const result   = [];
+        const rejected = [];
         for (const file of files) {
-            if (Utils.isValidFile(file, onlyImages, maxSize, withSVG)) {
+            if (Utils.isValidFile(file, onlyImages, maxSize, withSVG, maxVideoSize)) {
                 result.push(file);
+            } else {
+                rejected.push(file);
             }
         }
 
         if (result.length) {
             onDrop(result);
         }
-        if (result.length !== files.length && onError) {
-            onError(files.length - result.length);
+        if (rejected.length && onError) {
+            onError(rejected.length, rejected);
         }
     };
 
@@ -192,31 +225,53 @@ function DropZone(props) {
 
 
     // Do the Render
-    const prefix = onlyImages ? "DROPZONE_IMAGES_" : "DROPZONE_FILES_";
+    const prefix   = onlyImages ? "DROPZONE_IMAGES_" : "DROPZONE_FILES_";
+    const percent  = upload ? Math.round((upload.index + upload.progress) / upload.total * 100) : 0;
+    let   sizeText = NLS.format("DROPZONE_MAX_SIZE", String(maxSize));
+    let   amount   = `${percent}%`;
+
+    if (Number(maxVideoSize) && !onlyImages) {
+        sizeText = NLS.format("DROPZONE_MAX_SIZE_VIDEO", String(maxSize), String(maxVideoSize));
+    }
+    if (upload && upload.total > 1) {
+        amount = `${NLS.format("DROPZONE_UPLOADING_AMOUNT", String(upload.index + 1), String(upload.total))} · ${percent}%`;
+    }
     if (isHidden) {
         return <React.Fragment />;
     }
     return <>
         <DragDrop
-            isHidden={isHidden}
+            isHidden={isHidden || Boolean(upload)}
             onlyImages={onlyImages}
             withSVG={withSVG}
             maxSize={maxSize}
+            maxVideoSize={maxVideoSize}
             onDrop={onDrop}
             onError={onError}
         />
 
         <Container ref={containerRef} className="dropzone-upload">
-            <Content>
+            {!!upload && <>
+                <Content>
+                    <UploadIcon icon="upload" />
+                    <Info>
+                        <FileName>{NLS.format("DROPZONE_UPLOADING", upload.name)}</FileName>
+                        <Text>{amount}</Text>
+                    </Info>
+                </Content>
+                <Bar>
+                    <Fill style={{ width : `${percent}%` }} />
+                </Bar>
+            </>}
+
+            {!upload && <Content>
                 <UploadIcon icon="upload" />
                 <div>
                     <Title>{NLS.get(`${prefix}TITLE`)}</Title>
-                    {!!Number(maxSize) && <Text>
-                        {NLS.format("DROPZONE_MAX_SIZE", String(maxSize))}
-                    </Text>}
+                    {!!Number(maxSize) && <Text>{sizeText}</Text>}
                 </div>
-            </Content>
-            <Buttons>
+            </Content>}
+            {!upload && <Buttons>
                 <Button
                     variant="outlined"
                     icon="upload"
@@ -232,7 +287,7 @@ function DropZone(props) {
                     onClick={() => setShowUpload(true)}
                     inLowerCase
                 />
-            </Buttons>
+            </Buttons>}
             <Input
                 ref={inputRef}
                 type="file"
@@ -266,13 +321,20 @@ function DropZone(props) {
  * @type {object} propTypes
  */
 DropZone.propTypes = {
-    isHidden   : PropTypes.bool,
-    onlyImages : PropTypes.bool,
-    withSVG    : PropTypes.bool,
-    maxSize    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    onDrop     : PropTypes.func.isRequired,
-    onError    : PropTypes.func,
-    onUrl      : PropTypes.func,
+    isHidden     : PropTypes.bool,
+    onlyImages   : PropTypes.bool,
+    withSVG      : PropTypes.bool,
+    maxSize      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxVideoSize : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    upload       : PropTypes.shape({
+        name     : PropTypes.string,
+        index    : PropTypes.number,
+        total    : PropTypes.number,
+        progress : PropTypes.number,
+    }),
+    onDrop       : PropTypes.func.isRequired,
+    onError      : PropTypes.func,
+    onUrl        : PropTypes.func,
 };
 
 export default DropZone;

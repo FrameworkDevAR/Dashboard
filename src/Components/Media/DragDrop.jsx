@@ -32,7 +32,10 @@ const Container = Styled.div.attrs(({ isUploading }) => ({ isUploading }))`
  * @returns {React.ReactElement}
  */
 function DragDrop(props) {
-    const { isHidden, message, onlyImages, withSVG, maxSize, onDrop, onError } = props;
+    const {
+        isHidden, message, onlyImages, withSVG, maxSize, maxVideoSize,
+        onDrop, onError,
+    } = props;
 
 
     // The References
@@ -73,39 +76,27 @@ function DragDrop(props) {
         e.preventDefault();
     };
 
-    // Handles the Drop
+    // Handles the Drop. The Files are read from the list of Files, as the items of the
+    // transfer have no size to check
     const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const files      = [];
-        let   totalFiles = 0;
+        const files    = [];
+        const rejected = [];
 
-        // Use DataTransferItemList interface to access the file(s)
-        if (e.dataTransfer.items) {
-            totalFiles = e.dataTransfer.items.length;
-            for (const item of e.dataTransfer.items) {
-                if (item.kind === "file" && Utils.isValidFile(item, onlyImages, maxSize, withSVG)) {
-                    const file = item.getAsFile();
-                    files.push(file);
-                }
-            }
-        }
-
-        // Use DataTransfer interface to access the file(s)
-        if (!files.length) {
-            totalFiles = e.dataTransfer.files.length;
-            for (const file of e.dataTransfer.files) {
-                if (Utils.isValidFile(file, onlyImages, maxSize, withSVG)) {
-                    files.push(file);
-                }
+        for (const file of e.dataTransfer.files) {
+            if (Utils.isValidFile(file, onlyImages, maxSize, withSVG, maxVideoSize)) {
+                files.push(file);
+            } else {
+                rejected.push(file);
             }
         }
 
         if (files.length) {
             onDrop(files);
         }
-        if (totalFiles !== files.length && onError) {
-            onError(totalFiles - files.length);
+        if (rejected.length && onError) {
+            onError(rejected.length, rejected);
         }
 
         endDrop();
@@ -162,13 +153,14 @@ function DragDrop(props) {
  * @type {object} propTypes
  */
 DragDrop.propTypes = {
-    isHidden   : PropTypes.bool,
-    message    : PropTypes.string,
-    onlyImages : PropTypes.bool,
-    withSVG    : PropTypes.bool,
-    maxSize    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    onDrop     : PropTypes.func.isRequired,
-    onError    : PropTypes.func,
+    isHidden     : PropTypes.bool,
+    message      : PropTypes.string,
+    onlyImages   : PropTypes.bool,
+    withSVG      : PropTypes.bool,
+    maxSize      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxVideoSize : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    onDrop       : PropTypes.func.isRequired,
+    onError      : PropTypes.func,
 };
 
 export default DragDrop;

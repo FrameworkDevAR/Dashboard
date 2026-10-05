@@ -1743,10 +1743,11 @@ function isValidEmail(email) {
  * @param {object}  file
  * @param {boolean} onlyImages
  * @param {number}  maxSize
- * @param {boolean} withSVG    Optional.
+ * @param {boolean} withSVG      Optional.
+ * @param {number}  maxVideoSize Optional. The size of the Videos, when they have their own.
  * @returns {boolean}
  */
-function isValidFile(file, onlyImages, maxSize, withSVG = false) {
+function isValidFile(file, onlyImages, maxSize, withSVG = false, maxVideoSize = 0) {
     if (onlyImages) {
         const imageTypes = [ "image/png", "image/gif", "image/bmp", "image/jpg", "image/jpeg", "image/webp", "image/avif" ];
         if (withSVG) {
@@ -1756,9 +1757,11 @@ function isValidFile(file, onlyImages, maxSize, withSVG = false) {
             return false;
         }
     }
-    if (Number(maxSize)) {
+    const isVideo = String(file.type).startsWith("video/");
+    const limit   = isVideo && Number(maxVideoSize) ? maxVideoSize : maxSize;
+    if (Number(limit)) {
         const size = file.size / (1024 * 1024);
-        if (size > Number(maxSize)) {
+        if (size > Number(limit)) {
             return false;
         }
     }
