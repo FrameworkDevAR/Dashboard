@@ -29,13 +29,27 @@ const WIDTH_FOR_WIDE_DETAILS = 1600;
 
 
 /**
+ * Hook that answers if the given Media Query matches, which updates when it stops or starts matching
+ * @param {string} query
+ * @returns {boolean}
+ */
+function useMediaQuery(query) {
+    // It only renders again when the width crosses the query, and not on every pixel of a resize
+    const subscribe = React.useCallback((onChange) => {
+        const media = window.matchMedia(query);
+        media.addEventListener("change", onChange);
+        return () => media.removeEventListener("change", onChange);
+    }, [ query ]);
+
+    return React.useSyncExternalStore(subscribe, () => window.matchMedia(query).matches);
+}
+
+/**
  * Hook to determine if the current width is for the Mobile
  * @returns {boolean}
  */
 function useIsForMobile() {
-    return React.useMemo(() => {
-        return window.innerWidth <= WIDTH_FOR_MOBILE;
-    }, [ window.innerWidth ]);
+    return useMediaQuery(`(max-width: ${WIDTH_FOR_MOBILE}px)`);
 }
 
 /**
@@ -43,9 +57,7 @@ function useIsForMobile() {
  * @returns {boolean}
  */
 function useIsForMenu() {
-    return React.useMemo(() => {
-        return window.innerWidth <= WIDTH_FOR_MENU;
-    }, [ window.innerWidth ]);
+    return useMediaQuery(`(max-width: ${WIDTH_FOR_MENU}px)`);
 }
 
 /**
@@ -53,9 +65,7 @@ function useIsForMenu() {
  * @returns {boolean}
  */
 function useIsForDetails() {
-    return React.useMemo(() => {
-        return window.innerWidth <= WIDTH_FOR_DETAILS;
-    }, [ window.innerWidth ]);
+    return useMediaQuery(`(max-width: ${WIDTH_FOR_DETAILS}px)`);
 }
 
 /**
@@ -64,11 +74,8 @@ function useIsForDetails() {
  * @returns {boolean}
  */
 function useIsForWideDetails(width = WIDTH_FOR_WIDE_DETAILS) {
-    return React.useMemo(() => {
-        return window.innerWidth >= width;
-    }, [ window.innerWidth, width ]);
+    return useMediaQuery(`(min-width: ${width}px)`);
 }
-
 
 
 
@@ -79,6 +86,7 @@ export default {
     WIDTH_FOR_DETAILS,
     WIDTH_FOR_WIDE_DETAILS,
 
+    useMediaQuery,
     useIsForMobile,
     useIsForMenu,
     useIsForDetails,
