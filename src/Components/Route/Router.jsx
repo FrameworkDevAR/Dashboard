@@ -7,8 +7,42 @@ import Utils                from "../../Utils/Utils";
 
 // Router
 import {
-    Routes, Route, Navigate,
+    Routes, Route, Navigate, useParams,
 } from "react-router-dom";
+
+
+
+/**
+ * The Redirect of the Router, which goes to its first Route
+ * @param {object} props
+ * @returns {React.ReactElement}
+ */
+function RouterRedirect(props) {
+    const { to, isQuiet } = props;
+
+    const params = useParams();
+    const rest   = params["*"] || "";
+
+    // Only the base Url is meant to land here, so a rest is a link that no Route matches,
+    // which would otherwise go to the first Route without a word
+    React.useEffect(() => {
+        if (rest && !isQuiet && import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.warn(`No Route matches "${rest}", so it went to "${to}"`);
+        }
+    }, [ rest ]);
+
+    return <Navigate to={to} replace />;
+}
+
+/**
+ * The Property Types
+ * @type {object} propTypes
+ */
+RouterRedirect.propTypes = {
+    to      : PropTypes.string.isRequired,
+    isQuiet : PropTypes.bool,
+};
 
 
 
@@ -18,7 +52,7 @@ import {
  * @returns {React.ReactElement}
  */
 function Router(props) {
-    const { initialUrl, type, noFirst, children } = props;
+    const { initialUrl, type, noFirst, quietRedirect, children } = props;
 
 
     // Create the Routes
@@ -57,7 +91,7 @@ function Router(props) {
         routes.push(<Route
             key="redirect"
             path="*"
-            element={<Navigate to={firstPath} replace />}
+            element={<RouterRedirect to={firstPath} isQuiet={quietRedirect} />}
         />);
     }
 
@@ -73,10 +107,11 @@ function Router(props) {
  * @type {object} propTypes
  */
 Router.propTypes = {
-    initialUrl : PropTypes.string,
-    type       : PropTypes.string,
-    noFirst    : PropTypes.bool,
-    children   : PropTypes.any,
+    initialUrl    : PropTypes.string,
+    type          : PropTypes.string,
+    noFirst       : PropTypes.bool,
+    quietRedirect : PropTypes.bool,
+    children      : PropTypes.any,
 };
 
 /**
@@ -84,9 +119,10 @@ Router.propTypes = {
  * @type {object} defaultProps
  */
 Router.defaultProps = {
-    initialUrl : "",
-    type       : "",
-    noFirst    : false,
+    initialUrl    : "",
+    type          : "",
+    noFirst       : false,
+    quietRedirect : false,
 };
 
 export default Router;
