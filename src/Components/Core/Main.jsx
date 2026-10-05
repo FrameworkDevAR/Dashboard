@@ -32,9 +32,18 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
         width: calc(100vw - var(--sidebar-width) - var(--main-navigation) - var(--main-margin));
     }
 
+    &:has(> .main-header-filter) {
+        --header-height: calc(var(--main-padding) + var(--filter-height));
+        --page-height: calc(var(--main-height) - var(--header-height) - var(--main-padding));
+    }
+
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         width: 100vw !important;
         overflow: auto;
+
+        &:has(> .main-header-filter) {
+            --header-height: calc(var(--main-padding) / 2 + var(--filter-height));
+        }
     }
 `;
 

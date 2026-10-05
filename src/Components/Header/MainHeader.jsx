@@ -28,10 +28,6 @@ const Container = Styled.div`
 const Grow = Styled.div`
     flex-grow: 2;
     min-width: 0;
-
-    & > div {
-        margin-bottom: 0;
-    }
 `;
 
 const Actions = Styled.div`
@@ -71,7 +67,8 @@ function MainHeader(props) {
         </>;
     }
 
-    return <Container className={className}>
+    // The Main makes the header taller when it has a Filter, so the Filter keeps its gap
+    return <Container className={`${className} ${filter ? "main-header-filter" : ""}`}>
         <Grow>{filter}</Grow>
         <Actions>{children}</Actions>
     </Container>;
