@@ -2,6 +2,9 @@ import Utils                from "../../Utils/Utils";
 
 
 
+// The Item where the collapse of the Details of the current page is stored
+let collapseItem = "dashboard-details-collapsed";
+
 // The initial State
 const initialState = {
     loaders     : {},
@@ -221,13 +224,17 @@ const actions = {
     },
 
     /**
-     * Sets if the Details of the page can be collapsed, restoring the last state
+     * Sets if the Details of the page can be collapsed, restoring the last state of the page
      * @param {Function} dispatch
      * @param {boolean}  canCollapse
+     * @param {string=}  name
      * @returns {void}
      */
-    setCanCollapse(dispatch, canCollapse) {
-        const isCollapsed = canCollapse && Utils.restoreItem("dashboard-details-collapsed") === "1";
+    setCanCollapse(dispatch, canCollapse, name = "") {
+        // Each page keeps its own state, and a page without a name shares the general one
+        collapseItem = name ? `dashboard-details-collapsed-${name}` : "dashboard-details-collapsed";
+
+        const isCollapsed = canCollapse && Utils.restoreItem(collapseItem) === "1";
         dispatch({ type : "CORE_COLLAPSE_SET", canCollapse, isCollapsed });
     },
 
@@ -238,7 +245,7 @@ const actions = {
      * @returns {void}
      */
     setCollapsed(dispatch, isCollapsed) {
-        Utils.storeItem("dashboard-details-collapsed", isCollapsed ? "1" : "0");
+        Utils.storeItem(collapseItem, isCollapsed ? "1" : "0");
         dispatch({ type : "CORE_COLLAPSE_TOGGLE", isCollapsed });
     },
 

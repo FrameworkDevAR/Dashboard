@@ -155,13 +155,13 @@ function Details(props) {
     React.useEffect(() => {
         if (!isHidden) {
             setDetails(true);
-            setCanCollapse(canCollapse);
+            setCanCollapse(canCollapse, collapsible);
         }
         return () => {
             setDetails(false);
             setCanCollapse(false);
         };
-    }, [ isHidden, canCollapse ]);
+    }, [ isHidden, canCollapse, collapsible ]);
 
 
     // Parse the Items
