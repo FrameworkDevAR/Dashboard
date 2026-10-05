@@ -1,6 +1,6 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
+import Styled, { keyframes } from "styled-components";
 
 // Utils
 import Action               from "../../Core/Action";
@@ -22,8 +22,17 @@ import TableAction          from "../Table/TableAction";
 
 
 
+// Animations
+const highlight = keyframes`
+    from { background-color: var(--accent-light); }
+    to   { background-color: transparent; }
+`;
+
 // Styles
 const List = Styled(Table)`
+    tr.media-added td {
+        animation: ${highlight} 1.5s ease-out;
+    }
     tr.media-target td {
         background-color: var(--accent-light);
     }
@@ -112,7 +121,7 @@ const Ghost = Styled(Name)`
  */
 function MediaTable(props) {
     const {
-        items, inDialog, canEdit, extraSpace, isSelected, openElem,
+        items, inDialog, canEdit, extraSpace, isSelected, isAdded, openElem,
         isMoving, dragIndex, dropIndex, movedIndex, ghostStyle,
         onAction, onGrab,
     } = props;
@@ -121,6 +130,9 @@ function MediaTable(props) {
     // Returns the classes of a Row, used to drag and to drop
     const getRowClass = (index) => {
         const result = [ `media-item-${index}` ];
+        if (isAdded(items[index])) {
+            result.push("media-added");
+        }
         if (index === movedIndex) {
             result.push("media-hidden");
         }
@@ -242,6 +254,7 @@ MediaTable.propTypes = {
     canEdit    : PropTypes.bool,
     extraSpace : PropTypes.number,
     isSelected : PropTypes.func.isRequired,
+    isAdded    : PropTypes.func.isRequired,
     openElem   : PropTypes.object,
     isMoving   : PropTypes.bool,
     dragIndex  : PropTypes.number,

@@ -42,7 +42,7 @@ const Section = Styled.section.attrs(({ inDialog, extraSpace }) => ({ inDialog, 
  */
 function MediaGrid(props) {
     const {
-        items, inDialog, canEdit, extraSpace, isSelected,
+        items, inDialog, canEdit, extraSpace, isSelected, isAdded,
         openElem, isMoving, dragIndex, dropIndex, movedIndex, dragStyle,
         onAction, onGrab,
     } = props;
@@ -59,7 +59,7 @@ function MediaGrid(props) {
                 return <MediaItem
                     key={index}
                     elem={elem}
-                    className={`media-item-${index}`}
+                    className={`media-item-${index} ${isAdded(elem) ? "media-added" : ""}`}
                     style={isCurrent ? dragStyle : null}
                     isHidden={index === movedIndex}
                     isMoving={isCurrent}
@@ -85,6 +85,7 @@ MediaGrid.propTypes = {
     canEdit    : PropTypes.bool,
     extraSpace : PropTypes.number,
     isSelected : PropTypes.func.isRequired,
+    isAdded    : PropTypes.func.isRequired,
     openElem   : PropTypes.object,
     isMoving   : PropTypes.bool,
     dragIndex  : PropTypes.number,

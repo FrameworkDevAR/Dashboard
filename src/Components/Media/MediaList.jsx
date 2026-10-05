@@ -24,6 +24,7 @@ const DROP_MARGIN = 16;
 const CRUMB_SPACE = 28 + GAP_SPACE;
 const DROP_SPACE  = 60 + DROP_MARGIN + GAP_SPACE;
 const TIP_SPACE   = 42 + GAP_SPACE;
+const ADDED_TIME  = 1500;
 
 // Styles
 const Container = Styled.div.attrs(({ inDialog, isCentered }) => ({ inDialog, isCentered }))`
@@ -73,9 +74,11 @@ function MediaList(props) {
 
     // The References
     const containerRef = React.useRef(null);
+    const knownRef     = React.useRef({ path : null, paths : [] });
 
     // The Current State
-    const [ openElem, setOpenElem ] = React.useState(null);
+    const [ openElem,   setOpenElem   ] = React.useState(null);
+    const [ addedPaths, setAddedPaths ] = React.useState([]);
     const [ view,     setView     ] = React.useState(localStorage.getItem("dashboard-media-view") || "grid");
     const [ sort,     setSort     ] = React.useState(localStorage.getItem("dashboard-media-sort") || "name");
 
@@ -139,6 +142,9 @@ function MediaList(props) {
         localStorage.setItem("dashboard-media-sort", newSort);
     };
 
+    // Returns true if the elem was just added
+    const isAdded = (elem) => addedPaths.includes(elem.path);
+
     // Returns true if the elem is selected
     const isSelected = (elem) => {
         if (!canSelect || elem.isBack) {
@@ -168,6 +174,31 @@ function MediaList(props) {
             resetDrag();
         }
     }, [ isLoading, items ]);
+
+    // Marks the Items added to the Directory since it was loaded, to animate them
+    React.useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+        const paths = items.map((elem) => elem.path);
+        const known = knownRef.current;
+        if (known.path === path) {
+            const added = paths.filter((elemPath) => !known.paths.includes(elemPath));
+            if (added.length) {
+                setAddedPaths(added);
+            }
+        }
+        knownRef.current = { path, paths };
+    }, [ isLoading, items ]);
+
+    // Removes the mark once the animation ends
+    React.useEffect(() => {
+        if (!addedPaths.length) {
+            return undefined;
+        }
+        const timer = window.setTimeout(() => setAddedPaths([]), ADDED_TIME);
+        return () => window.clearTimeout(timer);
+    }, [ addedPaths ]);
 
     // Scrolls to the selected Item, as the list can start with it out of the view
     React.useEffect(() => {
@@ -236,6 +267,7 @@ function MediaList(props) {
                 canEdit={canEdit}
                 extraSpace={extraSpace}
                 isSelected={isSelected}
+                isAdded={isAdded}
                 openElem={openElem}
                 isMoving={isMoving}
                 dragIndex={dragIndex}
@@ -250,6 +282,7 @@ function MediaList(props) {
                 canEdit={canEdit}
                 extraSpace={extraSpace}
                 isSelected={isSelected}
+                isAdded={isAdded}
                 openElem={openElem}
                 isMoving={isMoving}
                 dragIndex={dragIndex}

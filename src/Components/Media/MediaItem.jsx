@@ -1,6 +1,6 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
+import Styled, { keyframes } from "styled-components";
 
 // Core & Utils
 import Action               from "../../Core/Action";
@@ -14,6 +14,13 @@ import CircularLoader       from "../Loader/CircularLoader";
 
 
 
+// Animations
+const pop = keyframes`
+    from { opacity: 0; transform: scale(0.8); box-shadow: 0 0 0 3px var(--primary-color); }
+    50%  { opacity: 1; transform: scale(1.04); }
+    to   { transform: scale(1); box-shadow: 0 0 0 3px transparent; }
+`;
+
 // Styles
 const Div = Styled.div.attrs(({ isSelected, isTarget, isMoving, hasActions }) => ({ isSelected, isTarget, isMoving, hasActions }))`
     position: relative;
@@ -25,6 +32,10 @@ const Div = Styled.div.attrs(({ isSelected, isTarget, isMoving, hasActions }) =>
     overflow: hidden;
     cursor: pointer;
     transition: all 0.2s;
+
+    &.media-added {
+        animation: ${pop} 1.2s ease-out;
+    }
 
     &:hover {
         border-color: var(--input-border-hover);
