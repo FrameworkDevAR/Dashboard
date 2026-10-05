@@ -16,9 +16,9 @@ import CircularLoader       from "../Loader/CircularLoader";
 
 // Animations
 const pop = keyframes`
-    from { opacity: 0; transform: scale(0.8); box-shadow: 0 0 0 3px var(--primary-color); }
-    50%  { opacity: 1; transform: scale(1.04); }
-    to   { transform: scale(1); box-shadow: 0 0 0 3px transparent; }
+    from { opacity: 0; transform: scale(0.85); box-shadow: 0 0 0 3px var(--primary-color); }
+    50%  { opacity: 1; transform: scale(1); }
+    to   { box-shadow: 0 0 0 3px transparent; }
 `;
 
 // Styles
