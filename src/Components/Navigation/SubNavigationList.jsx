@@ -25,16 +25,19 @@ const Ul = Styled.ul.attrs(({ isSmallNav }) => ({ isSmallNav }))`
  * @returns {React.ReactElement}
  */
 function SubNavigationList(props) {
-    const { isHidden, className, onAction, onClose, children } = props;
+    const { isHidden, className, listID, onGrab, onAction, onClose, children } = props;
 
     const { smallNav } = Store.useState("core");
     const isForMenu    = Responsive.useIsForMenu();
     const isSmallNav   = smallNav && !isForMenu;
 
 
-    // Clone the Children
-    const items = Utils.cloneChildren(children, () => ({
+    // Clone the Children. When the Items can be dragged, the ones with an ID can be grabbed,
+    // and the List says its ID, so they can be dropped in it or taken from it
+    const canDrag = Boolean(onGrab) && listID !== undefined && !isSmallNav;
+    const items   = Utils.cloneChildren(children, (child) => ({
         onAction, onClose,
+        ...(canDrag && child.props.elemID !== undefined && { onGrab }),
     }));
 
 
@@ -42,7 +45,11 @@ function SubNavigationList(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Ul className={className} isSmallNav={isSmallNav}>
+    return <Ul
+        className={className}
+        isSmallNav={isSmallNav}
+        data-nav-list={canDrag ? listID : undefined}
+    >
         {items}
     </Ul>;
 }
@@ -54,6 +61,8 @@ function SubNavigationList(props) {
 SubNavigationList.propTypes = {
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
+    listID    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    onGrab    : PropTypes.func,
     onAction  : PropTypes.func,
     onClose   : PropTypes.func,
     children  : PropTypes.any,

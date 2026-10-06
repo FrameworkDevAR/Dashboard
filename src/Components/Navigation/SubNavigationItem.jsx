@@ -11,13 +11,24 @@ import Store                from "../../Core/Store";
 // Components
 import MenuLink             from "../Link/MenuLink";
 import IconLink             from "../Link/IconLink";
+import Icon                 from "../Common/Icon";
 
 
 
 // Styles
-const Content = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
+const Content = Styled.div.attrs(({ hideActions, canDrag }) => ({ hideActions, canDrag }))`
     position: relative;
     margin-bottom: 4px;
+
+    ${(props) => props.canDrag && `
+        &:hover > .subnav-drag {
+            display: flex;
+        }
+        &:hover > .link .link-preicon {
+            opacity: 0;
+            cursor: grab;
+        }
+    `}
 
     ${(props) => props.hideActions && `
         &:hover > .subnav-actions {
@@ -27,7 +38,7 @@ const Content = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
     `}
 `;
 
-const NavMenu = Styled(MenuLink)`
+const NavMenu = Styled(MenuLink).attrs(({ actionsAmount }) => ({ actionsAmount }))`
     --link-icon: 18px;
     --link-color: var(--navigation-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
@@ -44,6 +55,22 @@ const NavMenu = Styled(MenuLink)`
         margin-left: 0;
         margin-right: -4px;
     }
+
+    ${(props) => props.actionsAmount > 0 && `
+        padding-right: calc(10px + ${props.actionsAmount} * 20px);
+    `}
+`;
+
+const DragHandle = Styled(Icon)`
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    z-index: 1;
+    pointer-events: none;
+    color: var(--navigation-color, var(--title-color));
+    font-size: 18px;
+    transform: translateY(-50%);
 `;
 
 const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
@@ -71,7 +98,7 @@ function SubNavigationItem(props) {
     const {
         action, isSelected, message, url, href, emoji, icon, iconColor, afterIcon,
         amount, badge, onAction, onClick, onClose, noClose,
-        hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, children,
+        hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, onGrab, children,
     } = props;
 
 
@@ -115,6 +142,17 @@ function SubNavigationItem(props) {
         e.preventDefault();
     };
 
+    // Handles the Grab of the Item, which can be taken from any place but its Actions. The drag
+    // only starts once the mouse moves, so a click still opens it, and the default is prevented
+    // so the browser does not drag the link or select its text instead
+    const handleGrab = (e) => {
+        if (e.target.closest(".subnav-actions")) {
+            return;
+        }
+        e.preventDefault();
+        onGrab(e, elemID);
+    };
+
     // Handles the Tooltip
     const handleTooltip = () => {
         if (isSmallNav) {
@@ -125,11 +163,26 @@ function SubNavigationItem(props) {
 
     // Variables
     const hasActions = !isSmallNav && (canEdit || canDelete || canCollapse);
+    const canDrag    = !isSmallNav && Boolean(onGrab);
+
+    // The Actions are drawn over the end of the Link, so the After Icon is moved before them
+    let actionsAmount = 0;
+    if (hasActions && !hideActions && afterIcon) {
+        actionsAmount = [ canCollapse, canEdit, canDelete ].filter(Boolean).length;
+    }
 
 
     // Do the Render
-    return <li>
-        <Content hideActions={hideActions}>
+    return <li data-nav-item={canDrag ? elemID : undefined}>
+        <Content
+            hideActions={hideActions}
+            canDrag={canDrag}
+            onMouseDown={canDrag ? handleGrab : undefined}
+        >
+            {canDrag && <DragHandle
+                className="subnav-drag"
+                icon="drag"
+            />}
             <NavMenu
                 passedRef={elementRef}
                 variant="light"
@@ -140,6 +193,7 @@ function SubNavigationItem(props) {
                 icon={icn}
                 iconColor={iconColor}
                 afterIcon={afterIcon}
+                actionsAmount={actionsAmount}
                 onClick={handleClick}
                 amount={amount}
                 badge={badge}
@@ -203,6 +257,7 @@ SubNavigationItem.propTypes = {
     canCollapse : PropTypes.bool,
     isCollapsed : PropTypes.bool,
     elemID      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    onGrab      : PropTypes.func,
     children    : PropTypes.any,
 };
 
