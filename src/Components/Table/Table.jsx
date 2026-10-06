@@ -74,7 +74,7 @@ const Loading = Styled(Wrapper)`
     overflow: hidden;
 `;
 
-const Container = Styled.table.attrs(({ isEditable, totalWidth, hasRadius, hasScroll }) => ({ isEditable, totalWidth, hasRadius, hasScroll }))`
+const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll }) => ({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll }))`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -87,6 +87,24 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, hasRadius, hasSc
 
     ${(props) => props.isEditable && `
         min-width: calc(${props.totalWidth}px + var(--table-checks-width) + var(--table-actions-width));
+    `}
+
+    ${(props) => props.minWidth && !props.isEditable && `
+        min-width: ${props.minWidth}px;
+    `}
+
+    ${(props) => props.minWidth && !props.isEditable && props.hasActions && `
+        tr > th:last-child,
+        tr > td:last-child {
+            position: sticky;
+            right: 0;
+            z-index: 1;
+        }
+        tr > th:last-child {
+            background-color: var(--table-background);
+            border-top-right-radius: var(--table-border-radius);
+            border-bottom-right-radius: var(--table-border-radius);
+        }
     `}
 
     ${(props) => props.hasRadius && `
@@ -115,7 +133,7 @@ function Table(props) {
         isHidden, className, sort, fetch, isLoading, none, hideEmpty,
         noClick, onRowClick, inDialog, hasFade, hasFilter, statsAmount, hasTabs, hasAlert,
         noSorting, notFixed, columnData, onColumnEdit,
-        checked, setChecked, hasCheckAll, extraSpace, children,
+        checked, setChecked, hasCheckAll, extraSpace, minWidth, children,
     } = props;
 
     // The References
@@ -432,6 +450,8 @@ function Table(props) {
             className={className}
             isEditable={isEditable}
             totalWidth={totalWidth}
+            minWidth={minWidth}
+            hasActions={hasActions}
             hasRadius={hasRadius}
             hasScroll={hasScroll}
         >
@@ -496,6 +516,7 @@ Table.propTypes = {
     setChecked   : PropTypes.func,
     hasCheckAll  : PropTypes.bool,
     extraSpace   : PropTypes.number,
+    minWidth     : PropTypes.number,
     children     : PropTypes.any,
 };
 
@@ -519,6 +540,7 @@ Table.defaultProps = {
     columnData  : [],
     hasCheckAll : false,
     extraSpace  : 0,
+    minWidth    : 0,
 };
 
 export default Table;
