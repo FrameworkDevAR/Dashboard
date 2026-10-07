@@ -14,7 +14,10 @@ const Container = Styled(AccordionList).attrs(({ withSpacing }) => ({ withSpacin
     min-height: 0;
     overflow: auto;
 
-    ${(props) => props.withSpacing && "padding: 16px;"}
+    ${(props) => props.withSpacing ? "padding: 16px;" : `
+        margin-right: -4px;
+        padding-right: 4px;
+    `}
 `;
 
 
