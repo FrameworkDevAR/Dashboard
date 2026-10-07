@@ -12,6 +12,7 @@ import ChooserInput         from "../InputType/ChooserInput";
 import CodeInput            from "../InputType/CodeInput";
 import ColorInput           from "../InputType/ColorInput";
 import DoubleInput          from "../InputType/DoubleInput";
+import EditorInput          from "../InputType/EditorInput";
 import EmailsInput          from "../InputType/EmailsInput";
 import EmojiInput           from "../InputType/EmojiInput";
 import FieldInput           from "../InputType/FieldInput";
@@ -55,6 +56,8 @@ function Input(props) {
         return <ColorInput {...props} />;
     case InputType.DOUBLE:
         return <DoubleInput {...props} />;
+    case InputType.EDITOR:
+        return <EditorInput {...props} />;
     case InputType.EMAILS:
         return <EmailsInput {...props} />;
     case InputType.EMOJI:

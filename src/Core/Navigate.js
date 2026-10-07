@@ -38,6 +38,14 @@ function init(newAppUrl, params) {
     }
 }
 
+/**
+ * Returns the Url of the App, without the slash at the end
+ * @returns {string}
+ */
+function getAppUrl() {
+    return appUrl.replace(/\/$/, "");
+}
+
 
 
 /**
@@ -479,6 +487,7 @@ function reload(...args) {
 // The public API
 export default {
     init,
+    getAppUrl,
 
     useParams,
     useOneParam,
