@@ -12,7 +12,10 @@ import Backdrop             from "../Common/Backdrop";
 import TabList              from "../Tab/TabList";
 
 // Module Variables
-let dialogLevel = 0;
+// The open Dialogs in the order they opened, as only the last one closes. A Dialog can
+// open in the same render that another one closes, and a count of the open ones would
+// end up out of order with the level that each one took
+const openDialogs = [];
 
 
 
@@ -116,12 +119,26 @@ function Dialog(props) {
     // The References
     const contentRef   = React.useRef(null);
     const savedHandler = React.useRef(null);
+    const dialogRef    = React.useRef({});
 
     // The Current State
     const [ level,     setLevel   ] = React.useState(0);
     const [ opened,    setOpened  ] = React.useState(false);
     const [ isClosing, setClosing ] = React.useState(false);
 
+
+    // Returns true if this is the Dialog on top of the others
+    const isOnTop = () => {
+        return openDialogs[openDialogs.length - 1] === dialogRef.current;
+    };
+
+    // Removes the Dialog from the open ones
+    const removeDialog = () => {
+        const index = openDialogs.indexOf(dialogRef.current);
+        if (index > -1) {
+            openDialogs.splice(index, 1);
+        }
+    };
 
     // Handles the Dialog Close from the Backdrop
     const handleBackClose = () => {
@@ -133,7 +150,7 @@ function Dialog(props) {
 
     // Handles the Dialog Close
     const handleClose = () => {
-        if (dontClose || isClosing || dialogLevel !== level) {
+        if (dontClose || isClosing || !isOnTop()) {
             return;
         }
 
@@ -147,7 +164,7 @@ function Dialog(props) {
 
     // Handle the Key
     const handleKey = (e) => {
-        if (!open || isClosing || dialogLevel !== level) {
+        if (!open || isClosing || !isOnTop()) {
             return;
         }
 
@@ -183,18 +200,26 @@ function Dialog(props) {
         const eventListener = (e) => savedHandler.current(e);
 
         if (open) {
-            dialogLevel += 1;
-            setLevel(dialogLevel);
+            if (!isOnTop()) {
+                removeDialog();
+                openDialogs.push(dialogRef.current);
+            }
+            setLevel(openDialogs.length);
             setOpened(true);
             window.addEventListener("keyup", eventListener);
         } else if (opened) {
-            dialogLevel -= 1;
+            removeDialog();
             setOpened(false);
             setLevel(0);
             window.removeEventListener("keyup", eventListener);
         }
         return () => window.removeEventListener("keyup", eventListener);
     }, [ open ]);
+
+    // A Dialog that is removed while open is no longer on top of the others
+    React.useEffect(() => {
+        return () => removeDialog();
+    }, []);
 
 
 
