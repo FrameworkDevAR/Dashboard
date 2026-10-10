@@ -40,7 +40,7 @@ function EditDialog(props) {
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryLoading, onSecondary,
         tertiary, tertiaryVariant, onTertiary,
-        aside, asideWidth, children,
+        aside, asideWidth, keepAside, children,
     } = props;
 
 
@@ -57,6 +57,7 @@ function EditDialog(props) {
         dontBackClose
         aside={aside}
         asideWidth={asideWidth}
+        keepAside={keepAside}
     >
         <DialogHeader message={title} icon={icon}>
             {header}
@@ -149,6 +150,7 @@ EditDialog.propTypes = {
     onTertiary       : PropTypes.func,
     aside            : PropTypes.any,
     asideWidth       : PropTypes.number,
+    keepAside        : PropTypes.bool,
     children         : PropTypes.any,
 };
 

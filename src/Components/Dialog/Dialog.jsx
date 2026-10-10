@@ -111,7 +111,7 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
 function Dialog(props) {
     const {
         open, className, isLoading, loadingMessage,
-        width, isWide, isNarrow, noTab, zIndex, aside, asideWidth,
+        width, isWide, isNarrow, noTab, zIndex, aside, asideWidth, keepAside,
         dontClose, dontBackClose, onClose, hasFooter, children,
     } = props;
 
@@ -230,7 +230,8 @@ function Dialog(props) {
 
 
     // Variables
-    const showAside  = open && !isClosing && !isLoading;
+    // The Aside hides while the Dialog loads, unless it is kept, as when saving
+    const showAside  = open && !isClosing && (!isLoading || keepAside);
     const items      = [];
     let   hasTabs    = false;
     let   withFooter = Boolean(hasFooter);
@@ -303,6 +304,7 @@ Dialog.propTypes = {
     hasFooter      : PropTypes.bool,
     aside          : PropTypes.any,
     asideWidth     : PropTypes.number,
+    keepAside      : PropTypes.bool,
     children       : PropTypes.any,
 };
 
@@ -321,6 +323,7 @@ Dialog.defaultProps = {
     noTab         : false,
     isLoading     : false,
     asideWidth    : 320,
+    keepAside     : false,
 };
 
 export default Dialog;
