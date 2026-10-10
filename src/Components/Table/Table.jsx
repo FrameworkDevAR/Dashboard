@@ -14,9 +14,11 @@ import TableBody            from "../Table/TableBody";
 import TableFoot            from "../Table/TableFoot";
 import TablePaging          from "../Table/TablePaging";
 import TableActionList      from "../Table/TableActionList";
+import TableActionLine      from "../Table/TableActionLine";
 import TableEdit            from "../Table/TableEdit";
 import Menu                 from "../Menu/Menu";
 import MenuItem             from "../Menu/MenuItem";
+import MenuLine             from "../Menu/MenuLine";
 import NoneAvailable        from "../Common/NoneAvailable";
 import CircularLoader       from "../Loader/CircularLoader";
 import ScrollFade           from "../Common/ScrollFade";
@@ -352,6 +354,13 @@ function Table(props) {
 
         if (child.type === TableActionList) {
             for (const tableAction of Utils.getChildren(child.props.children)) {
+                if (tableAction.type === TableActionLine) {
+                    if (!tableAction.props.isHidden) {
+                        actions.push({ isLine : true });
+                    }
+                    continue;
+                }
+
                 const action = { ...tableAction.props };
                 action.act = Action.get(action.action);
                 if (!action.isHidden && ((action.act.isCCED && child.props.canEdit) || !action.act.isCCED)) {
@@ -366,6 +375,19 @@ function Table(props) {
                 }
             }
         }
+    }
+
+    // The Lines only separate the Actions that are shown, so the ones at the start, at the
+    // end or next to another Line are dropped, as the Actions around them can be hidden
+    const menuItems = [];
+    for (const action of actions) {
+        const lastItem = menuItems[menuItems.length - 1];
+        if (!action.isLine || (lastItem && !lastItem.isLine)) {
+            menuItems.push(action);
+        }
+    }
+    if (menuItems.length && menuItems[menuItems.length - 1].isLine) {
+        menuItems.pop();
     }
 
 
@@ -471,12 +493,12 @@ function Table(props) {
             iconHeight={iconHeight}
             onClose={handleMenuClose}
         >
-            {actions.map((elem, index) => <MenuItem
+            {menuItems.map((elem, index) => (elem.isLine ? <MenuLine key={index} /> : <MenuItem
                 key={index}
                 icon={elem.icon || elem.act.icon}
                 message={elem.message || elem.act.message}
                 onClick={() => handleClick(elem, menuID)}
-            />)}
+            />))}
         </Menu>
 
         <TableEdit
