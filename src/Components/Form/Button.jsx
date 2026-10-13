@@ -14,21 +14,22 @@ import CircularLoader       from "../Loader/CircularLoader";
 
 // Variants
 const Variant = {
-    NONE            : "none",
-    PRIMARY         : "primary",
-    CANCEL          : "cancel",
-    SUCCESS         : "success",
-    ERROR           : "error",
-    ACCENT          : "accent",
-    WHITE           : "white",
-    OUTLINED        : "outlined",
-    OUTLINED_WHITE  : "outlined-white",
-    OUTLINED_ACCENT : "outlined-accent",
-    OUTLINED_ERROR  : "outlined-error",
-    OUTLINED_GRAY   : "outlined-gray",
-    OUTLINED_DASHED : "outlined-dashed",
-    MENU            : "menu",
-    ICON            : "icon",
+    NONE             : "none",
+    PRIMARY          : "primary",
+    CANCEL           : "cancel",
+    SUCCESS          : "success",
+    ERROR            : "error",
+    ACCENT           : "accent",
+    WHITE            : "white",
+    OUTLINED         : "outlined",
+    OUTLINED_WHITE   : "outlined-white",
+    OUTLINED_ACCENT  : "outlined-accent",
+    OUTLINED_SUCCESS : "outlined-success",
+    OUTLINED_ERROR   : "outlined-error",
+    OUTLINED_GRAY    : "outlined-gray",
+    OUTLINED_DASHED  : "outlined-dashed",
+    MENU             : "menu",
+    ICON             : "icon",
 };
 
 
@@ -214,6 +215,23 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
             --button-background: var(--content-color);
             --button-hover-color: white;
             --button-hover-background: var(--accent-color);
+        `;
+
+        case Variant.OUTLINED_SUCCESS: return `
+            --button-color: var(--success-color);
+            --button-border: var(--success-border, var(--success-color));
+            --button-background: var(--content-color);
+            --button-hover-color: white;
+            --button-hover-border: var(--success-color);
+            --button-hover-background: var(--success-color);
+
+            &:disabled,
+            &:disabled:hover,
+            &:disabled:focus,
+            &:disabled:active {
+                color: var(--darkest-gray);
+                background-color: var(--content-color);
+            }
         `;
 
         case Variant.OUTLINED_ERROR: return `

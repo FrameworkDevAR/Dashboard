@@ -63,6 +63,15 @@ function useSaving() {
     return { saving, startSaving, endSaving };
 }
 
+/**
+ * Returns a State for the values or the errors of the Options, which start empty
+ * @returns {[ any, Function ]}
+ */
+function useValues() {
+    // Their fields are only known once they load, so the State has no type
+    return React.useState({});
+}
+
 
 
 // The public API
@@ -71,4 +80,5 @@ export default {
     Status,
 
     useSaving,
+    useValues,
 };
