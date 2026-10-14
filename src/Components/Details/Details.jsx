@@ -49,6 +49,22 @@ const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternal
         padding-bottom: 0px;
     `}
 
+    ${(props) => !props.stickyBottom && `
+        &::after {
+            content: "";
+            position: sticky;
+            bottom: calc(-1 * var(--details-spacing));
+            flex-shrink: 0;
+            height: var(--details-fade);
+            margin-top: calc(-1 * var(--details-fade));
+            margin-bottom: calc(-1 * var(--details-spacing));
+            background: linear-gradient(transparent, var(--content-color));
+            opacity: var(--details-fade-bottom);
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+    `}
+
     @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
         & {
             display: none;
