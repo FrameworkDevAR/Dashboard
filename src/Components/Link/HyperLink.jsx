@@ -43,22 +43,16 @@ const Link = Styled.a.attrs(({ variant }) => ({ variant }))`
 `;
 
 const ColoredLink = Styled(Link)`
-    &::before {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 1px;
-        bottom: 0;
-        left: 0;
-        visibility: hidden;
-        transform: scaleX(0);
-        transition: all 0.2s ease-in-out;
-        background-color: var(--link-hover, var(--link-color));
-    }
-    &:hover::before,
-    &:focus::before {
-        visibility: visible;
-        transform: scaleX(1);
+    background-image: linear-gradient(var(--link-hover, var(--link-color)), var(--link-hover, var(--link-color)));
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 0% 1px;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+
+    &:hover,
+    &:focus {
+        background-size: 100% 1px;
     }
 
     ${(props) => {
