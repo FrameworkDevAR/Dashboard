@@ -2,6 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Core & Utils
+import Utils                from "../../Utils/Utils";
+
 
 
 // Styles
@@ -157,25 +160,7 @@ function ScrollFade(props) {
         setShowTop(node.scrollTop > 1);
         setShowBottom(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
     };
-
-    React.useEffect(() => {
-        const node = passedRef.current;
-        if (!node) {
-            return undefined;
-        }
-        node.addEventListener("scroll", updateFades);
-        const observer = new ResizeObserver(updateFades);
-        observer.observe(node);
-        return () => {
-            node.removeEventListener("scroll", updateFades);
-            observer.disconnect();
-        };
-    }, []);
-
-    // The content can change without resizing the node, so this runs on every render
-    React.useEffect(() => {
-        updateFades();
-    });
+    Utils.useScrollUpdate(passedRef, updateFades);
 
 
     // Do the Render

@@ -146,25 +146,7 @@ function Details(props) {
             setAtBottom(node.scrollHeight - node.scrollTop - node.clientHeight <= 1);
         }
     };
-
-    React.useEffect(() => {
-        const node = contentRef.current;
-        if (!node) {
-            return undefined;
-        }
-        node.addEventListener("scroll", updateFades);
-        const observer = new ResizeObserver(updateFades);
-        observer.observe(node);
-        return () => {
-            node.removeEventListener("scroll", updateFades);
-            observer.disconnect();
-        };
-    }, [ isShown ]);
-
-    // The content changes without resizing the node, so this runs on every render
-    React.useEffect(() => {
-        updateFades();
-    });
+    Utils.useScrollUpdate(contentRef, updateFades, [ isShown ]);
 
 
     // Set/Unset the Details on Load/Unload, and if they can be collapsed from the Top Bar

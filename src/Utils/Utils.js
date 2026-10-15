@@ -212,6 +212,39 @@ function scrollToBottom(ref, instant, timeout = 0) {
 }
 
 /**
+ * A Hook to call the given function when the element scrolls, resizes or renders
+ * @param {React.RefObject<HTMLElement>} ref
+ * @param {Function}                     onUpdate
+ * @param {Array=}                       deps
+ * @returns {void}
+ */
+function useScrollUpdate(ref, onUpdate, deps = []) {
+    // The listeners are only added again when the deps change, so they call the latest function
+    const updateRef = React.useRef(onUpdate);
+    updateRef.current = onUpdate;
+
+    React.useEffect(() => {
+        const node = ref.current;
+        if (!node) {
+            return undefined;
+        }
+        const handleUpdate = () => updateRef.current();
+        node.addEventListener("scroll", handleUpdate);
+        const observer = new ResizeObserver(handleUpdate);
+        observer.observe(node);
+        return () => {
+            node.removeEventListener("scroll", handleUpdate);
+            observer.disconnect();
+        };
+    }, deps);
+
+    // The content can change without resizing the element, so this runs on every render
+    React.useEffect(() => {
+        updateRef.current();
+    });
+}
+
+/**
  * Returns the Caret Position
  * @param {HTMLInputElement|HTMLTextAreaElement} inputElement
  * @returns {{top: number, bottom: number, left: number}}
@@ -1933,6 +1966,7 @@ export default {
     inBounds,
     inRef,
     scrollToBottom,
+    useScrollUpdate,
     getCaretPosition,
     insertText,
     formatText,
