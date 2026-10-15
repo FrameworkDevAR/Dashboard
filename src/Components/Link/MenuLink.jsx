@@ -244,7 +244,7 @@ function MenuLink(props) {
         isSelected={isSelected}
         isDisabled={isDisabled}
         isSmall={isSmall}
-        href={isButton ? undefined : Navigate.getUrl(props)}
+        href={isButton ? undefined : Navigate.getHref(props)}
         target={target}
         onClick={onClick}
         onMouseEnter={handleMouseEnter}

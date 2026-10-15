@@ -172,7 +172,7 @@ function IconLink(props) {
         isTiny={isTiny}
         size={size}
         withMark={withMark}
-        href={isDisabled ? undefined : Navigate.getUrl(props)}
+        href={isDisabled ? undefined : Navigate.getHref(props)}
         target={target}
         onClick={handleClick}
         onTouchEnd={onTouchEnd}

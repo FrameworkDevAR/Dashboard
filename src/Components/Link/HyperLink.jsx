@@ -162,7 +162,7 @@ function HyperLink(props) {
         ref={passedRef}
         className={`link ${className}`}
         variant={variant}
-        href={Navigate.getUrl(props)}
+        href={Navigate.getHref(props)}
         target={target}
         onClick={onClick}
     >

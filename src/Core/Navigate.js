@@ -21,6 +21,7 @@ let hasUnsaved = false;
 
 // All the params
 let   appUrl     = "";
+let   basePath   = "";
 const paramTypes = {};
 
 
@@ -36,6 +37,28 @@ function init(newAppUrl, params) {
     for (const [ key, value ] of Object.entries(params)) {
         paramTypes[key] = value;
     }
+}
+
+/**
+ * Sets the Base Path where the Router is mounted, as the Router only adds it to its own
+ * navigation, and the links and the new tabs need it too
+ * @param {string} baseUrl
+ * @returns {void}
+ */
+function setBasePath(baseUrl) {
+    basePath = (baseUrl || "").replace(/\/$/, "");
+}
+
+/**
+ * Returns the given Url with the Base Path when it is an internal one, like "/campaigns"
+ * @param {string} url
+ * @returns {string}
+ */
+function withBase(url) {
+    if (!basePath || typeof url !== "string" || !url.startsWith("/") || url.startsWith("//")) {
+        return url;
+    }
+    return `${basePath}${url}`;
 }
 
 /**
@@ -242,6 +265,15 @@ function getUrl(data) {
 }
 
 /**
+ * Returns the Url for the href of a link, with the Base Path
+ * @param {object} data
+ * @returns {string}
+ */
+function getHref(data) {
+    return withBase(getUrl(data));
+}
+
+/**
  * Returns the Email Url
  * @param {string} email
  * @returns {string}
@@ -379,11 +411,11 @@ function useGotoUrl() {
             return true;
         }
         if (target === "_self") {
-            window.location.href = url;
+            window.location.href = withBase(url);
             return true;
         }
         if (target === "_blank") {
-            window.open(url);
+            window.open(withBase(url));
             return true;
         }
         return false;
@@ -455,7 +487,7 @@ function useLink(props) {
  */
 function gotoBlank(...args) {
     const url = NLS.baseUrl(...args);
-    window.open(url);
+    window.open(withBase(url));
 }
 
 /**
@@ -487,6 +519,7 @@ function reload(...args) {
 // The public API
 export default {
     init,
+    setBasePath,
     getAppUrl,
 
     useParams,
@@ -503,6 +536,7 @@ export default {
 
     isUrl,
     getUrl,
+    getHref,
     getEmail,
     getPhone,
     getWhatsApp,

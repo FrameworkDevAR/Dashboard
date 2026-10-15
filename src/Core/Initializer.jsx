@@ -18,7 +18,7 @@ import Store                from "../Core/Store";
  * @returns {React.ReactElement}
  */
 function Initializer(props) {
-    const { url, apiUrl, routeUrl, actions, params, maxSize, maxVideoSize } = props;
+    const { url, baseUrl, apiUrl, routeUrl, actions, params, maxSize, maxVideoSize } = props;
 
     const { error } = Store.useState("core");
 
@@ -48,6 +48,9 @@ function Initializer(props) {
     // The sizes are set while rendering, as the pages below check them in their first render
     Files.init(maxSize, maxVideoSize);
 
+    // The links need the Base Path from their first render
+    Navigate.setBasePath(baseUrl);
+
     // Initialize the Modules once
     React.useEffect(() => {
         Ajax.init(apiUrl, routeUrl, onResult, onError);
@@ -68,6 +71,7 @@ function Initializer(props) {
  */
 Initializer.propTypes = {
     url          : PropTypes.string,
+    baseUrl      : PropTypes.string,
     apiUrl       : PropTypes.string,
     routeUrl     : PropTypes.string,
     actions      : PropTypes.array,
@@ -82,6 +86,7 @@ Initializer.propTypes = {
  */
 Initializer.defaultProps = {
     url          : "",
+    baseUrl      : "",
     apiUrl       : "",
     routeUrl     : "",
     actions      : [],
