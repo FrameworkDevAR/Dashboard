@@ -19,7 +19,7 @@ import CheckboxInput        from "../InputType/CheckboxInput";
 function TableRow(props) {
     const {
         className, hasChecks, hasActions, isEditable, isSelected, elemID,
-        handleRowClick, handleMenuOpen, columns, checked, setChecked,
+        handleRowClick, handleRowDoubleClick, handleMenuOpen, columns, checked, setChecked,
         onMouseDown, children,
     } = props;
 
@@ -30,6 +30,14 @@ function TableRow(props) {
     // Handles the Row Click
     const handleClick = (e) => {
         handleRowClick(elemID, e);
+    };
+
+    // Handles the Row Double Click, which also selects a word of the row, so it is unselected
+    const handleDoubleClick = () => {
+        if (handleRowDoubleClick) {
+            Utils.unselectAll();
+            handleRowDoubleClick(elemID);
+        }
     };
 
     // Handles the Check
@@ -76,6 +84,7 @@ function TableRow(props) {
     return <TableRowCnt
         className={className}
         onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
         onMouseDown={onMouseDown}
         onContextMenu={handleContextMenu}
         hasChecks={hasChecks}
@@ -112,19 +121,20 @@ function TableRow(props) {
  * @type {object} propTypes
  */
 TableRow.propTypes = {
-    className      : PropTypes.string,
-    hasChecks      : PropTypes.bool,
-    hasActions     : PropTypes.bool,
-    isEditable     : PropTypes.bool,
-    isSelected     : PropTypes.bool,
-    elemID         : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
-    handleRowClick : PropTypes.func,
-    onMouseDown    : PropTypes.func,
-    handleMenuOpen : PropTypes.func,
-    columns        : PropTypes.array,
-    checked        : PropTypes.array,
-    setChecked     : PropTypes.func,
-    children       : PropTypes.any,
+    className            : PropTypes.string,
+    hasChecks            : PropTypes.bool,
+    hasActions           : PropTypes.bool,
+    isEditable           : PropTypes.bool,
+    isSelected           : PropTypes.bool,
+    elemID               : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    handleRowClick       : PropTypes.func,
+    handleRowDoubleClick : PropTypes.func,
+    onMouseDown          : PropTypes.func,
+    handleMenuOpen       : PropTypes.func,
+    columns              : PropTypes.array,
+    checked              : PropTypes.array,
+    setChecked           : PropTypes.func,
+    children             : PropTypes.any,
 };
 
 /**

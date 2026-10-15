@@ -52,7 +52,7 @@ function TableBody(props) {
     const {
         notFixed, isEditable, hasChecks,
         hasActions, hasPaging, hasFooter,
-        handleRowClick, handleMenuOpen, columns,
+        handleRowClick, handleRowDoubleClick, handleMenuOpen, columns,
         checked, setChecked, children,
     } = props;
 
@@ -61,7 +61,7 @@ function TableBody(props) {
     const items = Utils.cloneChildren(children, () => ({
         hasChecks, hasActions, isEditable,
         columns, checked, setChecked,
-        handleRowClick, handleMenuOpen,
+        handleRowClick, handleRowDoubleClick, handleMenuOpen,
     }));
 
 
@@ -79,18 +79,19 @@ function TableBody(props) {
  * @type {object} propTypes
  */
 TableBody.propTypes = {
-    notFixed       : PropTypes.bool,
-    isEditable     : PropTypes.bool,
-    hasChecks      : PropTypes.bool,
-    hasActions     : PropTypes.bool,
-    hasPaging      : PropTypes.bool,
-    hasFooter      : PropTypes.bool,
-    handleRowClick : PropTypes.func,
-    handleMenuOpen : PropTypes.func,
-    columns        : PropTypes.array,
-    checked        : PropTypes.array,
-    setChecked     : PropTypes.func,
-    children       : PropTypes.node,
+    notFixed             : PropTypes.bool,
+    isEditable           : PropTypes.bool,
+    hasChecks            : PropTypes.bool,
+    hasActions           : PropTypes.bool,
+    hasPaging            : PropTypes.bool,
+    hasFooter            : PropTypes.bool,
+    handleRowClick       : PropTypes.func,
+    handleRowDoubleClick : PropTypes.func,
+    handleMenuOpen       : PropTypes.func,
+    columns              : PropTypes.array,
+    checked              : PropTypes.array,
+    setChecked           : PropTypes.func,
+    children             : PropTypes.node,
 };
 
 export default TableBody;

@@ -133,7 +133,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
 function Table(props) {
     const {
         isHidden, className, sort, fetch, isLoading, none, hideEmpty,
-        noClick, onRowClick, inDialog, hasFade, hasFilter, statsAmount, hasTabs, hasAlert,
+        noClick, onRowClick, onRowDoubleClick, inDialog, hasFade, hasFilter, statsAmount, hasTabs, hasAlert,
         noSorting, notFixed, columnData, onColumnEdit,
         checked, setChecked, hasCheckAll, extraSpace, minWidth, children,
     } = props;
@@ -245,6 +245,13 @@ function Table(props) {
                 handleClick(action, elemID);
                 break;
             }
+        }
+    };
+
+    // Handles the Row Double Click
+    const handleRowDoubleClick = (elemID) => {
+        if (!noClick && onRowDoubleClick) {
+            onRowDoubleClick(elemID);
         }
     };
 
@@ -412,7 +419,7 @@ function Table(props) {
                 hasChecks, checked, setChecked,
                 hasCheckAll, isCheckedAll, isCheckedSome, handleCheckAll,
                 hasActions, isEditable, setShowEdit, handleColWidth,
-                handleRowClick, handleMenuOpen,
+                handleRowClick, handleRowDoubleClick, handleMenuOpen,
             }));
         }
     }
@@ -515,31 +522,32 @@ function Table(props) {
  * @type {object} propTypes
  */
 Table.propTypes = {
-    isHidden     : PropTypes.bool,
-    className    : PropTypes.string,
-    fetch        : PropTypes.func,
-    sort         : PropTypes.object,
-    none         : PropTypes.string,
-    hideEmpty    : PropTypes.bool,
-    isLoading    : PropTypes.bool,
-    inDialog     : PropTypes.bool,
-    hasFade      : PropTypes.bool,
-    hasFilter    : PropTypes.bool,
-    statsAmount  : PropTypes.number,
-    hasTabs      : PropTypes.bool,
-    hasAlert     : PropTypes.bool,
-    noSorting    : PropTypes.bool,
-    noClick      : PropTypes.bool,
-    onRowClick   : PropTypes.func,
-    notFixed     : PropTypes.bool,
-    columnData   : PropTypes.array,
-    onColumnEdit : PropTypes.func,
-    checked      : PropTypes.array,
-    setChecked   : PropTypes.func,
-    hasCheckAll  : PropTypes.bool,
-    extraSpace   : PropTypes.number,
-    minWidth     : PropTypes.number,
-    children     : PropTypes.any,
+    isHidden         : PropTypes.bool,
+    className        : PropTypes.string,
+    fetch            : PropTypes.func,
+    sort             : PropTypes.object,
+    none             : PropTypes.string,
+    hideEmpty        : PropTypes.bool,
+    isLoading        : PropTypes.bool,
+    inDialog         : PropTypes.bool,
+    hasFade          : PropTypes.bool,
+    hasFilter        : PropTypes.bool,
+    statsAmount      : PropTypes.number,
+    hasTabs          : PropTypes.bool,
+    hasAlert         : PropTypes.bool,
+    noSorting        : PropTypes.bool,
+    noClick          : PropTypes.bool,
+    onRowClick       : PropTypes.func,
+    onRowDoubleClick : PropTypes.func,
+    notFixed         : PropTypes.bool,
+    columnData       : PropTypes.array,
+    onColumnEdit     : PropTypes.func,
+    checked          : PropTypes.array,
+    setChecked       : PropTypes.func,
+    hasCheckAll      : PropTypes.bool,
+    extraSpace       : PropTypes.number,
+    minWidth         : PropTypes.number,
+    children         : PropTypes.any,
 };
 
 /**
