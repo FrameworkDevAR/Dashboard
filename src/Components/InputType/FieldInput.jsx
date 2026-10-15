@@ -11,6 +11,7 @@ import useDrag              from "../../Hooks/Drag";
 import InputField           from "../Form/InputField";
 import Button               from "../Form/Button";
 import InputError           from "../Input/InputError";
+import InputLabel           from "../Input/InputLabel";
 import IconLink             from "../Link/IconLink";
 import Icon                 from "../Common/Icon";
 
@@ -40,14 +41,18 @@ const Container = Styled.div.attrs(({ withBorder, isDisabled }) => ({ withBorder
     `}
 `;
 
-const Content = Styled.div.attrs(({ withTitle, withLine }) => ({ withTitle, withLine }))`
+const Content = Styled.div.attrs(({ withTitle, withLine, smallGap }) => ({ withTitle, withLine, smallGap }))`
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: ${(props) => props.withTitle ? "24px" : (props.withLine ? "20px" : "16px")};
+
+    ${(props) => props.smallGap && `
+        gap: 8px;
+    `}
 `;
 
-const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, withLine }) => ({ withSort, withRemove, withTitle, withError, withLine }))`
+const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, withLine, iconsWidth }) => ({ withSort, withRemove, withTitle, withError, withLine, iconsWidth }))`
     width: 100%;
     background-color: var(--content-color);
 
@@ -88,13 +93,13 @@ const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, wit
             "sort input remove"
             ${props.withError ? '"error error error"' : ""}
         ;
-        grid-template-columns: 16px 1fr 24px;
+        grid-template-columns: 16px 1fr ${props.iconsWidth}px;
     ` : ((!props.withTitle && props.withRemove) ? `
         grid-template-areas:
             "input remove"
             ${props.withError ? '"error error"' : ""}
         ;
-        grid-template-columns: 1fr 24px;
+        grid-template-columns: 1fr ${props.iconsWidth}px;
     ` : (!props.withTitle ? `
         grid-template-areas:
             "input"
@@ -163,6 +168,14 @@ const Actions = Styled.div`
     margin-left: auto;
 `;
 
+const Header = Styled(Item)`
+    margin-bottom: -2px;
+
+    .inputfield-label {
+        margin-bottom: 0;
+    }
+`;
+
 const Inside = Styled.div.attrs(({ columns, withTitle }) => ({ columns, withTitle }))`
     grid-area: input;
     box-sizing: border-box;
@@ -202,9 +215,8 @@ const Remove = Styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     grid-area: remove;
-    gap: 8px;
+    gap: 4px;
 `;
 
 const Error = Styled(InputError)`
@@ -236,11 +248,11 @@ const Footer = Styled.footer.attrs(({ withTitle }) => ({ withTitle }))`
  */
 function FieldInput(props) {
     const {
-        className, isDisabled, withBorder, withLine, outsideLabel,
+        className, isDisabled, withBorder, withLine, smallGap, outsideLabel, withHeader,
         name, value, indexes, addButton, onChange,
         title, getAfterTitle, columns,
         errors, maxAmount, allowEmpty, noneText,
-        isSortable, onSort, extraIcon, onExtraIcon, children,
+        isSortable, onSort, extraIcon, getExtraIcon, onExtraIcon, children,
     } = props;
 
 
@@ -428,9 +440,19 @@ function FieldInput(props) {
     const canAdd       = Boolean(!isDisabled && (maxAmount === 0 || partsRef.current.length < maxAmount));
     const canSort      = Boolean(!isDisabled && isSortable && partsRef.current.length > 1);
     const canRemove    = Boolean(!isDisabled && (allowEmpty || partsRef.current.length > 1));
-    const hasExtraIcon = Boolean(extraIcon && onExtraIcon);
+    const hasExtraIcon = Boolean((extraIcon || getExtraIcon) && onExtraIcon);
     const hasPostIcons = Boolean(!isDisabled && (canRemove || hasExtraIcon));
     const isEmpty      = Boolean(allowEmpty && noneText && !partsRef.current.length);
+    const showHeader   = Boolean(withHeader && !withTitle && partsRef.current.length);
+
+    // The icons of each row are 24px wide with a gap of 4px, and the column has a fixed
+    // width so the Header lines up with the rows
+    const iconsWidth   = hasExtraIcon ? 52 : 24;
+
+    // Returns the extra Icon of a row, which can change with its data, and its tooltip
+    const getExtra = (elem) => {
+        return getExtraIcon ? getExtraIcon(elem || {}) : { icon : extraIcon };
+    };
 
 
     // Do the Render
@@ -439,7 +461,32 @@ function FieldInput(props) {
         withBorder={withBorder}
         isDisabled={isDisabled}
     >
-        <Content withTitle={withTitle} withLine={withLine}>
+        {showHeader && <Header
+            withSort={canSort}
+            withRemove={hasPostIcons}
+            iconsWidth={iconsWidth}
+        >
+            <Inside columns={columns}>
+                {items.map((item) => {
+                    const data  = partsRef.current[0] || {};
+                    const label = item.getLabel?.(data) || item.label;
+                    if (item.hide?.(data)) {
+                        return <React.Fragment key={item.subKey || item.name} />;
+                    }
+                    return <Input key={item.subKey || item.name} columns={item.getColumns?.(data) || item.columns || 1}>
+                        {Boolean(label) && <InputLabel
+                            className="inputfield-label"
+                            isRequired={item.isRequired}
+                            message={label}
+                            withValue
+                            isOutside
+                        />}
+                    </Input>;
+                })}
+            </Inside>
+        </Header>}
+
+        <Content withTitle={withTitle} withLine={withLine} smallGap={smallGap}>
             {partsRef.current.map((elem, index) => <Item
                 key={index}
                 className="inputfield-container"
@@ -448,6 +495,7 @@ function FieldInput(props) {
                 withError={!!getError(index)}
                 withTitle={withTitle}
                 withLine={withLine && index < partsRef.current.length - 1}
+                iconsWidth={iconsWidth}
             >
                 {(canSort && !withTitle) && <Sort>
                     <Icon
@@ -470,7 +518,8 @@ function FieldInput(props) {
                         <IconLink
                             isHidden={!hasExtraIcon}
                             variant="light"
-                            icon={extraIcon}
+                            icon={getExtra(elem).icon}
+                            tooltip={getExtra(elem).tooltip}
                             onClick={() => onExtraIcon(index)}
                             isSmall
                         />
@@ -498,8 +547,9 @@ function FieldInput(props) {
                         // The label of each column goes over the field when it is asked
                         // outside. The rows that have a title of their own read as a block,
                         // so each one shows them, and the ones that do not read as a table,
-                        // where only the first does. Inside the field every row shows it
-                        const showLabel = Boolean(label) && (!outsideLabel || withTitle || index === 0);
+                        // where only the first does, or the Header when there is one. Inside
+                        // the field every row shows it
+                        const showLabel = Boolean(label) && !showHeader && (!outsideLabel || withTitle || index === 0);
 
                         if (isHidden) {
                             return <React.Fragment key={key} />;
@@ -544,7 +594,8 @@ function FieldInput(props) {
                     <IconLink
                         isHidden={!hasExtraIcon}
                         variant="light"
-                        icon={extraIcon}
+                        icon={getExtra(elem).icon}
+                        tooltip={getExtra(elem).tooltip}
                         onClick={() => onExtraIcon(index)}
                         isSmall
                     />
@@ -584,7 +635,9 @@ FieldInput.propTypes = {
     isDisabled    : PropTypes.bool,
     withBorder    : PropTypes.bool,
     withLine      : PropTypes.bool,
+    smallGap      : PropTypes.bool,
     outsideLabel  : PropTypes.bool,
+    withHeader    : PropTypes.bool,
     name          : PropTypes.string.isRequired,
     value         : PropTypes.any,
     indexes       : PropTypes.any,
@@ -600,6 +653,7 @@ FieldInput.propTypes = {
     isSortable    : PropTypes.bool,
     onSort        : PropTypes.func,
     extraIcon     : PropTypes.string,
+    getExtraIcon  : PropTypes.func,
     onExtraIcon   : PropTypes.func,
     maxAmount     : PropTypes.number,
     errors        : PropTypes.object,
@@ -615,6 +669,8 @@ FieldInput.defaultProps = {
     isDisabled : false,
     withBorder : false,
     withLine   : false,
+    smallGap   : false,
+    withHeader : false,
     addButton  : "GENERAL_ADD_FIELD",
     allowEmpty : false,
     isSortable : false,
