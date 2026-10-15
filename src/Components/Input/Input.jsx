@@ -27,6 +27,7 @@ import RadioInput           from "../InputType/RadioInput";
 import RadioboxInput        from "../InputType/RadioboxInput";
 import SelectInput          from "../InputType/SelectInput";
 import SuggestInput         from "../InputType/SuggestInput";
+import TagsInput            from "../InputType/TagsInput";
 import TextareaInput        from "../InputType/TextareaInput";
 import ToggleInput          from "../InputType/ToggleInput";
 import TextInput            from "../InputType/TextInput";
@@ -86,6 +87,8 @@ function Input(props) {
         return <SelectInput {...props} />;
     case InputType.SUGGEST:
         return <SuggestInput {...props} />;
+    case InputType.TAGS:
+        return <TagsInput {...props} />;
     case InputType.TEXTAREA:
         return <TextareaInput {...props} />;
     case InputType.TOGGLE:

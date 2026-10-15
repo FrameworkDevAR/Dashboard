@@ -27,6 +27,7 @@ const RADIO    = "radio";
 const RADIOBOX = "radiobox";
 const SELECT   = "select";
 const SUGGEST  = "suggest";
+const TAGS     = "tags";
 const TEXTAREA = "textarea";
 const TOGGLE   = "toggle";
 
@@ -205,6 +206,7 @@ export default {
     RADIOBOX,
     SELECT,
     SUGGEST,
+    TAGS,
     TEXTAREA,
     TOGGLE,
 
