@@ -215,15 +215,21 @@ function useSelect() {
     const path      = usePath();
     const childPath = useChildPath();
 
+    // The Url only selects the paths that continue after a slash, as otherwise the
+    // one of an ID would also select the ones that start with it, like 1 with 15
+    const isPrefix = (value, route) => {
+        return value === route || value.startsWith(`${route}/`);
+    };
+
     return (url, startsWith, useExact) => {
         const route = NLS.url(url);
         if (startsWith) {
-            return path.startsWith(`/${route}`);
+            return isPrefix(path, `/${route}`);
         }
         if (useExact) {
             return childPath === route;
         }
-        return childPath.startsWith(route);
+        return isPrefix(childPath, route);
     };
 }
 
