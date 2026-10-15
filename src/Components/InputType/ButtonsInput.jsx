@@ -37,6 +37,11 @@ const Container = Styled.div`
     gap: 4px;
 `;
 
+// Returns the CSS color of an option, which is a named one of the theme or a color as it is
+const getColor = (color) => {
+    return color.startsWith("#") || color.startsWith("rgb") ? color : `var(--${color}-color)`;
+};
+
 const Indicator = Styled.div.attrs(({ left, width, color, isAnimated }) => ({ left, width, color, isAnimated }))`
     position: absolute;
     top: 0;
@@ -45,7 +50,7 @@ const Indicator = Styled.div.attrs(({ left, width, color, isAnimated }) => ({ le
     width: ${(props) => props.width}px;
     translate: ${(props) => props.left}px;
     border-radius: calc(var(--input-border-radius, var(--border-radius)) - var(--buttons-padding));
-    background: ${(props) => props.color ? `color-mix(in srgb, var(--${props.color}-color) 12%, transparent)` : "var(--buttons-sel-background, rgb(237, 241, 250))"};
+    background: ${(props) => props.color ? `color-mix(in srgb, ${getColor(props.color)} 12%, transparent)` : "var(--buttons-sel-background, rgb(237, 241, 250))"};
     ${(props) => props.isAnimated && `
         transition: translate ${ANIMATION_TIME}ms cubic-bezier(0.34, 1.4, 0.4, 1), width ${ANIMATION_TIME}ms cubic-bezier(0.34, 1.4, 0.4, 1);
     `}
@@ -81,10 +86,10 @@ const Item = Styled.div.attrs(({ withTexts, isDisabled, isSelected, color }) => 
     `}
 
     ${(props) => props.isSelected && `
-        color: ${props.color ? `var(--${props.color}-color)` : "var(--black-color)"};
+        color: ${props.color ? getColor(props.color) : "var(--black-color)"};
         font-weight: 500;
         .icon {
-            color: ${props.color ? `var(--${props.color}-color)` : "var(--black-color)"};
+            color: ${props.color ? getColor(props.color) : "var(--black-color)"};
         }
     `}
 `;

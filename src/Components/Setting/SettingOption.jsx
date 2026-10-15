@@ -115,7 +115,7 @@ const Content = Styled.div.attrs(({ isWide, isNarrow, isHalf }) => ({ isWide, is
     > .btn {
         flex: 0 0 auto;
     }
-    > .inputfield-color {
+    > .inputfield-color:not(:has(.colorinput-options)) {
         flex: 1 1 140px;
         max-width: var(--setting-narrow-width);
     }

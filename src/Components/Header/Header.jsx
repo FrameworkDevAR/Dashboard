@@ -45,7 +45,7 @@ function Header(props) {
     const {
         isHidden, className, icon, iconColor, emoji,
         message, fallback, href, backIcon,
-        subTitle, subCircle, hasChanges, children,
+        subTitle, subCircle, hasChanges, tabs, children,
     } = props;
 
 
@@ -70,6 +70,7 @@ function Header(props) {
             message={subTitle}
             circle={subCircle}
         />}
+        {tabs}
         <Child className="header-child">
             {children}
         </Child>
@@ -93,6 +94,7 @@ Header.propTypes = {
     subTitle   : PropTypes.string,
     subCircle  : PropTypes.string,
     hasChanges : PropTypes.bool,
+    tabs       : PropTypes.node,
     children   : PropTypes.any,
 };
 

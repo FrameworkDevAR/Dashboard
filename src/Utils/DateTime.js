@@ -22,6 +22,7 @@ const FORMATS = {
     dayYearMedium  : "DATE_DAY_YEAR_MEDIUM",
     monthYear      : "DATE_MONTH_YEAR",
     reduced        : "DATE_REDUCED",
+    reducedShort   : "DATE_REDUCED_SHORT",
     complete       : "DATE_COMPLETE",
     completeShort  : "DATE_COMPLETE_SHORT",
     completeMonth  : "DATE_COMPLETE_MONTH",

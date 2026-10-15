@@ -121,7 +121,7 @@ function ColorInput(props) {
         withLabel={withLabel}
         withPadding
     >
-        {withOptions ? <List>
+        {withOptions ? <List className="colorinput-options">
             {options.map((color) => <Item
                 key={color}
                 color={color}
