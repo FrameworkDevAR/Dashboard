@@ -99,7 +99,7 @@ function DetailItem(props) {
     const {
         isHidden, className, textColor, gap,
         message, icon, title, prefix, prefixLine, yesNo, smallPill, showAlways,
-        tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
+        tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks,
         href, url, onClick, isEmail, isPhone, isWhatsApp, isSelected,
         hasCopy, copyValue, children,
     } = props;
@@ -125,7 +125,7 @@ function DetailItem(props) {
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
-            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay);
+            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay, tooltipBreaks);
         }
     };
 
@@ -205,6 +205,7 @@ DetailItem.propTypes = {
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
     tooltipDelay   : PropTypes.number,
+    tooltipBreaks  : PropTypes.bool,
     prefix         : PropTypes.string,
     prefixLine     : PropTypes.bool,
     yesNo          : PropTypes.oneOfType([ PropTypes.bool, PropTypes.number, PropTypes.string ]),
@@ -235,6 +236,7 @@ DetailItem.defaultProps = {
     tooltipVariant : "bottom",
     tooltipWidth   : 0,
     tooltipDelay   : 1,
+    tooltipBreaks  : false,
     target         : "_self",
     isEmail        : false,
     isPhone        : false,

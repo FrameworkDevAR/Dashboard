@@ -17,6 +17,7 @@ import Styled              from "styled-components";
 const MOVE_TIME  = 0.3;
 const OPEN_TIME  = 0.3;
 const CLOSE_TIME = 0.2;
+const EDGE_SPACE = 16;
 
 // Styles
 const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow, hasBreaks, isDark, isVisible, showDelay }) => ({ variant, width, maxWidth, toLeft, arrow, hasBreaks, isDark, isVisible, showDelay }))`
@@ -36,6 +37,33 @@ const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow,
     border-radius: var(--border-radius);
     pointer-events: none;
     z-index: var(--z-tooltip);
+
+    ${(props) => props.hasBreaks && `
+        --tooltip-color: var(--font-color);
+        --tooltip-background: var(--content-color);
+        ${props.maxWidth ? "width: max-content;" : ""}
+        padding: 10px 12px;
+        border: 1px solid var(--border-color-medium);
+        border-radius: var(--border-radius-medium);
+        box-shadow: 0 6px 20px -6px rgba(9, 30, 66, 0.2);
+
+        p {
+            margin: 0 0 8px;
+        }
+        p:last-child {
+            margin-bottom: 0;
+        }
+        ul {
+            margin: 0;
+            padding-left: 16px;
+        }
+        li + li {
+            margin-top: 4px;
+        }
+        b {
+            color: var(--title-color);
+        }
+    `}
 
     .tooltip-row {
         display: flex;
@@ -98,6 +126,46 @@ const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow,
             border-color: transparent var(--tooltip-background) transparent transparent;
         `}
     }
+
+    ${(props) => props.hasBreaks && !props.isDark && `
+        &::before {
+            width: 10px;
+            height: 10px;
+            border: 0 solid var(--border-color-medium);
+            background-color: var(--tooltip-background);
+            transform: rotate(45deg);
+        }
+    `}
+    ${(props) => props.hasBreaks && !props.isDark && props.variant === "top" && `
+        &::before {
+            bottom: -6px;
+            border-right-width: 1px;
+            border-bottom-width: 1px;
+        }
+    `}
+    ${(props) => props.hasBreaks && !props.isDark && props.variant === "bottom" && `
+        &::before {
+            top: -6px;
+            border-top-width: 1px;
+            border-left-width: 1px;
+        }
+    `}
+    ${(props) => props.hasBreaks && !props.isDark && props.variant === "left" && `
+        &::before {
+            top: calc(50% - 6px);
+            right: -6px;
+            border-top-width: 1px;
+            border-right-width: 1px;
+        }
+    `}
+    ${(props) => props.hasBreaks && !props.isDark && props.variant === "right" && `
+        &::before {
+            top: calc(50% - 6px);
+            left: -6px;
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+        }
+    `}
 `;
 
 
@@ -162,8 +230,13 @@ function Tooltip() {
     // Variables
     const { targetRef, variant, message, maxWidth, hasBreaks, isDark } = current;
 
-    const content    = NLS.get(message);
+    let   content    = NLS.get(message);
     const hasTooltip = current.open && !!content;
+
+    // A long one is shown in paragraphs, so each line of the text is spaced from the next
+    if (hasBreaks && content.includes("\n") && !content.includes("<p>")) {
+        content = content.split("\n").filter((line) => line.trim()).map((line) => `<p>${line}</p>`).join("");
+    }
 
 
     // Nothing to Show
@@ -198,7 +271,7 @@ function Tooltip() {
     case "bottom":
         top  += bounds.height + 8;
         left += bounds.width / 2;
-        if (maxWidth && bounds.left + Number(maxWidth) > window.innerWidth) {
+        if (maxWidth && left + Number(maxWidth) / 2 + EDGE_SPACE > window.innerWidth) {
             left   = bounds.left - Number(maxWidth) / 2 + bounds.width + 6;
             width  = maxWidth;
             toLeft = true;

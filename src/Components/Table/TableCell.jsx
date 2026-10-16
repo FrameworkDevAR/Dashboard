@@ -108,7 +108,7 @@ const TData = Styled.td.attrs(props)`
 function TableCell(props) {
     const {
         isHidden, message,
-        tooltip, tooltipVariant, tooltipWidth, tooltipDelay,
+        tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks,
         className, textColor, circle, circleTooltip, hideCircle,
         colSpan, grow, shrink, width, minWidth, maxWidth, align,
         isSmall, isBold, isTitle, isFlex, isMultiline,
@@ -124,7 +124,7 @@ function TableCell(props) {
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
-            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay);
+            showTooltip(elementRef, tooltipVariant, tooltip, tooltipWidth, tooltipDelay, tooltipBreaks);
         }
     };
 
@@ -191,6 +191,7 @@ TableCell.propTypes = {
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
     tooltipDelay   : PropTypes.number,
+    tooltipBreaks  : PropTypes.bool,
     className      : PropTypes.string,
     textColor      : PropTypes.string,
     colSpan        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
@@ -227,6 +228,7 @@ TableCell.defaultProps = {
     tooltipVariant : "bottom",
     tooltipWidth   : 0,
     tooltipDelay   : 1,
+    tooltipBreaks  : false,
     className      : "",
     textColor      : "",
     colSpan        : "1",

@@ -193,7 +193,8 @@ function InputContent(props) {
             size="18"
             iconColor={postIconColor}
             tooltip={postTooltip}
-            tooltipWidth={postTooltip ? 300 : undefined}
+            tooltipWidth={postTooltip ? 360 : undefined}
+            tooltipBreaks={!!postTooltip}
             withLabel={withLabel}
         />}
 

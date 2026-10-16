@@ -129,7 +129,7 @@ function IconLink(props) {
     const {
         isHidden, passedRef, variant, className, isDisabled,
         target, icon, isSmall, isTiny, size, withMark,
-        tooltip, tooltipVariant, tooltipWidth, tooltipDelay, shortcut,
+        tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks, shortcut,
         onMouseDown, onMouseUp, onTouchEnd,
     } = props;
 
@@ -147,7 +147,7 @@ function IconLink(props) {
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
-            showTooltip(elementRef, tooltipVariant, tooltipText, tooltipWidth, tooltipDelay);
+            showTooltip(elementRef, tooltipVariant, tooltipText, tooltipWidth, tooltipDelay, tooltipBreaks);
         }
     };
 
@@ -200,6 +200,7 @@ IconLink.propTypes = {
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,
     tooltipDelay   : PropTypes.number,
+    tooltipBreaks  : PropTypes.bool,
     href           : PropTypes.string,
     url            : PropTypes.string,
     target         : PropTypes.string,
@@ -231,6 +232,7 @@ IconLink.defaultProps = {
     tooltipVariant : "bottom",
     tooltipWidth   : 0,
     tooltipDelay   : 1,
+    tooltipBreaks  : false,
     href           : "#",
     url            : "",
     target         : "_self",
