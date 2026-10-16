@@ -91,11 +91,11 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
         min-width: calc(${props.totalWidth}px + var(--table-checks-width) + var(--table-actions-width));
     `}
 
-    ${(props) => props.minWidth && !props.isEditable && `
+    ${(props) => props.minWidth > 0 && !props.isEditable && `
         min-width: ${props.minWidth}px;
     `}
 
-    ${(props) => props.minWidth && !props.isEditable && props.hasActions && `
+    ${(props) => props.minWidth > 0 && !props.isEditable && props.hasActions && `
         tr > th:last-child,
         tr > td:last-child {
             position: sticky;
