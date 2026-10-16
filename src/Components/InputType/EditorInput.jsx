@@ -17,8 +17,9 @@ import Icon                 from "../Common/Icon";
 import IconLink             from "../Link/IconLink";
 import Menu                 from "../Menu/Menu";
 import MenuItem             from "../Menu/MenuItem";
-import MenuTitle            from "../Menu/MenuTitle";
 import EditorColors         from "./EditorColors";
+import EditorLink           from "./EditorLink";
+import EditorVariables      from "./EditorVariables";
 import EditorTable          from "./EditorTable";
 
 
@@ -250,7 +251,7 @@ function EditorInput(props) {
     const {
         inputRef, className, isFocused, isDisabled, withLabel,
         name, value, placeholder, rows, maxRows, titles, filesUrl, variables,
-        withColors, withAlign, withLinks, withFiles, withTables,
+        withColors, withAlign, withLinks, withFiles, withTables, outsideLabel,
         onChange, onFocus, onBlur, onMedia,
     } = props;
 
@@ -272,6 +273,7 @@ function EditorInput(props) {
     const [ active, setActive ] = React.useState({});
     const [ menu,   setMenu   ] = React.useState("");
     const [ lift,   setLift   ] = React.useState(0);
+    const [ link,   setLink   ] = React.useState({ url : "", text : "", target : "_blank", isEdit : false });
 
 
     // The Blocks are the paragraph and the titles that are allowed, which are numbered in their
@@ -290,6 +292,9 @@ function EditorInput(props) {
         }
         editor.on("ObjectResizeStart", handleResizeStart);
         editor.on("ObjectResized", handleResized);
+
+        // The shortcut of the links opens the dialog of the Link instead of the one of the editor
+        editor.addShortcut("meta+k", "", () => openLink());
     };
 
     // Handles the Start of the Resize of an image, keeping the width that it is shown with, as
@@ -403,6 +408,7 @@ function EditorInput(props) {
     // Removes the given color from the selection, or from the word where the cursor is
     const removeColor = (format) => {
         const editor = editorRef.current;
+        markRef.current = null;
         if (editor) {
             editor.focus();
             editor.undoManager.transact(() => {
@@ -416,45 +422,23 @@ function EditorInput(props) {
     // Handles the Variable, which is written where the cursor was, as the search of the menu
     // takes the focus away from the text
     const handleVariable = (key) => {
-        const editor = editorRef.current;
+        const editor = restoreFocus();
         if (editor) {
-            editor.focus();
-            if (markRef.current) {
-                editor.selection.moveToBookmark(markRef.current);
-            }
             editor.insertContent(editor.dom.encode(key));
         }
         setMenu("");
     };
-
-    // The Variables are grouped by the title that each one has
-    const variableItems = React.useMemo(() => {
-        const result = [];
-        let   title  = "";
-        for (const { key, value : name, extra } of variables) {
-            if (extra && extra !== title) {
-                title = extra;
-                result.push(<MenuTitle key={`title-${extra}`} message={extra} isTitle />);
-            }
-            result.push(<MenuItem
-                key={key}
-                title={NLS.get(name)}
-                message={key}
-                onClick={() => handleVariable(key)}
-                isSmall
-            />);
-        }
-        return result;
-    }, [ JSON.stringify(variables) ]);
 
     // Handles the Table, which inserts one with the given size
     const handleTable = (rows, columns) => {
         runCommand("mceInsertTable", { rows, columns });
     };
 
-    // Runs a command of the editor and gives it the focus back
+    // Runs a command of the editor and gives it the focus back. The command already used the
+    // cursor, so it is not restored when its Menu closes
     const runCommand = (command, commandValue = null) => {
         const editor = editorRef.current;
+        markRef.current = null;
         if (editor) {
             editor.execCommand(command, false, commandValue);
             editor.focus();
@@ -470,14 +454,107 @@ function EditorInput(props) {
         runCommand(command, commandValue);
     };
 
-    // Handles the Menu
+    // Handles the Menu, which keeps where the cursor is to give it back when it closes
     const handleMenu = (e, menuName) => {
         e.preventDefault();
         e.stopPropagation();
+        if (menu === menuName) {
+            handleMenuClose();
+            return;
+        }
         if (editorRef.current) {
             markRef.current = editorRef.current.selection.getBookmark(2, true);
         }
-        setMenu(menu === menuName ? "" : menuName);
+        setMenu(menuName);
+    };
+
+    // Handles the Close of a Menu or of the Link. When nothing was picked, the cursor is still
+    // kept, and the focus goes back to it
+    const handleMenuClose = () => {
+        if (markRef.current) {
+            restoreFocus();
+        }
+        setMenu("");
+    };
+
+    // Gives the focus back to the editor where the cursor was, which is used only once
+    const restoreFocus = () => {
+        const editor = editorRef.current;
+        if (editor) {
+            editor.focus();
+            if (markRef.current) {
+                editor.selection.moveToBookmark(markRef.current);
+            }
+        }
+        markRef.current = null;
+        return editor;
+    };
+
+    // Opens the Link, which edits the one where the cursor is or links the selected text
+    const openLink = () => {
+        const editor = editorRef.current;
+        if (!editor) {
+            return;
+        }
+        markRef.current = editor.selection.getBookmark(2, true);
+        const anchor = editor.dom.getParent(editor.selection.getNode(), "a[href]");
+        if (anchor) {
+            setLink({
+                url    : anchor.getAttribute("href"),
+                text   : anchor.textContent,
+                target : anchor.target === "_blank" ? "_blank" : "_self",
+                isEdit : true,
+            });
+        } else {
+            setLink({
+                url    : "",
+                text   : editor.selection.getContent({ format : "text" }),
+                target : "_blank",
+                isEdit : false,
+            });
+        }
+        setMenu("link");
+    };
+
+    // Handles the Link of the toolbar
+    const handleLink = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openLink();
+    };
+
+    // Handles the Submit of the Link. A selected text that was not changed keeps its format,
+    // as it is linked as it is, and any other text is written with the link
+    const handleLinkSubmit = ({ url, text, target }) => {
+        const editor = restoreFocus();
+        if (editor) {
+            const newTab = target === "_blank";
+            const attrs  = { href : url, target : newTab ? target : null, rel : newTab ? "noopener" : null };
+            const label  = text || url;
+            const anchor = editor.dom.getParent(editor.selection.getNode(), "a[href]");
+            if (anchor) {
+                editor.dom.setAttribs(anchor, attrs);
+                if (anchor.textContent !== label) {
+                    anchor.textContent = label;
+                }
+            } else if (!editor.selection.isCollapsed() && text === link.text) {
+                editor.execCommand("mceInsertLink", false, attrs);
+            } else {
+                editor.insertContent(editor.dom.createHTML("a", attrs, editor.dom.encode(label)));
+            }
+            editor.undoManager.add();
+            handleNodeChange();
+        }
+        setMenu("");
+    };
+
+    // Handles the Remove of the Link, which keeps its text
+    const handleLinkRemove = () => {
+        const editor = restoreFocus();
+        if (editor) {
+            editor.execCommand("unlink");
+        }
+        setMenu("");
     };
 
     // Handles the List. The style that the list already has takes the list away
@@ -490,8 +567,8 @@ function EditorInput(props) {
     };
 
 
-    // Variables. The theme of the dialogs of the editor, like the one of the links, follows the
-    // dark mode when it is created
+    // Variables. The theme of the dialogs of the editor, like the ones of the tables, follows
+    // the dark mode when it is created
     const isDark    = document.body.classList.contains("dark-mode");
 
     const minHeight = (Number(rows) || 3) * LINE_HEIGHT + 16;
@@ -515,247 +592,255 @@ function EditorInput(props) {
 
 
     // Do the Render
-    return <Container
-        className={className}
-        isFocused={isFocused || Boolean(menu)}
-        isOpen={showToolbar}
-        lift={lift}
-        isDisabled={isDisabled}
-        withLabel={withLabel}
-        withBorder
-    >
-        <EditorStyles />
-        {showToolbar && <Toolbar ref={barRef} onMouseDown={(e) => e.preventDefault()}>
-            {titles.length > 0 && <>
-                <Block ref={blockRef} onClick={(e) => handleMenu(e, "block")}>
-                    <BlockNames>
-                        {blocks.map((block) => <BlockName
-                            key={block.key}
-                            isHidden={block.key !== (active.block || "p")}
-                        >
-                            {block.message}
-                        </BlockName>)}
-                    </BlockNames>
-                    <Icon icon="expand" />
-                </Block>
-                <Line />
-            </>}
-            {FORMATS.map((action) => <Action
-                key={action.key}
-                variant="black"
-                icon={action.icon}
-                tooltip={action.tooltip}
-                tooltipVariant="bottom"
-                isActive={Boolean(active[action.key])}
-                onClick={(e) => handleCommand(e, action.command)}
-                isSmall
-            />)}
-            {withColors && COLORS.map((color) => <Action
-                key={color.key}
-                passedRef={colorRefs[color.key]}
-                variant="black"
-                icon={color.icon}
-                tooltip={color.tooltip}
-                tooltipVariant="bottom"
-                isActive={Boolean(active[color.key])}
-                onClick={(e) => handleMenu(e, color.key)}
-                isSmall
-            />)}
-            <Line />
-            {withAlign && <>
-                <Action
-                    passedRef={alignRef}
+    return <>
+        <Container
+            className={className}
+            isFocused={isFocused || Boolean(menu)}
+            isOpen={showToolbar}
+            lift={lift}
+            isDisabled={isDisabled}
+            withLabel={withLabel}
+            withBorder
+        >
+            <EditorStyles />
+            {showToolbar && <Toolbar ref={barRef} onMouseDown={(e) => e.preventDefault()}>
+                {titles.length > 0 && <>
+                    <Block ref={blockRef} onClick={(e) => handleMenu(e, "block")}>
+                        <BlockNames>
+                            {blocks.map((block) => <BlockName
+                                key={block.key}
+                                isHidden={block.key !== (active.block || "p")}
+                            >
+                                {block.message}
+                            </BlockName>)}
+                        </BlockNames>
+                        <Icon icon="expand" />
+                    </Block>
+                    <Line />
+                </>}
+                {FORMATS.map((action) => <Action
+                    key={action.key}
                     variant="black"
-                    icon={Utils.getValue(ALIGNS, "key", active.align || "alignleft", "icon")}
-                    tooltip="GENERAL_FORMAT_ALIGN"
+                    icon={action.icon}
+                    tooltip={action.tooltip}
                     tooltipVariant="bottom"
-                    onClick={(e) => handleMenu(e, "align")}
+                    isActive={Boolean(active[action.key])}
+                    onClick={(e) => handleCommand(e, action.command)}
                     isSmall
-                />
-                {INDENTS.map((indent) => <Action
-                    key={indent.key}
+                />)}
+                {withColors && COLORS.map((color) => <Action
+                    key={color.key}
+                    passedRef={colorRefs[color.key]}
                     variant="black"
-                    icon={indent.icon}
-                    tooltip={indent.tooltip}
+                    icon={color.icon}
+                    tooltip={color.tooltip}
                     tooltipVariant="bottom"
-                    onClick={(e) => handleCommand(e, indent.command)}
+                    isActive={Boolean(active[color.key])}
+                    onClick={(e) => handleMenu(e, color.key)}
                     isSmall
                 />)}
                 <Line />
-            </>}
-            {LISTS.map((list) => <Action
-                key={list.key}
-                passedRef={list.key === "list" ? listRef : numberRef}
-                variant="black"
-                icon={list.icon}
-                tooltip={list.tooltip}
-                tooltipVariant="bottom"
-                isActive={Boolean(active[list.key])}
-                onClick={(e) => handleMenu(e, list.key)}
-                isSmall
-            />)}
-            <Line />
-            {!!onMedia && <>
-                <Action
+                {withAlign && <>
+                    <Action
+                        passedRef={alignRef}
+                        variant="black"
+                        icon={Utils.getValue(ALIGNS, "key", active.align || "alignleft", "icon")}
+                        tooltip="GENERAL_FORMAT_ALIGN"
+                        tooltipVariant="bottom"
+                        onClick={(e) => handleMenu(e, "align")}
+                        isSmall
+                    />
+                    {INDENTS.map((indent) => <Action
+                        key={indent.key}
+                        variant="black"
+                        icon={indent.icon}
+                        tooltip={indent.tooltip}
+                        tooltipVariant="bottom"
+                        onClick={(e) => handleCommand(e, indent.command)}
+                        isSmall
+                    />)}
+                    <Line />
+                </>}
+                {LISTS.map((list) => <Action
+                    key={list.key}
+                    passedRef={list.key === "list" ? listRef : numberRef}
                     variant="black"
-                    icon="image"
-                    tooltip="GENERAL_FORMAT_IMAGE"
+                    icon={list.icon}
+                    tooltip={list.tooltip}
                     tooltipVariant="bottom"
-                    onClick={(e) => handleMedia(e, MediaType.IMAGE)}
+                    isActive={Boolean(active[list.key])}
+                    onClick={(e) => handleMenu(e, list.key)}
                     isSmall
-                />
-                {withFiles && <Action
+                />)}
+                <Line />
+                {!!onMedia && <>
+                    <Action
+                        variant="black"
+                        icon="image"
+                        tooltip="GENERAL_FORMAT_IMAGE"
+                        tooltipVariant="bottom"
+                        onClick={(e) => handleMedia(e, MediaType.IMAGE)}
+                        isSmall
+                    />
+                    {withFiles && <Action
+                        variant="black"
+                        icon="attachment"
+                        tooltip="GENERAL_FORMAT_FILE"
+                        tooltipVariant="bottom"
+                        onClick={(e) => handleMedia(e, MediaType.ANY)}
+                        isSmall
+                    />}
+                </>}
+                {withTables && <Action
+                    passedRef={tableRef}
                     variant="black"
-                    icon="attachment"
-                    tooltip="GENERAL_FORMAT_FILE"
+                    icon="table"
+                    tooltip="GENERAL_FORMAT_TABLE"
                     tooltipVariant="bottom"
-                    onClick={(e) => handleMedia(e, MediaType.ANY)}
+                    onClick={(e) => handleMenu(e, "table")}
                     isSmall
                 />}
-            </>}
-            {withTables && <Action
-                passedRef={tableRef}
-                variant="black"
-                icon="table"
-                tooltip="GENERAL_FORMAT_TABLE"
-                tooltipVariant="bottom"
-                onClick={(e) => handleMenu(e, "table")}
-                isSmall
-            />}
-            {variables.length > 0 && <Action
-                passedRef={varRef}
-                variant="black"
-                icon="variable"
-                tooltip="GENERAL_VARIABLES"
-                tooltipVariant="bottom"
-                onClick={(e) => handleMenu(e, "variable")}
-                isSmall
-            />}
-            {withLinks && <Action
-                variant="black"
-                icon="insert-link"
-                tooltip="GENERAL_FORMAT_LINK"
-                tooltipVariant="bottom"
-                onClick={(e) => handleCommand(e, "mceLink")}
-                isSmall
-            />}
-            <Action
-                variant="black"
-                icon="format-clear"
-                tooltip="GENERAL_FORMAT_CLEAR"
-                tooltipVariant="bottom"
-                onClick={(e) => handleCommand(e, "RemoveFormat")}
-                isSmall
-            />
-
-            <Menu
-                open={menu === "block"}
-                targetRef={blockRef}
-                direction="bottom right"
-                onClose={() => setMenu("")}
-                gap={4}
-            >
-                {blocks.map((block) => <MenuItem
-                    key={block.key}
-                    message={block.message}
-                    isSelected={(active.block || "p") === block.key}
-                    onClick={() => runCommand("FormatBlock", block.key)}
-                />)}
-            </Menu>
-            {LISTS.map((list) => <Menu
-                key={list.key}
-                open={menu === list.key}
-                targetRef={list.key === "list" ? listRef : numberRef}
-                direction="bottom right"
-                onClose={() => setMenu("")}
-                gap={4}
-            >
-                {list.styles.map((style) => <MenuItem
-                    key={style.key}
-                    message={style.message}
-                    isSelected={Boolean(active[list.key]) && active.listStyle === style.key}
-                    onClick={() => handleList(list, style.key)}
-                />)}
-            </Menu>)}
-            {COLORS.map((color) => <Menu
-                key={color.key}
-                open={menu === color.key}
-                targetRef={colorRefs[color.key]}
-                direction="bottom right"
-                onClose={() => setMenu("")}
-                gap={4}
-            >
-                <EditorColors
-                    value={active[color.key]}
-                    onSelect={(value) => runCommand(color.command, value)}
-                    onClear={() => removeColor(color.format)}
+                {variables.length > 0 && <Action
+                    passedRef={varRef}
+                    variant="black"
+                    icon="variable"
+                    tooltip="GENERAL_VARIABLES"
+                    tooltipVariant="bottom"
+                    onClick={(e) => handleMenu(e, "variable")}
+                    isSmall
+                />}
+                {withLinks && <Action
+                    variant="black"
+                    icon="insert-link"
+                    tooltip="GENERAL_FORMAT_LINK"
+                    tooltipVariant="bottom"
+                    onClick={handleLink}
+                    isSmall
+                />}
+                <Action
+                    variant="black"
+                    icon="format-clear"
+                    tooltip="GENERAL_FORMAT_CLEAR"
+                    tooltipVariant="bottom"
+                    onClick={(e) => handleCommand(e, "RemoveFormat")}
+                    isSmall
                 />
-            </Menu>)}
-            <Menu
-                open={menu === "align"}
-                targetRef={alignRef}
-                direction="bottom right"
-                onClose={() => setMenu("")}
-                gap={4}
-            >
-                {ALIGNS.map((align) => <MenuItem
-                    key={align.key}
-                    icon={align.icon}
-                    message={align.message}
-                    isSelected={(active.align || "alignleft") === align.key}
-                    onClick={() => runCommand(align.command)}
-                />)}
-            </Menu>
-            <Menu
-                open={menu === "variable"}
-                targetRef={varRef}
-                direction="bottom left"
-                width={400}
-                maxHeight={300}
-                onClose={() => setMenu("")}
-                gap={4}
-                withSearch
-            >
-                {variableItems}
-            </Menu>
-            <Menu
-                open={menu === "table"}
-                targetRef={tableRef}
-                direction="bottom right"
-                onClose={() => setMenu("")}
-                gap={4}
-            >
-                <EditorTable onSelect={handleTable} />
-            </Menu>
-        </Toolbar>}
-        <Content minHeight={minHeight} maxHeight={maxHeight}>
-            <Editor
-                tinymceScriptSrc={`${Navigate.getAppUrl()}/tinymce/tinymce.min.js`}
-                value={shownValue}
-                disabled={isDisabled}
-                onInit={handleInit}
-                onEditorChange={handleChange}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                onNodeChange={handleNodeChange}
-                init={{
-                    inline              : true,
-                    menubar             : false,
-                    skin                : isDark ? "oxide-dark" : "oxide",
-                    language            : NLS.getCurrentLang(),
-                    placeholder         : placeholder ? NLS.get(placeholder) : "",
-                    valid_children      : "-li[p]",
-                    convert_urls        : false,
-                    plugins             : [ "autolink", "lists", "link", "table" ],
-                    link_default_target : "_blank",
 
-                    // The actions are the ones of the toolbar below, as the ones of the editor
-                    // float over the text and move by their own when the content is scrolled
-                    toolbar             : false,
-                }}
-            />
-        </Content>
-    </Container>;
+                <Menu
+                    open={menu === "block"}
+                    targetRef={blockRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    {blocks.map((block) => <MenuItem
+                        key={block.key}
+                        message={block.message}
+                        isSelected={(active.block || "p") === block.key}
+                        onClick={() => runCommand("FormatBlock", block.key)}
+                    />)}
+                </Menu>
+                {LISTS.map((list) => <Menu
+                    key={list.key}
+                    open={menu === list.key}
+                    targetRef={list.key === "list" ? listRef : numberRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    {list.styles.map((style) => <MenuItem
+                        key={style.key}
+                        message={style.message}
+                        isSelected={Boolean(active[list.key]) && active.listStyle === style.key}
+                        onClick={() => handleList(list, style.key)}
+                    />)}
+                </Menu>)}
+                {COLORS.map((color) => <Menu
+                    key={color.key}
+                    open={menu === color.key}
+                    targetRef={colorRefs[color.key]}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    <EditorColors
+                        value={active[color.key]}
+                        onSelect={(value) => runCommand(color.command, value)}
+                        onClear={() => removeColor(color.format)}
+                    />
+                </Menu>)}
+                <Menu
+                    open={menu === "align"}
+                    targetRef={alignRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    {ALIGNS.map((align) => <MenuItem
+                        key={align.key}
+                        icon={align.icon}
+                        message={align.message}
+                        isSelected={(active.align || "alignleft") === align.key}
+                        onClick={() => runCommand(align.command)}
+                    />)}
+                </Menu>
+                <EditorVariables
+                    open={menu === "variable"}
+                    targetRef={varRef}
+                    variables={variables}
+                    onSelect={handleVariable}
+                    onClose={handleMenuClose}
+                />
+                <Menu
+                    open={menu === "table"}
+                    targetRef={tableRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    <EditorTable onSelect={handleTable} />
+                </Menu>
+            </Toolbar>}
+            <Content minHeight={minHeight} maxHeight={maxHeight}>
+                <Editor
+                    tinymceScriptSrc={`${Navigate.getAppUrl()}/tinymce/tinymce.min.js`}
+                    value={shownValue}
+                    disabled={isDisabled}
+                    onInit={handleInit}
+                    onEditorChange={handleChange}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    onNodeChange={handleNodeChange}
+                    init={{
+                        inline              : true,
+                        menubar             : false,
+                        skin                : isDark ? "oxide-dark" : "oxide",
+                        language            : NLS.getCurrentLang(),
+                        placeholder         : placeholder ? NLS.get(placeholder) : "",
+                        valid_children      : "-li[p]",
+                        convert_urls        : false,
+                        plugins             : [ "autolink", "lists", "link", "table" ],
+                        link_default_target : "_blank",
+                        contextmenu         : "table",
+
+                        // The actions are the ones of the toolbar below, as the ones of the editor
+                        // float over the text and move by their own when the content is scrolled
+                        toolbar             : false,
+                    }}
+                />
+            </Content>
+        </Container>
+
+        <EditorLink
+            open={menu === "link"}
+            link={link}
+            variables={variables}
+            outsideLabel={outsideLabel}
+            onSubmit={handleLinkSubmit}
+            onRemove={handleLinkRemove}
+            onClose={handleMenuClose}
+        />
+    </>;
 }
 
 /**
@@ -763,28 +848,29 @@ function EditorInput(props) {
  * @type {object} propTypes
  */
 EditorInput.propTypes = {
-    inputRef    : PropTypes.object,
-    className   : PropTypes.string,
-    isFocused   : PropTypes.bool,
-    isDisabled  : PropTypes.bool,
-    withLabel   : PropTypes.bool,
-    name        : PropTypes.string,
-    value       : PropTypes.string,
-    placeholder : PropTypes.string,
-    rows        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    maxRows     : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
-    titles      : PropTypes.array,
-    withLinks   : PropTypes.bool,
-    withFiles   : PropTypes.bool,
-    withTables  : PropTypes.bool,
-    withColors  : PropTypes.bool,
-    withAlign   : PropTypes.bool,
-    filesUrl    : PropTypes.string,
-    variables   : PropTypes.array,
-    onChange    : PropTypes.func.isRequired,
-    onMedia     : PropTypes.func,
-    onFocus     : PropTypes.func,
-    onBlur      : PropTypes.func,
+    inputRef     : PropTypes.object,
+    className    : PropTypes.string,
+    isFocused    : PropTypes.bool,
+    isDisabled   : PropTypes.bool,
+    withLabel    : PropTypes.bool,
+    name         : PropTypes.string,
+    value        : PropTypes.string,
+    placeholder  : PropTypes.string,
+    rows         : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxRows      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    titles       : PropTypes.array,
+    withLinks    : PropTypes.bool,
+    withFiles    : PropTypes.bool,
+    withTables   : PropTypes.bool,
+    withColors   : PropTypes.bool,
+    withAlign    : PropTypes.bool,
+    filesUrl     : PropTypes.string,
+    outsideLabel : PropTypes.bool,
+    variables    : PropTypes.array,
+    onChange     : PropTypes.func.isRequired,
+    onMedia      : PropTypes.func,
+    onFocus      : PropTypes.func,
+    onBlur       : PropTypes.func,
 };
 
 /**
@@ -792,20 +878,21 @@ EditorInput.propTypes = {
  * @type {object} defaultProps
  */
 EditorInput.defaultProps = {
-    className   : "",
-    isFocused   : false,
-    isDisabled  : false,
-    withLabel   : false,
-    value       : "",
-    placeholder : "",
-    titles      : [ "h1", "h2", "h3" ],
-    withLinks   : true,
-    withFiles   : true,
-    withTables  : true,
-    withColors  : true,
-    withAlign   : true,
-    filesUrl    : "",
-    variables   : [],
+    className    : "",
+    isFocused    : false,
+    isDisabled   : false,
+    withLabel    : false,
+    value        : "",
+    placeholder  : "",
+    titles       : [ "h1", "h2", "h3" ],
+    withLinks    : true,
+    withFiles    : true,
+    withTables   : true,
+    withColors   : true,
+    withAlign    : true,
+    filesUrl     : "",
+    outsideLabel : false,
+    variables    : [],
 };
 
 export default EditorInput;
