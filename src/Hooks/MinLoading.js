@@ -40,7 +40,8 @@ function useMinLoading(isLoading, minTime = 200) {
         return () => Utils.clearTimeout(timerRef);
     }, []);
 
-    return isWaiting;
+    // The state only changes after the render, so the render where the load starts reads it too
+    return isLoading || isWaiting;
 }
 
 export default useMinLoading;
