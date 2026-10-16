@@ -143,16 +143,24 @@ function Menu(props) {
         setSelectedIdx(0);
     };
 
-    // Handles the Key Down
+    // Handles the Key Down. The Escape closes the Menu on the Key Up instead, where the
+    // Dialogs close too, so it can stop it before it closes the Dialog of the Menu
     const handleKeyDown = (e) => {
-        if (selectUsingKey(e.keyCode)) {
+        if (e.keyCode === KeyCode.DOM_VK_ESCAPE) {
+            e.preventDefault();
+        } else if (selectUsingKey(e.keyCode)) {
             e.preventDefault();
         }
     };
 
-    // Handles the Key Down
+    // Handles the Key Up
     const handleKeyUp = (e) => {
-        submitUsingKey(e.keyCode);
+        if (e.keyCode === KeyCode.DOM_VK_ESCAPE) {
+            onClose();
+            e.stopPropagation();
+        } else {
+            submitUsingKey(e.keyCode);
+        }
         e.preventDefault();
     };
 
