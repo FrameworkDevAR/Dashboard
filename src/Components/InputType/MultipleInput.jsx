@@ -109,8 +109,8 @@ const SelectedGhost = Styled.span`
     font-weight: 600;
 `;
 
-const List = Styled(ScrollFade).attrs(({ noScroll }) => ({ noScroll }))`
-    max-height: ${(props) => props.noScroll ? "none" : "260px"};
+const List = Styled(ScrollFade).attrs(({ noScroll, isSmall }) => ({ noScroll, isSmall }))`
+    max-height: ${(props) => props.noScroll ? "none" : (props.isSmall ? "220px" : "260px")};
 `;
 
 const Badge = Styled.span`
@@ -132,7 +132,7 @@ const None = Styled.p`
     color: var(--font-lighter);
 `;
 
-const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll }) => ({ columns, withLabel, withSearch, noScroll }))`
+const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll, isSmall }) => ({ columns, withLabel, withSearch, noScroll, isSmall }))`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: ${(props) => `repeat(${props.columns}, 1fr)`};
@@ -188,6 +188,15 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll }
             background-color: color-mix(in srgb, var(--primary-color) 11%, transparent);
         }
     `}
+
+    ${(props) => (props.withSearch && props.isSmall) && `
+        gap: 2px 8px;
+        max-height: ${props.noScroll ? "none" : "220px"};
+
+        > .input-content {
+            padding: 4px 6px;
+        }
+    `}
 `;
 
 
@@ -199,7 +208,7 @@ const Container = Styled.div.attrs(({ columns, withLabel, withSearch, noScroll }
  */
 function MultipleInput(props) {
     const {
-        className, isFocused, isDisabled, withLabel, withBorder,
+        className, isFocused, isDisabled, isSmall, withLabel, withBorder,
         name, value, placeholder, columns, withSearch, searchToShow, noScroll, getDisabled, getPrefix,
         onChange, onFocus, onBlur,
     } = props;
@@ -337,13 +346,14 @@ function MultipleInput(props) {
                 </Selected>
             </Header>}
 
-            {withSearch ? <List passedRef={listRef} noScroll={noScroll}>
+            {withSearch ? <List passedRef={listRef} noScroll={noScroll} isSmall={isSmall}>
                 <Container
                     ref={listRef}
                     columns={columns}
                     withLabel={withLabel}
                     withSearch
                     noScroll={noScroll}
+                    isSmall={isSmall}
                 >
                     {checkboxes}
                 </Container>
@@ -368,6 +378,7 @@ MultipleInput.propTypes = {
     className    : PropTypes.string,
     isFocused    : PropTypes.bool,
     isDisabled   : PropTypes.bool,
+    isSmall      : PropTypes.bool,
     withLabel    : PropTypes.bool,
     withBorder   : PropTypes.bool,
     name         : PropTypes.string.isRequired,
@@ -395,6 +406,7 @@ MultipleInput.defaultProps = {
     className    : "",
     isFocused    : false,
     isDisabled   : false,
+    isSmall      : false,
     withBorder   : true,
     noneText     : "",
     columns      : 2,
