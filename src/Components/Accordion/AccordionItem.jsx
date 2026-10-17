@@ -225,6 +225,7 @@ const Content = Styled.section.attrs(({ isSelected }) => ({ isSelected }))`
 `;
 
 const Clip = Styled.div.attrs(({ isSelected, isExpanded }) => ({ isSelected, isExpanded }))`
+    min-width: 0;
     min-height: 0;
     overflow: ${(props) => props.isExpanded ? "visible" : "hidden"};
     visibility: ${(props) => props.isSelected ? "visible" : "hidden"};
