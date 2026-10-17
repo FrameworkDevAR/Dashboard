@@ -284,13 +284,14 @@ function SelectInput(props) {
 
 
     // Stores the height of the description, which is used as a space under the input while
-    // the options are shown, so hiding it does not move the content that is under the select
+    // the options are shown, so hiding it does not move the content that is under the select.
+    // An inline description is beside the input and takes no height, so it leaves no space
     React.useEffect(() => {
         const element = containerRef.current?.querySelector(".input-description");
         if (element) {
-            setBottomSpace(element.offsetHeight + DESCRIPTION_GAP);
+            setBottomSpace(inlineDescription ? 0 : element.offsetHeight + DESCRIPTION_GAP);
         }
-    }, [ optionDesc, showOptions ]);
+    }, [ optionDesc, showOptions, inlineDescription ]);
 
     // Clear the Timer
     React.useEffect(() => {
