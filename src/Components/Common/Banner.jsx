@@ -18,11 +18,17 @@ const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace,
     gap: 8px;
     padding: 12px 16px;
     line-height: 1.4;
+    overflow-wrap: anywhere;
     border: 1px solid;
     border-radius: var(--border-radius-medium);
 
     .banner-content {
         gap: 12px;
+    }
+    a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
     }
     .banner-icon {
         flex-shrink: 0;
