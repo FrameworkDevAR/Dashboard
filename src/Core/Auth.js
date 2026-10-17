@@ -122,12 +122,18 @@ function setUser() {
         if (token.data.language) {
             const oldLanguage = userLanguage;
             userLanguage = token.data.language;
-            NLS.setLang(token.data.language);
 
-            // The Urls are translated, so when the language changes in the middle of a session
-            // the current one is translated too, or the Router finds no route and redirects
-            if (oldLanguage && oldLanguage !== userLanguage) {
-                translateLocation(oldLanguage, userLanguage);
+            // A language that is not loaded yet is downloaded first, and the User is set
+            // again once it is, so the App renders with it
+            if (NLS.isLangLoaded(userLanguage)) {
+                setLanguage(oldLanguage, userLanguage);
+            } else {
+                NLS.loadLang(userLanguage).then(() => {
+                    if (userLanguage === token.data.language) {
+                        setLanguage(oldLanguage, userLanguage);
+                        setCurrentUser({ ...token.data });
+                    }
+                });
             }
         }
         if (token.data.appearance) {
@@ -148,6 +154,22 @@ function setUser() {
  */
 function unsetUser() {
     setCurrentUser({});
+}
+
+/**
+ * Sets the Language of the User
+ * @param {string} oldLanguage
+ * @param {string} newLanguage
+ * @returns {void}
+ */
+function setLanguage(oldLanguage, newLanguage) {
+    NLS.setLang(newLanguage);
+
+    // The Urls are translated, so when the language changes in the middle of a session
+    // the current one is translated too, or the Router finds no route and redirects
+    if (oldLanguage && oldLanguage !== newLanguage) {
+        translateLocation(oldLanguage, newLanguage);
+    }
 }
 
 /**
@@ -178,6 +200,18 @@ function translateLocation(fromLang, toLang) {
 function getLanguage() {
     const language = NLS.getLang();
     return String(language);
+}
+
+/**
+ * Returns the Language of the logged User, or the one of the browser before the login
+ * @returns {string}
+ */
+function getUserLanguage() {
+    try {
+        return getUser()?.language || NLS.getLang();
+    } catch {
+        return NLS.getLang();
+    }
 }
 
 /**
@@ -221,6 +255,7 @@ export default {
     setUser,
 
     getLanguage,
+    getUserLanguage,
     getTimezone,
     setAppearance,
 };

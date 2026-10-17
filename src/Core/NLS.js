@@ -22,17 +22,47 @@ function init(newAppUrl) {
 
 /**
  * Initialize a Language
- * @param {string}  lang
- * @param {object=} strings
- * @param {object=} urls
- * @param {object=} actions
+ * @param {string}             lang
+ * @param {(object|Function)=} strings
+ * @param {object=}            urls
+ * @param {object=}            actions
  * @returns {void}
  */
 function initLang(lang, strings = {}, urls = {}, actions = {}) {
-    langsData[lang] = { strings, urls, actions };
+    // The Strings can be a function that imports them, so each language is a file of its
+    // own that is only downloaded when it is used
+    const loader = typeof strings === "function" ? strings : null;
+    langsData[lang] = { strings : loader ? null : strings, urls, actions, loader };
     if (!defaultLang) {
         defaultLang = lang;
     }
+}
+
+/**
+ * Loads the Strings of the given Language, when they are not loaded yet
+ * @param {string=} langCode
+ * @returns {Promise<void>}
+ */
+async function loadLang(langCode) {
+    const data = getLangData(langCode || getLang());
+    if (!data || data.strings) {
+        return;
+    }
+    if (!data.promise) {
+        data.promise = data.loader().then((module) => {
+            data.strings = module.default;
+        });
+    }
+    await data.promise;
+}
+
+/**
+ * Returns true if the Strings of the given Language are loaded
+ * @param {string} langCode
+ * @returns {boolean}
+ */
+function isLangLoaded(langCode) {
+    return Boolean(getLangData(langCode)?.strings);
 }
 
 /**
@@ -59,9 +89,9 @@ function getCurrentLang() {
 function setLang(langCode) {
     language = langCode || getLang();
 
-    stringData = loadLang("strings");
-    urlData    = loadLang("urls");
-    actionData = loadLang("actions");
+    stringData = readLang("strings");
+    urlData    = readLang("urls");
+    actionData = readLang("actions");
 }
 
 /**
@@ -75,11 +105,11 @@ function getLangData(langCode) {
 }
 
 /**
- * Loads the Language Strings
+ * Reads the Language Strings
  * @param {string} key
  * @returns {object}
  */
-function loadLang(key) {
+function readLang(key) {
     const data            = getLangData(language);
     const messages        = data?.[key] || {};
     const defaultMessages = langsData[defaultLang]?.[key] || {};
@@ -101,7 +131,7 @@ function loadLang(key) {
  * @returns {string}
  */
 function getForLang(id, langCode) {
-    if (langsData[langCode]) {
+    if (langsData[langCode]?.strings) {
         return langsData[langCode].strings[id] || id;
     }
     return stringData[id] || id;
@@ -375,6 +405,8 @@ function getAction(module, action) {
 export default {
     init,
     initLang,
+    loadLang,
+    isLangLoaded,
     getLang,
     getCurrentLang,
     setLang,
