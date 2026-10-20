@@ -5,7 +5,7 @@ import Styled               from "styled-components";
 
 
 // Styles
-const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground }) => ({ width, fullWidth, hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground }))`
+const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }) => ({ width, fullWidth, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }))`
     --input-border: var(--input-border-color);
     position: relative;
     display: block;
@@ -58,6 +58,26 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
         }
     `}
 
+    ${(props) => props.sideLabel && `
+        display: grid;
+        grid-template-columns: var(--input-side-label, 140px) minmax(0, 1fr);
+        column-gap: var(--main-gap);
+
+        > .inputfield-label {
+            grid-column: 1;
+            grid-row: 1 / span 3;
+            display: flex;
+            align-items: center;
+            align-self: start;
+            min-height: var(--input-height);
+            margin-bottom: 0;
+            white-space: normal;
+        }
+        > :not(.inputfield-label) {
+            grid-column: 2;
+        }
+    `}
+
     ${(props) => props.atBottom && `
         display: flex;
         flex-direction: column;
@@ -103,7 +123,7 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
 function InputContainer(props) {
     const {
         className, dataName, width, fullWidth,
-        hasError, bigLabel, outsideLabel, bottomSpace, rightInput, atBottom, disabledBackground, children,
+        hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground, children,
     } = props;
 
     return <Container
@@ -114,6 +134,7 @@ function InputContainer(props) {
         hasError={hasError}
         bigLabel={bigLabel}
         outsideLabel={outsideLabel}
+        sideLabel={sideLabel}
         bottomSpace={bottomSpace}
         rightInput={rightInput}
         atBottom={atBottom}
@@ -135,6 +156,7 @@ InputContainer.propTypes = {
     hasError           : PropTypes.bool,
     bigLabel           : PropTypes.bool,
     outsideLabel       : PropTypes.bool,
+    sideLabel          : PropTypes.bool,
     bottomSpace        : PropTypes.bool,
     rightInput         : PropTypes.bool,
     atBottom           : PropTypes.bool,
@@ -152,6 +174,7 @@ InputContainer.defaultProps = {
     fullWidth          : false,
     hasError           : false,
     outsideLabel       : false,
+    sideLabel          : false,
     bottomSpace        : false,
     rightInput         : false,
     atBottom           : false,

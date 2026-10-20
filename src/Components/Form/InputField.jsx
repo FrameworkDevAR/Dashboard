@@ -71,7 +71,7 @@ function InputField(props) {
         label, icon, postIcon, prefixText, suffixText, value,
         error, helperText, helperSteps, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
-        autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel,
+        autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel, sideLabel,
         rightToggle, rightInput, atBottom, errorBackground, disabledBackground, isDisabled,
         suggestID, hasClear, forceClear, hideClear, onClear,
         hasCopy, copyValue, onCopy,
@@ -164,11 +164,11 @@ function InputField(props) {
 
 
     // Variables
-    // The label is shown over the border of the Input, unless it is asked outside of it.
+    // The label is shown over the border of the Input, unless it is asked outside of it or at its side.
     // An Input with no label takes the same style, so it is as tall as one that has it
     const hasLabel      = Boolean(label && InputType.hasLabel(type));
-    const hasOutside    = Boolean(hasLabel && outsideLabel);
-    const withOutside   = Boolean(outsideLabel);
+    const hasOutside    = Boolean(hasLabel && (outsideLabel || sideLabel));
+    const withOutside   = Boolean(outsideLabel || sideLabel);
     const canFocus      = InputType.canFocus(type);
     const isValueFilled = InputType.isValueFilled(type, value);
     const hasValue      = InputType.hasValue(type, value);
@@ -204,6 +204,7 @@ function InputField(props) {
         hasError={hasError}
         bigLabel={bigLabel}
         outsideLabel={withOutside}
+        sideLabel={sideLabel}
         bottomSpace={rightToggle}
         rightInput={rightInput}
         atBottom={atBottom}
@@ -352,6 +353,7 @@ InputField.propTypes = {
     shrinkLabel       : PropTypes.bool,
     bigLabel          : PropTypes.bool,
     outsideLabel      : PropTypes.bool,
+    sideLabel         : PropTypes.bool,
     withLabel         : PropTypes.bool,
     withBorder        : PropTypes.bool,
     rightToggle       : PropTypes.bool,
@@ -419,6 +421,7 @@ InputField.defaultProps = {
     fullWidth       : false,
     shrinkLabel     : false,
     outsideLabel    : false,
+    sideLabel       : false,
     bigLabel        : false,
     isSmall         : false,
     errorBackground : false,
