@@ -20,11 +20,11 @@ const CLOSE_TIME = 0.2;
 const EDGE_SPACE = 16;
 
 // Styles
-const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow, hasBreaks, isDark, isVisible, showDelay }) => ({ variant, width, maxWidth, toLeft, arrow, hasBreaks, isDark, isVisible, showDelay }))`
+const Container = Styled.div.attrs(({ variant, width, maxWidth, toLeft, arrow, shift, hasBreaks, isDark, isVisible, showDelay }) => ({ variant, width, maxWidth, toLeft, arrow, shift, hasBreaks, isDark, isVisible, showDelay }))`
     box-sizing: border-box;
     position: fixed;
     min-width: ${(props) => `${props.width}px`};
-    max-width: ${(props) => props.maxWidth ? `${props.maxWidth}px` : "auto"};
+    max-width: ${(props) => props.maxWidth ? `${props.maxWidth}px` : `calc(100vw - ${EDGE_SPACE * 2}px)`};
     opacity: ${(props) => props.isVisible ? 1 : 0};
     padding: 5px 8px;
     font-size: 12px;
@@ -82,10 +82,14 @@ const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow,
     `}
 
     ${(props) => props.variant === "top" && `
+        width: max-content;
         transform: translateX(-50%) translateY(-100%);
     `}
     ${(props) => props.variant === "bottom" && `
         transform: translateX(-50%);
+    `}
+    ${(props) => props.variant === "bottom" && !props.toLeft && `
+        width: max-content;
     `}
     ${(props) => (props.variant === "left" || props.variant === "right") && `
         transform: translateY(-50%);
@@ -104,13 +108,13 @@ const Container = Styled(Html).attrs(({ variant, width, maxWidth, toLeft, arrow,
 
         ${(props) => props.variant === "top" && `
             bottom: -18px;
-            left: calc(50% - 6px);
+            left: calc(50% - 6px - ${props.shift}px);
             border-color: var(--tooltip-background) transparent transparent transparent;
         `}
 
         ${(props) => props.variant === "bottom" && `
             top: -6px;
-            ${props.toLeft ? `right: ${props.arrow}px;` : "left: calc(50% - 6px);"}
+            ${props.toLeft ? `right: ${props.arrow}px;` : `left: calc(50% - 6px - ${props.shift}px);`}
             border-color: transparent transparent var(--tooltip-background) transparent;
         `}
 
@@ -179,13 +183,15 @@ function Tooltip() {
 
 
     // The References
-    const closeRef  = React.useRef(0);
-    const shownRef  = React.useRef(false);
+    const closeRef     = React.useRef(0);
+    const shownRef     = React.useRef(false);
+    const containerRef = React.useRef(null);
 
     // The Current State
     const [ current,   setCurrent   ] = React.useState(tooltip);
     const [ isVisible, setIsVisible ] = React.useState(false);
     const [ showDelay, setShowDelay ] = React.useState(0);
+    const [ shift,     setShift     ] = React.useState(0);
 
 
     // The one that closes is kept while it fades out, so it does not leave the screen on the
@@ -224,6 +230,35 @@ function Tooltip() {
     // Keep whether it is on the screen, which is what the delay above is decided with
     React.useEffect(() => {
         shownRef.current = current.open;
+    });
+
+    // One that is centered over a target close to an edge would go out of the screen, so it is
+    // moved inside, which needs its width and so happens once it is rendered. The arrow moves
+    // back by the same amount, so it still points to the target
+    React.useLayoutEffect(() => {
+        const element = containerRef.current;
+        if (!element || element.dataset.canShift !== "true") {
+            if (shift) {
+                setShift(0);
+            }
+            return;
+        }
+        // The left moves with a transition, so the place comes from the style and not from
+        // where it is right now, and only the width is measured
+        const width  = element.offsetWidth;
+        const center = parseFloat(element.style.left) - Number(element.dataset.shift);
+        const start  = center - width / 2;
+        let   result = 0;
+        if (start + width > window.innerWidth - EDGE_SPACE) {
+            result = window.innerWidth - EDGE_SPACE - width - start;
+        }
+        if (start + result < EDGE_SPACE) {
+            result = EDGE_SPACE - start;
+        }
+        result = Math.round(result);
+        if (result !== shift) {
+            setShift(result);
+        }
     });
 
 
@@ -290,11 +325,14 @@ function Tooltip() {
     // The place is given as a style and not as a rule of its own, so the element keeps the
     // same class while it moves. It then slides from where it was to where it goes, which
     // only happens when it is already open, as a transition does not run on the first render
-    const style = { top : `${top}px`, left : `${left}px` };
+    const canShift = variant === "top" || (variant === "bottom" && !toLeft);
+    const offset   = canShift ? shift : 0;
+    const style    = { top : `${top}px`, left : `${left + offset}px` };
 
 
     // Do the Render
     return <Container
+        ref={containerRef}
         className="tooltip"
         style={style}
         variant={variant}
@@ -302,12 +340,16 @@ function Tooltip() {
         maxWidth={maxWidth}
         toLeft={toLeft}
         arrow={arrow}
+        shift={offset}
+        data-shift={offset}
+        data-can-shift={canShift}
         hasBreaks={hasBreaks}
         isDark={isDark}
         isVisible={isVisible}
         showDelay={showDelay}
-        content={content}
-    />;
+    >
+        <Html content={content} />
+    </Container>;
 }
 
 export default Tooltip;
