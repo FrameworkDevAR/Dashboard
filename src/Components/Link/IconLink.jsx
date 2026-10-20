@@ -15,19 +15,22 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withMark }) => ({ variant, isDisabled, isSmall, isTiny, size, withMark }))`
+const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withMark, withText }) => ({ variant, isDisabled, isSmall, isTiny, size, withMark, withText }))`
     --link-size: 32px;
     --link-font: 20px;
+    --link-text: var(--font-size-small);
     --link-radius: var(--border-radius);
 
     ${(props) => props.isSmall && `
         --link-size: 24px;
         --link-font: 18px;
+        --link-text: var(--font-size-smallest);
         --link-radius: var(--border-radius-small);
     `}
     ${(props) => props.isTiny && `
         --link-size: 20px;
         --link-font: 14px;
+        --link-text: var(--font-size-smallest);
         --link-radius: var(--border-radius-small);
     `}
     ${(props) => props.size && `
@@ -48,6 +51,12 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     color: var(--link-color, black);
     flex-shrink: 0;
     cursor: pointer;
+
+    ${(props) => props.withText && `
+        gap: 4px;
+        width: auto;
+        padding: 0 4px;
+    `}
 
     &:focus {
         outline: none;
@@ -118,6 +127,11 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
     `}
 `;
 
+const Text = Styled.span`
+    font-size: var(--link-text);
+    white-space: nowrap;
+`;
+
 
 
 /**
@@ -128,7 +142,7 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
 function IconLink(props) {
     const {
         isHidden, passedRef, variant, className, isDisabled,
-        target, icon, isSmall, isTiny, size, withMark,
+        target, icon, message, afterIcon, isSmall, isTiny, size, withMark,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks, shortcut,
         onMouseDown, onMouseUp, onTouchEnd,
     } = props;
@@ -172,6 +186,7 @@ function IconLink(props) {
         isTiny={isTiny}
         size={size}
         withMark={withMark}
+        withText={Boolean(message || afterIcon)}
         href={isDisabled ? undefined : Navigate.getHref(props)}
         target={target}
         onClick={handleClick}
@@ -182,6 +197,8 @@ function IconLink(props) {
         onMouseLeave={hideTooltip}
     >
         <Icon icon={icon} />
+        {!!message && <Text>{NLS.get(message)}</Text>}
+        {!!afterIcon && <Icon icon={afterIcon} />}
     </Link>;
 }
 
@@ -195,6 +212,8 @@ IconLink.propTypes = {
     className      : PropTypes.string,
     variant        : PropTypes.string,
     icon           : PropTypes.string,
+    message        : PropTypes.string,
+    afterIcon      : PropTypes.string,
     tooltip        : PropTypes.string,
     shortcut       : PropTypes.string,
     tooltipVariant : PropTypes.string,
