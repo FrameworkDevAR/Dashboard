@@ -12,6 +12,11 @@ import {
 
 
 
+// The urls that are reached while logged out
+const AUTH_URLS = [ "LOGIN", "PASS_RECOVER", "PASS_CODE", "PASS_RESET", "PASS_CHANGE" ];
+
+
+
 /**
  * The Redirect of the Router, which goes to its first Route
  * @param {object} props
@@ -24,9 +29,11 @@ function RouterRedirect(props) {
     const rest   = params["*"] || "";
 
     // Only the base Url is meant to land here, so a rest is a link that no Route matches,
-    // which would otherwise go to the first Route without a word
+    // which would otherwise go to the first Route without a word. The urls of the auth are
+    // left out, as the login lands on them for an instant before it navigates
     React.useEffect(() => {
-        if (rest && !isQuiet && import.meta.env.DEV) {
+        const isAuth = AUTH_URLS.some((key) => rest.startsWith(NLS.url(key)));
+        if (rest && !isQuiet && !isAuth && import.meta.env.DEV) {
             // eslint-disable-next-line no-console
             console.warn(`No Route matches "${rest}", so it went to "${to}"`);
         }
