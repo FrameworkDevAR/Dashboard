@@ -3,6 +3,7 @@ import Utils                from "../Utils/Utils";
 
 // Module variables
 const controllers = new Set();
+const extraData   = {};
 
 let setResult  = null;
 let setError   = null;
@@ -24,6 +25,20 @@ function init(newApiUrl, newRouteUrl, onResult, onError) {
     routeUrl  = newRouteUrl;
     setResult = onResult;
     setError  = onError;
+}
+
+/**
+ * Sets a Param that is sent with every Post, or removes it when the value is empty
+ * @param {string} key
+ * @param {string} value
+ * @returns {void}
+ */
+function setParam(key, value) {
+    if (value) {
+        extraData[key] = value;
+    } else {
+        delete extraData[key];
+    }
 }
 
 
@@ -373,6 +388,9 @@ function createBody(params = {}) {
     if (timezone) {
         body.append("xTimezone", timezone);
     }
+    for (const [ key, value ] of Object.entries(extraData)) {
+        body.append(key, value);
+    }
     return body;
 }
 
@@ -409,6 +427,7 @@ function route(route, params = {}, addToken = true, addAuth = false) {
 // The public API
 export default {
     init,
+    setParam,
     get,
     post,
     upload,
