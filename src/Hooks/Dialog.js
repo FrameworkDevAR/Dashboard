@@ -16,6 +16,7 @@ import Store                from "../Core/Store";
  *
  * @typedef {object}    DialogType
  * @property {boolean}  loading
+ * @property {boolean}  error
  * @property {Function} startLoading
  * @property {Function} endLoading
  * @property {object}   elem
@@ -30,6 +31,17 @@ function useDialog(slice, open, elemID = 0, data = null, setElem = null, getElem
     const { fetchElem, fetchEditData, fetchFilterData } = Store.useAction(slice);
 
     const loading = loaders[slice] || false;
+
+    // The Current State
+    const [ error, setError ] = React.useState(false);
+
+
+    // The fetch answers an error when the element does not exist or can not be shown,
+    // so the dialog can say so instead of showing an empty content
+    const handleResult = async (promise) => {
+        const data = await promise;
+        setError(Boolean(data && data.error));
+    };
 
     // Starts the Loading
     const startLoading = () => {
@@ -49,20 +61,21 @@ function useDialog(slice, open, elemID = 0, data = null, setElem = null, getElem
             return;
         }
 
+        setError(false);
         if (getElem && elemID) {
-            getElem(elemID, ...Object.values(data || {}));
+            handleResult(getElem(elemID, ...Object.values(data || {})));
             startLoading();
         } else if (getElem) {
-            getElem(...Object.values(data || {}));
+            handleResult(getElem(...Object.values(data || {})));
             startLoading();
         } else if (fetchElem && elemID) {
-            fetchElem(elemID, ...Object.values(data || {}));
+            handleResult(fetchElem(elemID, ...Object.values(data || {})));
             startLoading();
         } else if (fetchEditData) {
-            fetchEditData(...Object.values(data || {}));
+            handleResult(fetchEditData(...Object.values(data || {})));
             startLoading();
         } else if (fetchFilterData) {
-            fetchFilterData(...Object.values(data || {}));
+            handleResult(fetchFilterData(...Object.values(data || {})));
             startLoading();
         } else if (setElem) {
             if (data) {
@@ -109,7 +122,7 @@ function useDialog(slice, open, elemID = 0, data = null, setElem = null, getElem
 
     // The API
     return {
-        loading, startLoading, endLoading, elem, canEdit,
+        loading, error, startLoading, endLoading, elem, canEdit,
     };
 }
 
