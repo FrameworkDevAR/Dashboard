@@ -187,7 +187,9 @@ function TextInput(props) {
     const handleKeyUp = (e) => {
         switch (e.keyCode) {
         case KeyCode.DOM_VK_ESCAPE:
-            if (showOptions) {
+            // The focus shows the options even when there are none, so only an open list keeps
+            // the key, and otherwise it reaches the Dialog to close it
+            if (hasOptions) {
                 setShowOptions(false);
                 e.stopPropagation();
             }

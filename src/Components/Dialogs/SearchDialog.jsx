@@ -119,6 +119,12 @@ const Content = Styled(DialogBody).attrs(({ fadeTop, fadeBottom, isEmpty }) => (
     `}
 `;
 
+const GroupList = Styled.div`
+    &:not(:first-child) {
+        margin-top: calc(var(--main-gap) * 2);
+    }
+`;
+
 const Group = Styled.h3`
     margin: 0 0 4px 12px;
     color: var(--font-lightest);
@@ -126,10 +132,6 @@ const Group = Styled.h3`
     letter-spacing: 0.04em;
     text-transform: uppercase;
     font-weight: 600;
-
-    &:not(:first-child) {
-        margin-top: calc(var(--main-gap) * 2);
-    }
 `;
 
 const Item = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
@@ -186,8 +188,8 @@ const Footer = Styled.footer`
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: var(--main-gap);
-    padding: 4px var(--dialog-padding) 10px;
+    min-height: var(--dialog-footer);
+    padding: 0 var(--dialog-padding);
     color: var(--font-lighter);
     font-size: var(--font-size-small);
 
@@ -333,8 +335,7 @@ function SearchDialog(props) {
         handleSearch("");
     };
 
-    // Handles the Key Down, to move through the Items. The Escape clears the search
-    // before it closes the Dialog, and it is stopped so the Dialog does not see it
+    // Handles the Key Down, to move through the Items
     const handleKeyDown = (e) => {
         if (e.key === "ArrowDown") {
             fromKeyRef.current = true;
@@ -344,7 +345,13 @@ function SearchDialog(props) {
             fromKeyRef.current = true;
             setSelectedIdx((selectedIdx - 1 + filtered.length) % filtered.length);
             e.preventDefault();
-        } else if (e.key === "Escape" && search) {
+        }
+    };
+
+    // Handles the Key Up. The Escape clears the search before it closes the Dialog, and
+    // it is stopped on the key up, as that is the event the Dialog closes with
+    const handleKeyUp = (e) => {
+        if (e.key === "Escape" && search) {
             handleClear();
             e.preventDefault();
             e.stopPropagation();
@@ -364,6 +371,7 @@ function SearchDialog(props) {
     return <Container
         open={open}
         onClose={onClose}
+        hasFooter
     >
         <Corner>
             <IconLink
@@ -387,6 +395,7 @@ function SearchDialog(props) {
             onChange={(name, value) => handleSearch(value)}
             onSubmit={handleSubmit}
             onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
             autoFocus
         />
         <Loader isSearching={isLoading} />
@@ -400,7 +409,7 @@ function SearchDialog(props) {
         >
             {!filtered.length && children}
 
-            {groups.map((group, groupIdx) => <div key={`${group.name}-${groupIdx}`}>
+            {groups.map((group, groupIdx) => <GroupList key={`${group.name}-${groupIdx}`}>
                 {!!group.name && <Group>{group.name}</Group>}
                 {group.items.map((item) => {
                     index += 1;
@@ -419,7 +428,7 @@ function SearchDialog(props) {
                         </Texts>
                     </Item>;
                 })}
-            </div>)}
+            </GroupList>)}
         </Content>
 
         <Footer>
@@ -427,10 +436,9 @@ function SearchDialog(props) {
             <div><b>Enter</b>{NLS.get("GENERAL_KEY_OPEN")}</div>
             <div><b>Esc</b>{NLS.get(search ? "GENERAL_KEY_CLEAR" : "GENERAL_KEY_CLOSE")}</div>
             <Close
-                variant="cancel"
+                variant="outlined"
                 message="GENERAL_CLOSE"
                 onClick={onClose}
-                isSmall
             />
         </Footer>
     </Container>;
