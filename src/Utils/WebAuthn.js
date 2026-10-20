@@ -170,7 +170,9 @@ async function get(options, isAutofill = false, signal = undefined) {
             signature         : toBase64(credential.response.signature),
         };
     } catch (error) {
-        if (isCancel(error)) {
+        // The autofill is only an offer, so a browser that rejects it has nothing to tell
+        // the user, who still has the password and the Passkey button
+        if (isCancel(error) || isAutofill) {
             return null;
         }
         throw getError(error);
