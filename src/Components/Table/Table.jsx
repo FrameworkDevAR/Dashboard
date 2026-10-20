@@ -76,7 +76,7 @@ const Loading = Styled(Wrapper)`
     overflow: hidden;
 `;
 
-const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll }) => ({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll }))`
+const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll, scrollsLeft, scrollsRight }) => ({ isEditable, totalWidth, minWidth, hasActions, hasRadius, hasScroll, scrollsLeft, scrollsRight }))`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -89,6 +89,40 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
 
     ${(props) => props.isEditable && `
         min-width: calc(${props.totalWidth}px + var(--table-checks-width) + var(--table-actions-width));
+    `}
+
+    ${(props) => props.isEditable && props.scrollsLeft && `
+        tr > th:first-child,
+        tr > td:first-child {
+            box-shadow: 6px 0 6px -6px rgba(0, 0, 0, 0.2);
+        }
+        tr > th:first-child::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 100%;
+            width: 32px;
+            background: linear-gradient(to right, var(--table-background), transparent);
+            pointer-events: none;
+        }
+    `}
+
+    ${(props) => props.isEditable && props.scrollsRight && `
+        tr > th:last-child,
+        tr > td:last-child {
+            box-shadow: -6px 0 6px -6px rgba(0, 0, 0, 0.2);
+        }
+        tr > th:last-child::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            width: 32px;
+            background: linear-gradient(to left, var(--table-background), transparent);
+            pointer-events: none;
+        }
     `}
 
     ${(props) => props.minWidth > 0 && !props.isEditable && `
@@ -151,6 +185,8 @@ function Table(props) {
     const [ menuDir,    setMenuDir    ] = React.useState(null);
     const [ iconHeight, setIconHeight ] = React.useState(0);
     const [ hasScroll,  setHasScroll  ] = React.useState(false);
+    const [ scrollsLeft,  setScrollsLeft  ] = React.useState(false);
+    const [ scrollsRight, setScrollsRight ] = React.useState(false);
     const [ sortField,  setSortField  ] = React.useState("");
     const [ isPaging,   setIsPaging   ] = React.useState(false);
     const [ showEdit,   setShowEdit   ] = React.useState(false);
@@ -431,6 +467,18 @@ function Table(props) {
         }
     }, [ isLoading, elemIDs.length ]);
 
+    // Check if the Table has columns hidden behind the sticky Checks or Actions columns,
+    // which then cast a shadow and fade the header they cut, so the cut text reads as
+    // scrolled content. The listeners are added again after the loader, as the wrapper
+    // does not exist during it
+    Utils.useScrollUpdate(tableRef, () => {
+        const node = tableRef.current;
+        if (node) {
+            setScrollsLeft(node.scrollLeft > 1);
+            setScrollsRight(node.scrollLeft + node.clientWidth < node.scrollWidth - 1);
+        }
+    }, [ isLoading, hasContent ]);
+
 
     // Do the Render
     if (isHidden) {
@@ -483,6 +531,8 @@ function Table(props) {
             hasActions={hasActions}
             hasRadius={hasRadius}
             hasScroll={hasScroll}
+            scrollsLeft={scrollsLeft}
+            scrollsRight={scrollsRight}
         >
             {items}
         </Container>
