@@ -93,6 +93,10 @@ const Link = Styled.a.attrs(({ variant, isDisabled, isSmall, isTiny, size, withM
         --link-color: var(--black-color);
         --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
     `}
+    ${(props) => props.variant === Brightness.GRAY && `
+        --link-color: var(--font-lighter);
+        --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
+    `}
     ${(props) => props.variant === Brightness.ERROR && `
         --link-color: var(--error-color);
         --link-background: var(--hover-overlay, rgba(0, 0, 0, 0.1));
