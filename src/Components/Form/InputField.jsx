@@ -309,6 +309,7 @@ InputField.propTypes = {
     spellCheck        : PropTypes.string,
     isRequired        : PropTypes.bool,
     isDisabled        : PropTypes.bool,
+    isLoading         : PropTypes.bool,
     isValid           : PropTypes.bool,
     getDisabled       : PropTypes.func,
     getPrefix         : PropTypes.func,

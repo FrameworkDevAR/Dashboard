@@ -14,6 +14,7 @@ import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
 import Html                 from "../Common/Html";
 import Icon                 from "../Common/Icon";
+import CircularLoader       from "../Loader/CircularLoader";
 import Avatar               from "../Avatar/Avatar";
 
 
@@ -73,6 +74,10 @@ const InputIcon = Styled(Icon).attrs(({ withLabel }) => ({ withLabel }))`
     ${(props) => !props.withLabel && "margin-top: 0;"}
 `;
 
+const Loader = Styled(CircularLoader)`
+    flex-shrink: 0;
+`;
+
 const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`
     color: var(--font-lightest);
     font-size: 13px;
@@ -89,7 +94,7 @@ const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`
 function SelectInput(props) {
     const {
         inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix,
-        isFocused, isDisabled, isSmall, withBorder, withLabel,
+        isFocused, isDisabled, isLoading, isSmall, withBorder, withLabel,
         id, name, placeholder, value, allowMultiple, withColors, withAvatars,
         defaultText, emptyText, noneText, noneValue,
         withCustom, customFirst, customText, customKey,
@@ -327,7 +332,7 @@ function SelectInput(props) {
 
     // Handles the Click
     const handleClick = () => {
-        if (!showOptions) {
+        if (!showOptions && !isLoading) {
             inputRef.current.focus();
             setShowOptions(true);
         }
@@ -515,7 +520,7 @@ function SelectInput(props) {
     const current = allowMultiple ? null : optionList.find((item) => !item.isTitle && String(item.value) === valueKey);
 
     // More Variables
-    const showDisabled   = Boolean(isDisabled || (emptyText && optionList.length === 0));
+    const showDisabled   = Boolean(isDisabled || isLoading || (emptyText && optionList.length === 0));
     const hasDescription = Boolean(!showOptions && showDescription && optionDesc);
     const isOnlyOption   = Boolean(filteredOptions.length === 1);
     const hasTitles      = filteredOptions.some(({ isTitle }) => isTitle);
@@ -573,11 +578,11 @@ function SelectInput(props) {
                 isDisabled={isDisabled}
             />}
         </Inside>
-        <InputIcon
+        {isLoading ? <Loader isTiny /> : <InputIcon
             icon="expand"
             withLabel={withLabel}
             size="18"
-        />
+        />}
 
         {hasOptions && <InputOptions
             passedRef={optionsRef}
@@ -627,6 +632,7 @@ SelectInput.propTypes = {
     suffixText        : PropTypes.string,
     isFocused         : PropTypes.bool,
     isDisabled        : PropTypes.bool,
+    isLoading         : PropTypes.bool,
     isSmall           : PropTypes.bool,
     withBorder        : PropTypes.bool,
     withLabel         : PropTypes.bool,
@@ -671,6 +677,7 @@ SelectInput.defaultProps = {
     className   : "",
     isFocused   : false,
     isDisabled  : false,
+    isLoading   : false,
     isSmall     : false,
     withBorder  : true,
     withLabel   : true,
