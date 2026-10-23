@@ -22,6 +22,7 @@ const Content = Styled(Html)`
     font-weight: 400;
     line-height: 1.5;
     text-align: center;
+    overflow-wrap: anywhere;
 `;
 
 const Children = Styled.div`
