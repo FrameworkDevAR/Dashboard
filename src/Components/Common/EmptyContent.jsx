@@ -9,7 +9,7 @@ import Icon                 from "./Icon";
 
 
 // Styles
-const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing }) => ({ forPage, fullWidth, withSpacing }))`
+const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing, isSmall }) => ({ forPage, fullWidth, withSpacing, isSmall }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -22,6 +22,10 @@ const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing }) => 
         flex-grow: 2;
         padding: 40px;
     `}
+    ${(props) => props.isSmall && `
+        gap: 12px;
+        padding: 16px;
+    `}
     ${(props) => props.forPage && `
         height: var(--page-height);
     `}
@@ -30,13 +34,19 @@ const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing }) => 
     `}
 `;
 
-const Iconography = Styled(Icon).attrs(({ noIconMargin }) => ({ noIconMargin }))`
+const Iconography = Styled(Icon).attrs(({ noIconMargin, isSmall }) => ({ noIconMargin, isSmall }))`
     ${(props) => !props.noIconMargin && "margin-top: -40px;"}
     padding: 12px 24px;
     border-radius: var(--border-radius-big);
     background-color: var(--lighter-gray);
     color: var(--darkest-gray);
     opacity: 0.8;
+
+    ${(props) => props.isSmall && `
+        margin-top: 0;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+    `}
 `;
 
 const Content = Styled.div`
@@ -75,7 +85,7 @@ const Description = Styled(Html)`
 function EmptyContent(props) {
     const {
         isHidden, className, icon, message, description,
-        forPage, fullWidth, withSpacing, noIconMargin, children,
+        forPage, fullWidth, withSpacing, noIconMargin, isSmall, children,
     } = props;
 
 
@@ -88,11 +98,13 @@ function EmptyContent(props) {
         forPage={forPage}
         fullWidth={fullWidth}
         withSpacing={withSpacing}
+        isSmall={isSmall}
     >
         <Iconography
             icon={icon}
-            size="72"
+            size={isSmall ? "40" : "72"}
             noIconMargin={noIconMargin}
+            isSmall={isSmall}
         />
         <Content>
             <Title
@@ -124,6 +136,7 @@ EmptyContent.propTypes = {
     fullWidth    : PropTypes.bool,
     noIconMargin : PropTypes.bool,
     withSpacing  : PropTypes.bool,
+    isSmall      : PropTypes.bool,
     children     : PropTypes.any,
 };
 
