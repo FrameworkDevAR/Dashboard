@@ -157,7 +157,8 @@ function InputContent(props) {
             if (!isFocused) {
                 inputRef.current.focus();
             } else {
-                window.setTimeout(() => inputRef.current.focus(), 200);
+                // The input can be unmounted by then, like the one of a dialog that was saved
+                window.setTimeout(() => inputRef.current?.focus(), 200);
             }
         }
     };
