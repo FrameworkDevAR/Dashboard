@@ -41,6 +41,7 @@ function SettingItem(props) {
         onClick={onEdit}
         actions={<>
             <IconLink
+                isHidden={!onEdit}
                 variant="black"
                 icon="edit"
                 onClick={onEdit}
@@ -69,7 +70,7 @@ SettingItem.propTypes = {
     elemID    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]).isRequired,
     index     : PropTypes.number,
     onGrab    : PropTypes.func,
-    onEdit    : PropTypes.func.isRequired,
+    onEdit    : PropTypes.func,
     onDelete  : PropTypes.func.isRequired,
     children  : PropTypes.any,
 };
