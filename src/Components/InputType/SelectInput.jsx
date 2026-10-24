@@ -19,14 +19,7 @@ import Avatar               from "../Avatar/Avatar";
 
 
 
-// Constants
-const DESCRIPTION_GAP = 4;
-
 // Styles
-const Content = Styled(InputContent).attrs(({ bottomSpace }) => ({ bottomSpace }))`
-    ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
-`;
-
 const Inside = Styled.div.attrs(({ inlineDescription }) => ({ inlineDescription }))`
     display: flex;
     flex-direction: column;
@@ -78,10 +71,11 @@ const Loader = Styled(CircularLoader)`
     flex-shrink: 0;
 `;
 
-const Description = Styled(Html).attrs(({ isDisabled }) => ({ isDisabled }))`
+const Description = Styled(Html).attrs(({ isDisabled, isInvisible }) => ({ isDisabled, isInvisible }))`
     color: var(--font-lightest);
     font-size: 13px;
     ${(props) => !props.isDisabled && "cursor: pointer;"}
+    ${(props) => props.isInvisible && "visibility: hidden;"}
 `;
 
 
@@ -120,7 +114,6 @@ function SelectInput(props) {
     const [ timer,       setTimer       ] = React.useState(null);
     const [ style,       setStyle       ] = React.useState({ ...initStyle });
     const [ update,      setUpdate      ] = React.useState(0);
-    const [ bottomSpace, setBottomSpace ] = React.useState(0);
 
     // Variables
     const valueKey   = String(value || noneValue);
@@ -162,7 +155,7 @@ function SelectInput(props) {
             if (typeof item === "string") {
                 itemData = { key : item, value : item };
             }
-            const { key, value, icon : itemIcon, description, isTitle } = itemData;
+            const { key, value, icon : itemIcon, description, isTitle, level } = itemData;
 
             // The color and the avatar of an option are only shown when the input asks for them
             const avatar = { name : NLS.get(value), email : itemData.email || "", avatar : itemData.avatar || "" };
@@ -176,6 +169,7 @@ function SelectInput(props) {
                 icon        : itemIcon || "",
                 description : description ? NLS.get(description) : Utils.getValue(descItems, "key", key, "value"),
                 isTitle     : Boolean(isTitle),
+                level       : Number(level) || 0,
             });
         }
         for (const { key, value, icon : extraIcon, description } of extraItems) {
@@ -287,16 +281,6 @@ function SelectInput(props) {
         return [ NLS.get(value), NLS.get(desc), itemIcon, false ];
     }, [ valueKey, JSON.stringify(optionList), allowMultiple, defaultText, emptyText ]);
 
-
-    // Stores the height of the description, which is used as a space under the input while
-    // the options are shown, so hiding it does not move the content that is under the select.
-    // An inline description is beside the input and takes no height, so it leaves no space
-    React.useEffect(() => {
-        const element = containerRef.current?.querySelector(".input-description");
-        if (element) {
-            setBottomSpace(inlineDescription ? 0 : element.offsetHeight + DESCRIPTION_GAP);
-        }
-    }, [ optionDesc, showOptions, inlineDescription ]);
 
     // Clear the Timer
     React.useEffect(() => {
@@ -521,13 +505,13 @@ function SelectInput(props) {
 
     // More Variables
     const showDisabled   = Boolean(isDisabled || isLoading || (emptyText && optionList.length === 0));
-    const hasDescription = Boolean(!showOptions && showDescription && optionDesc);
+    const hasDescription = Boolean(showDescription && optionDesc);
     const isOnlyOption   = Boolean(filteredOptions.length === 1);
     const hasTitles      = filteredOptions.some(({ isTitle }) => isTitle);
 
 
     // Do the Render
-    return <Content
+    return <InputContent
         passedRef={containerRef}
         className={className}
         icon={showOptions ? "" : (icon || optionIcon)}
@@ -544,7 +528,6 @@ function SelectInput(props) {
         withLabel={withLabel}
         withPadding
         withClick
-        bottomSpace={showOptions ? bottomSpace : 0}
     >
         {!showOptions && Boolean(current && current.color) && <Dot dotColor={current.color} />}
         {!showOptions && Boolean(current && current.avatar) && <OptionAvatar
@@ -572,10 +555,12 @@ function SelectInput(props) {
                 onKeyUp={handleKeyUp}
                 inlineDescription={inlineDescription}
             />
+            {/* The description is only hidden while the options are shown, so the input keeps its height */}
             {hasDescription && <Description
                 className="input-description"
                 content={optionDesc}
                 isDisabled={isDisabled}
+                isInvisible={showOptions}
             />}
         </Inside>
         {isLoading ? <Loader isTiny /> : <InputIcon
@@ -595,7 +580,7 @@ function SelectInput(props) {
             maxHeight={style.maxHeight}
             opacity={style.opacity}
         >
-            {filteredOptions.map(({ key, value, text, message, icon : optionIcon, color, avatar, description, isTitle }, index) => <InputOption
+            {filteredOptions.map(({ key, value, text, message, icon : optionIcon, color, avatar, description, isTitle, level }, index) => <InputOption
                 key={key}
                 className={`input-option-${index}`}
                 hasCreate={hasCreate}
@@ -603,6 +588,7 @@ function SelectInput(props) {
                 isOnlyOption={isOnlyOption}
                 isTitle={isTitle}
                 leftSpace={hasTitles && !isTitle && !optionIcon}
+                level={level}
                 icon={optionIcon}
                 color={color}
                 avatar={avatar}
@@ -615,7 +601,7 @@ function SelectInput(props) {
                 hasChecks={allowMultiple && !isTitle}
             />)}
         </InputOptions>}
-    </Content>;
+    </InputContent>;
 }
 
 /**

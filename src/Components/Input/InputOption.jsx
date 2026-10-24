@@ -11,13 +11,16 @@ import Avatar               from "../Avatar/Avatar";
 
 
 // Styles
-const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }) => ({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace }))`
+const Container = Styled.li.attrs(({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace, level }) => ({ hasValue, forValue, hasCreate, forCreate, isOnlyOption, isSelected, isTitle, leftSpace, level }))`
     margin: 0;
     color: var(--title-color);
     background-color: var(--menu-background, var(--white-color));
 
     ${(props) => props.leftSpace && `
         margin-left: 16px;
+    `}
+    ${(props) => props.level > 0 && `
+        margin-left: ${props.level * 20}px;
     `}
 
     ${(props) => props.hasValue && `
@@ -161,7 +164,7 @@ function InputOption(props) {
     const {
         isHidden, className,
         hasValue, forValue,
-        hasCreate, forCreate, isOnlyOption, isTitle, leftSpace,
+        hasCreate, forCreate, isOnlyOption, isTitle, leftSpace, level,
         icon, color, avatar, content, message, description, inlineDescription,
         isSelected, hasChecks, isChecked, onMouseDown,
         direction, onClose, children,
@@ -196,6 +199,7 @@ function InputOption(props) {
             isOnlyOption={isOnlyOption}
             isTitle={isTitle}
             leftSpace={leftSpace}
+            level={level}
             onMouseDown={isTitle ? undefined : onMouseDown}
             onMouseEnter={() => setMenuOpen(true)}
             onMouseLeave={() => setMenuOpen(false)}
@@ -265,6 +269,7 @@ InputOption.propTypes = {
     isOnlyOption      : PropTypes.bool,
     isTitle           : PropTypes.bool,
     leftSpace         : PropTypes.bool,
+    level             : PropTypes.number,
     icon              : PropTypes.string,
     color             : PropTypes.string,
     avatar            : PropTypes.object,
@@ -294,6 +299,7 @@ InputOption.defaultProps = {
     isOnlyOption : false,
     isTitle      : false,
     leftSpace    : false,
+    level        : 0,
 };
 
 export default InputOption;
