@@ -91,7 +91,7 @@ const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace,
             width: 28px;
             height: 28px;
         }
-        ${!props.inlineChildren ? ".banner-children { padding-left: 38px; }" : ""}
+        ${!props.inlineChildren ? ".banner-children { padding: 6px 0 0 38px; }" : ""}
     `}
 
     ${(props) => props.noBorder && `
