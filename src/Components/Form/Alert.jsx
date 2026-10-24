@@ -3,11 +3,12 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
-import { Outcome }          from "../../Core/Variants";
+import { Outcome, Brightness } from "../../Core/Variants";
 import NLS                  from "../../Core/NLS";
 
 // Components
 import Html                 from "../Common/Html";
+import IconLink             from "../Link/IconLink";
 
 
 
@@ -50,7 +51,7 @@ const Container = Styled.div.attrs(({ variant, topSpace, bottomSpace }) => ({ va
 function Alert(props) {
     const {
         isHidden, className, variant, message,
-        topSpace, bottomSpace, children,
+        topSpace, bottomSpace, onClose, children,
     } = props;
 
 
@@ -77,6 +78,13 @@ function Alert(props) {
     >
         {!!message  && <Html>{content}</Html>}
         {!!children && <div className="alert-content">{children}</div>}
+        {!!onClose  && <IconLink
+            className="alert-close"
+            variant={Brightness.WHITE}
+            icon="close"
+            onClick={onClose}
+            isSmall
+        />}
     </Container>;
 }
 
@@ -91,6 +99,7 @@ Alert.propTypes = {
     message     : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     topSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    onClose     : PropTypes.func,
     children    : PropTypes.any,
 };
 
