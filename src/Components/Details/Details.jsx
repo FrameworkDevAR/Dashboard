@@ -85,6 +85,27 @@ const Container = Styled.section.attrs(({ isInside, isWide, isLarge, hasExternal
     }
 `;
 
+const Dragger = Styled.div`
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    height: 0;
+    z-index: 2;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: calc(-1 * var(--details-spacing));
+        width: 6px;
+        height: var(--details-height);
+        cursor: col-resize;
+    }
+    &:hover::before {
+        background-color: var(--primary-color);
+    }
+`;
+
 const Loading = Styled.div`
     display: flex;
     justify-content: center;
@@ -116,7 +137,8 @@ function Details(props) {
         passedRef, className, isHidden, isInside, isWide, isLarge,
         hasInternalTabs, hasExternalTabs, withBorder,
         isLoading, isEmpty, hasError, error,
-        canEdit, onAction, collapsible, canCollapse, stickyBottom, children,
+        canEdit, onAction, collapsible, canCollapse, stickyBottom,
+        resizable, resizeWidth, minWidth, maxWidth, children,
     } = props;
 
     const { isCollapsed } = Store.useState("core");
@@ -131,6 +153,8 @@ function Details(props) {
     // The References
     const ownRef     = React.useRef(null);
     const contentRef = passedRef || ownRef;
+    const widthRef   = React.useRef(resizeWidth);
+    const startRef   = React.useRef(0);
 
     // The Current State
     const [ atTop,    setAtTop    ] = React.useState(true);
@@ -147,6 +171,45 @@ function Details(props) {
         }
     };
     Utils.useScrollUpdate(contentRef, updateFades, [ isShown ]);
+
+
+    // The width is the variable of the body that the panel and the main area share, so a
+    // resize moves both, and the variable is removed when the panel goes away
+    const widthVar = isLarge ? "--details-width-large" : (isWide ? "--details-width-wide" : "--details-width");
+    const setWidth = (width) => {
+        widthRef.current = width;
+        document.body.style.setProperty(widthVar, `${width}px`);
+    };
+
+    React.useEffect(() => {
+        if (!resizable || !isShown) {
+            return undefined;
+        }
+        setWidth(widthRef.current);
+        return () => document.body.style.removeProperty(widthVar);
+    }, [ resizable, isShown, widthVar ]);
+
+
+    // Handles the Grab
+    const handleGrab = (e) => {
+        Utils.unselectAll();
+        startRef.current = e.clientX + widthRef.current;
+        window.addEventListener("mousemove", handleDrag);
+        window.addEventListener("mouseup",   handleDrop);
+    };
+
+    // Handles the Drag. The panel is at the right, so it grows when the mouse goes left
+    const handleDrag = (e) => {
+        Utils.unselectAll();
+        const width = Math.min(maxWidth, Math.max(minWidth, startRef.current - e.clientX));
+        setWidth(width);
+    };
+
+    // Handles the Drop
+    const handleDrop = () => {
+        window.removeEventListener("mousemove", handleDrag);
+        window.removeEventListener("mouseup",   handleDrop);
+    };
 
 
     // Set/Unset the Details on Load/Unload, and if they can be collapsed from the Top Bar
@@ -192,6 +255,7 @@ function Details(props) {
         withBorder={withBorder}
         stickyBottom={stickyBottom}
     >
+        {resizable   && <Dragger onMouseDown={handleGrab} />}
         {isLoading   && <Loading><CircularLoader /></Loading>}
         {showError   && <Error>{NLS.get(error)}</Error>}
         {showContent && items}
@@ -221,6 +285,10 @@ Details.propTypes = {
     collapsible     : PropTypes.string,
     canCollapse     : PropTypes.bool,
     stickyBottom    : PropTypes.bool,
+    resizable       : PropTypes.bool,
+    resizeWidth     : PropTypes.number,
+    minWidth        : PropTypes.number,
+    maxWidth        : PropTypes.number,
     children        : PropTypes.any,
 };
 
@@ -242,6 +310,10 @@ Details.defaultProps = {
     hasError        : false,
     canCollapse     : false,
     stickyBottom    : false,
+    resizable       : false,
+    resizeWidth     : 440,
+    minWidth        : 300,
+    maxWidth        : 900,
 };
 
 export default Details;
