@@ -477,8 +477,12 @@ function useLink(props) {
                 handled = true;
             }
         }
+        // A link with nothing to follow never leaves its "#" in the url, even when it
+        // lets the click propagate
         if (handled && !dontStop) {
             e.stopPropagation();
+        }
+        if (handled && (!dontStop || url === "#")) {
             e.preventDefault();
         }
     };

@@ -688,12 +688,15 @@ function formatNumber(number, decimals = 0, maxForDecimals = 1000, alwaysShowDec
         }
     }
 
-    const parts = result.split(".");
-    parts[0]    = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // The separators follow the language of the interface, as in English the thousands
+    // take a comma and the decimals a point
+    const isEnglish = NLS.getCurrentLang() === "en";
+    const parts     = result.split(".");
+    parts[0]        = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, isEnglish ? "," : ".");
     if (!decimals) {
         return parts[0];
     }
-    return parts.join(",");
+    return parts.join(isEnglish ? "." : ",");
 }
 
 /**
