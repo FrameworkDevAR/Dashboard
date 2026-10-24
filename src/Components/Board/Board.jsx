@@ -85,12 +85,13 @@ const Filler = Styled.div`
 function Board(props) {
     const {
         className, storageKey, columnWidth, canDrag, withOrder,
-        filler, fillerMinWidth, keepFiller, onSelect, onMove, children,
+        filler, fillerMinWidth, keepFiller, onSelect, onMove, onVisible, children,
     } = props;
 
 
     // References
     const containerRef = React.useRef(null);
+    const visibleRef   = React.useRef("");
 
     // The Current State
     const [ collapsed, setCollapsed ] = React.useState([]);
@@ -160,6 +161,28 @@ function Board(props) {
             setAtStart(el.scrollLeft <= 1);
             setAtEnd(el.scrollWidth - el.scrollLeft - el.clientWidth <= 1);
             setHasFiller(Boolean(filler) && (keepFiller || space >= fillerMinWidth));
+            checkVisible(el, columns);
+        }
+    };
+
+    // Reports the Columns that are shown, with half a screen more at each side, so what
+    // they show can be loaded before they are reached. The collapsed ones show nothing
+    const checkVisible = (el, columns) => {
+        if (!onVisible) {
+            return;
+        }
+
+        const from = el.scrollLeft - el.clientWidth / 2;
+        const to   = el.scrollLeft + el.clientWidth * 1.5;
+        const ids  = columns.filter((column) => {
+            const isShown = column.offsetLeft + column.offsetWidth > from && column.offsetLeft < to;
+            return isShown && !column.classList.contains("board-collapsed");
+        }).map((column) => Number(column.dataset.id));
+
+        const key = ids.join(",");
+        if (key !== visibleRef.current) {
+            visibleRef.current = key;
+            onVisible(ids);
         }
     };
 
@@ -422,6 +445,7 @@ Board.propTypes = {
     keepFiller     : PropTypes.bool,
     onSelect       : PropTypes.func,
     onMove         : PropTypes.func,
+    onVisible      : PropTypes.func,
     children       : PropTypes.any,
 };
 
