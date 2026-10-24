@@ -22,10 +22,6 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
         justify-content: center;
         align-items: center;
     `}
-    ${(props) => props.isLoading && `
-        padding: 32px;
-        --dialog-content: calc(var(--dialog-body) - 2 * 32px);
-    `}
     ${(props) => props.withSpacing && `
         padding: 4px var(--dialog-padding);
         --dialog-content: calc(var(--dialog-body) - 2 * 4px);
@@ -36,6 +32,10 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
     `}
     ${(props) => ((props.withSpacing || props.bigSpacing) && props.hideFooter) && `
         padding-bottom: var(--dialog-padding);
+    `}
+    ${(props) => props.isLoading && `
+        padding: 32px;
+        --dialog-content: calc(var(--dialog-body) - 2 * 32px);
     `}
     ${(props) => props.minHeight && `
         min-height: min(var(--dialog-body), ${props.minHeight}px);
