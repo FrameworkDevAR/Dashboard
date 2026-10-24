@@ -81,6 +81,20 @@ function EmojiPopup(props) {
         e.stopPropagation();
     };
 
+    // The Escape closes it too, like the menus
+    React.useEffect(() => {
+        if (!open) {
+            return undefined;
+        }
+        const handleKey = (e) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+    }, [ open ]);
+
 
     // Return early
     if (!open) {
