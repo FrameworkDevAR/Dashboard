@@ -132,6 +132,12 @@ const Title = Styled.h4`
 
 const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
     ${(props) => !props.inlineChildren && "padding: 12px 0 0 28px;"}
+    ${(props) => props.inlineChildren && `
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    `}
 
     :empty {
         display: none;
