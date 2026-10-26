@@ -531,7 +531,12 @@ function Filter(props) {
 
     // Generates the Options
     const optionList = React.useMemo(() => {
-        const result = [];
+        const result  = [];
+        const numbers = [];
+
+        // A number can be written with the signs of a phone, like +54 9 11 2166-1975
+        const isNumber = Boolean(search) && Utils.isNumeric(search.replace(/[\s+\-().#]/g, ""));
+
         for (const item of itemList) {
             // Only show a text item if searching
             if (!item.type || item.type === "text" || item.type === "textarea" || item.type === "email") {
@@ -545,10 +550,11 @@ function Filter(props) {
                 continue;
             }
 
-            // Only show a number item if searching a number
+            // Only show a number item if searching a number, and before the others, as the
+            // text items match any search
             if (item.type === "number") {
-                if (search && Utils.isNumeric(search.replace("#", ""))) {
-                    result.push({
+                if (isNumber) {
+                    numbers.push({
                         ...item,
                         value : search,
                         text  : `${NLS.get(item.message)} "${search}"`,
@@ -592,7 +598,7 @@ function Filter(props) {
                 }
             }
         }
-        return result;
+        return [ ...numbers, ...result ];
     }, [ JSON.stringify(itemList), JSON.stringify(data), search ]);
 
 
