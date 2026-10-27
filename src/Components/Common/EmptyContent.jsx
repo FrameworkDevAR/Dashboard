@@ -9,7 +9,7 @@ import Icon                 from "./Icon";
 
 
 // Styles
-const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing, isSmall }) => ({ forPage, fullWidth, withSpacing, isSmall }))`
+const Container = Styled.section.attrs(({ forPage, hasTabs, fullWidth, withSpacing, isSmall }) => ({ forPage, hasTabs, fullWidth, withSpacing, isSmall }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -27,7 +27,7 @@ const Container = Styled.section.attrs(({ forPage, fullWidth, withSpacing, isSma
         padding: 16px;
     `}
     ${(props) => props.forPage && `
-        height: var(--page-height);
+        height: var(--page-height${props.hasTabs ? "-tabs" : ""});
     `}
     ${(props) => props.fullWidth && `
         width: 100%;
@@ -85,7 +85,7 @@ const Description = Styled(Html)`
 function EmptyContent(props) {
     const {
         isHidden, className, icon, message, description,
-        forPage, fullWidth, withSpacing, noIconMargin, isSmall, children,
+        forPage, hasTabs, fullWidth, withSpacing, noIconMargin, isSmall, children,
     } = props;
 
 
@@ -96,6 +96,7 @@ function EmptyContent(props) {
     return <Container
         className={className}
         forPage={forPage}
+        hasTabs={hasTabs}
         fullWidth={fullWidth}
         withSpacing={withSpacing}
         isSmall={isSmall}
@@ -133,6 +134,7 @@ EmptyContent.propTypes = {
     message      : PropTypes.string.isRequired,
     description  : PropTypes.string,
     forPage      : PropTypes.bool,
+    hasTabs      : PropTypes.bool,
     fullWidth    : PropTypes.bool,
     noIconMargin : PropTypes.bool,
     withSpacing  : PropTypes.bool,
