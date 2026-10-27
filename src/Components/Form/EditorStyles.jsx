@@ -62,6 +62,9 @@ const EditorStyle = createGlobalStyle`
             box-shadow: none;
             margin: 0;
         }
+        &[style*="bottom"] {
+            top: auto !important;
+        }
     }
 
 
