@@ -145,6 +145,15 @@ function useSearchParams() {
 }
 
 /**
+ * Returns the Hash of the Url, without the #
+ * @returns {string}
+ */
+function useHash() {
+    const location = useLocation();
+    return location.hash.substring(1);
+}
+
+/**
  * Returns the Parent Path
  * @param {number=} levels
  * @returns {string}
@@ -538,6 +547,7 @@ export default {
 
     usePath,
     useSearchParams,
+    useHash,
     useFrom,
     useParent,
     useChildPath,
