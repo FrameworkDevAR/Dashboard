@@ -93,7 +93,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
 
     ${(props) => props.isEditable && props.scrollsLeft && `
         tr > th:first-child,
-        tr > td:first-child {
+        tbody tr > td:first-child {
             box-shadow: 6px 0 6px -6px rgba(0, 0, 0, 0.2);
         }
         tr > th:first-child::after {
@@ -110,7 +110,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
 
     ${(props) => props.isEditable && props.scrollsRight && `
         tr > th:last-child,
-        tr > td:last-child {
+        tbody tr > td:last-child {
             box-shadow: -6px 0 6px -6px rgba(0, 0, 0, 0.2);
         }
         tr > th:last-child::before {
