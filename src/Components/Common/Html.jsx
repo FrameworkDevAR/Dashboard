@@ -26,6 +26,8 @@ const urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#/%?=~_|!:,.;]*[a-z0-9-+&@#/
 const pseudoUrlPattern = /(^|[^/])(www\.[\S]+(\b|$))/gim;
 // Email addresses
 const emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+// The Links with their text and any other tag
+const tagPattern = /<a\b[^>]*>[\s\S]*?<\/a>|<\/?[a-z!][^>]*>/gi;
 
 
 
@@ -35,6 +37,25 @@ const Code = Styled.pre`
 `;
 
 
+
+/**
+ * Replaces the given pattern only in the text that is outside of the Links and the tags
+ * @param {string}   html
+ * @param {RegExp}   pattern
+ * @param {Function} replacer
+ * @returns {string}
+ */
+function replaceOutsideTags(html, pattern, replacer) {
+    // A url inside an href or inside the text of a Link is already one, and making it a
+    // Link again nests an anchor in the attribute and breaks the html
+    let result = "";
+    let last   = 0;
+    for (const match of html.matchAll(tagPattern)) {
+        result += html.slice(last, match.index).replace(pattern, replacer) + match[0];
+        last    = match.index + match[0].length;
+    }
+    return result + html.slice(last).replace(pattern, replacer);
+}
 
 /**
  * The Html Component
@@ -59,19 +80,18 @@ function Html(props) {
 
     // Parse the Content
     if (addLinks) {
-        __html = __html
-            .replace(urlPattern, (match) => {
-                const text = (breakEmail ? Utils.makeBreakable(match) : match).replace(/&/g, "&amp;");
-                return `<a href="${match}" target="_blank">${text}</a>`;
-            })
-            .replace(pseudoUrlPattern, (match, p1, p2) => {
-                const text = breakEmail ? Utils.makeBreakable(p2) : p2;
-                return `${p1}<a href="http://${p2}" target="_blank">${text}</a>`;
-            })
-            .replace(emailAddressPattern, (match) => {
-                const text = breakEmail ? Utils.makeBreakable(match) : match;
-                return `<a href="mailto:${match}" target="_blank">${text}</a>`;
-            });
+        __html = replaceOutsideTags(__html, urlPattern, (match) => {
+            const text = (breakEmail ? Utils.makeBreakable(match) : match).replace(/&/g, "&amp;");
+            return `<a href="${match}" target="_blank">${text}</a>`;
+        });
+        __html = replaceOutsideTags(__html, pseudoUrlPattern, (match, p1, p2) => {
+            const text = breakEmail ? Utils.makeBreakable(p2) : p2;
+            return `${p1}<a href="http://${p2}" target="_blank">${text}</a>`;
+        });
+        __html = replaceOutsideTags(__html, emailAddressPattern, (match) => {
+            const text = breakEmail ? Utils.makeBreakable(match) : match;
+            return `<a href="mailto:${match}" target="_blank">${text}</a>`;
+        });
     }
 
     if (addBreaks) {
