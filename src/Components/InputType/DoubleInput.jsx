@@ -63,6 +63,13 @@ const Container = Styled.div.attrs(({ withLabel, outsideLabel, noLabels }) => ({
     `}
 `;
 
+const Column = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+`;
+
 
 
 /**
@@ -72,7 +79,7 @@ const Container = Styled.div.attrs(({ withLabel, outsideLabel, noLabels }) => ({
  */
 function DoubleInput(props) {
     const {
-        className, isFocused, isDisabled, withLabel, outsideLabel, withBorder,
+        className, isFocused, isDisabled, withLabel, outsideLabel, withBorder, isVertical,
         onChange, onFocus, onBlur, children,
     } = props;
 
@@ -83,6 +90,23 @@ function DoubleInput(props) {
 
     // Without a label anywhere the fields do not reserve the space of one
     const noLabels = !withLabel && items.every((item) => !item.label);
+
+
+    // Each field is its own Input, one above the other, and its suffix says what it holds
+    if (isVertical) {
+        return <Column className={className}>
+            {items.map((item) => <InputField
+                {...item}
+                key={item.name}
+                label=""
+                onChange={item.onChange || onChange}
+                isDisabled={isDisabled || item.isDisabled}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                fullWidth
+            />)}
+        </Column>;
+    }
 
 
     // Do the Render. The label of a checkbox is the text next to the box and not the label
@@ -124,6 +148,7 @@ DoubleInput.propTypes = {
     withBorder   : PropTypes.bool,
     withLabel    : PropTypes.bool,
     outsideLabel : PropTypes.bool,
+    isVertical   : PropTypes.bool,
     onChange     : PropTypes.func.isRequired,
     onFocus      : PropTypes.func,
     onBlur       : PropTypes.func,
@@ -141,6 +166,7 @@ DoubleInput.defaultProps = {
     withBorder   : true,
     withLabel    : true,
     outsideLabel : false,
+    isVertical   : false,
 };
 
 export default DoubleInput;

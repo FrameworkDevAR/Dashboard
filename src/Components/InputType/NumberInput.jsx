@@ -55,7 +55,7 @@ const Input = Styled(InputBase).attrs(({ withSteps }) => ({ withSteps }))`
  */
 function NumberInput(props) {
     const {
-        inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix,
+        inputRef, className, icon, postIcon, prefixText, suffixText, strongPrefix, pluralSuffix,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
         id, name, value, step, decimals, minValue, maxValue, placeholder, withSteps,
         onChange, onInput, onPaste, onClear,
@@ -69,6 +69,12 @@ function NumberInput(props) {
     // With steps the suffix is drawn here and not by the Input Content, as that one adds it
     // after the children and the plus has to be the last thing of the field
     const hasStepSuffix = Boolean(withSteps && suffixText);
+
+    // A plural suffix has a text for one and another for the rest, which follow the value
+    let suffix = suffixText;
+    if (pluralSuffix && suffixText) {
+        suffix = `${suffixText}${Number(value) === 1 ? "_SINGULAR" : "_PLURAL"}`;
+    }
 
     // A step with decimals adds up with the errors of the floats, so every value that a step
     // makes is rounded to the decimals that the field takes, which are those of the step
@@ -169,7 +175,7 @@ function NumberInput(props) {
         postIcon={postIcon}
         prefixText={prefixText}
         strongPrefix={strongPrefix}
-        suffixText={hasStepSuffix ? "" : suffixText}
+        suffixText={hasStepSuffix ? "" : suffix}
         isFocused={isFocused}
         isDisabled={isDisabled}
         isSmall={isSmall}
@@ -205,7 +211,7 @@ function NumberInput(props) {
             onFocus={onFocus}
             onBlur={onBlur}
         />
-        {hasStepSuffix && <Suffix>{NLS.get(suffixText)}</Suffix>}
+        {hasStepSuffix && <Suffix>{NLS.get(suffix)}</Suffix>}
         {withSteps && <Step
             variant="black"
             icon="plus"
@@ -229,6 +235,7 @@ NumberInput.propTypes = {
     prefixText   : PropTypes.string,
     strongPrefix : PropTypes.bool,
     suffixText   : PropTypes.string,
+    pluralSuffix : PropTypes.bool,
     isFocused    : PropTypes.bool,
     isDisabled   : PropTypes.bool,
     isSmall      : PropTypes.bool,
