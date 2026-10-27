@@ -20,6 +20,8 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     list-style: none;
     border-radius: 9999px;
     background-color: var(--pills-background);
+    overflow-x: auto;
+    scrollbar-width: none;
 
     ${(props) => props.isMedium && `
         --pills-height: var(--pills-medium-height);
@@ -100,6 +102,11 @@ function PillTabs(props) {
             const item = node.querySelector(".pill-tab-selected");
             if (item && item.offsetWidth) {
                 setBounds({ left : item.offsetLeft, width : item.offsetWidth });
+            }
+            // When the Pills do not fit they scroll, so the selected one is brought to the center
+            if (item && node.scrollWidth > node.clientWidth) {
+                const left = item.offsetLeft - (node.clientWidth - item.offsetWidth) / 2;
+                node.scrollTo({ left, behavior : "smooth" });
             }
         };
 

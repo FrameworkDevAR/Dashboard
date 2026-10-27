@@ -21,7 +21,7 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isFit }) => ({ isSe
     align-items: center;
     justify-content: center;
     gap: 6px;
-    min-width: 0;
+    min-width: max-content;
     min-height: calc(var(--pills-height) - var(--pills-space) * 2);
     padding: var(--pills-padding);
     border-radius: 9999px;
