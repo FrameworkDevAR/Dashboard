@@ -31,7 +31,7 @@ const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter }) => ({ zIndex, h
     z-index: ${(props) => props.zIndex ? props.zIndex : "var(--z-dialog)"};
 
     @media (max-width: 500px) {
-        padding: 0;
+        --dialog-spacing: var(--main-padding);
     }
 `;
 
@@ -86,18 +86,7 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
     ${(props) => props.hasTabs  && "--dialog-tabs: var(--tabs-dialog);"}
 
     @media (max-width: 500px) {
-        ${(props) => props.isNarrow ? `
-            width: 95vw;
-            max-width: none;
-        ` : `
-            --dialog-spacing: 0;
-            --dialog-radius: 0;
-
-            width: 100%;
-            height: var(--full-height);
-            max-width: none;
-            max-height: none;
-        `}
+        max-width: none;
     }
 `;
 

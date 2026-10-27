@@ -59,10 +59,6 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
         --dialog-padding: 16px;
 
         ${(props) => props.hideFooter && "--dialog-footer: 0;"}
-        ${(props) => !props.isNarrow && `
-            height: calc(var(--full-height) - var(--dialog-header) - var(--dialog-footer));
-            max-height: none;
-        `}
     }
 `;
 
