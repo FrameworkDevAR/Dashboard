@@ -87,8 +87,8 @@ const Wrapper = Styled(ScrollFade)`
 const Content = Styled.div`
     flex-grow: 2;
     box-sizing: border-box;
-    margin: 0;
-    padding: 0 var(--column-padding-right) 12px var(--column-padding-left);
+    margin: -5px 0 0 0;
+    padding: 5px var(--column-padding-right) 12px var(--column-padding-left);
     border-radius: var(--border-radius);
     overflow: auto;
 `;
@@ -148,7 +148,7 @@ const CollapsedTitle = Styled(Header)`
 function BoardColumn(props) {
     const {
         className, columnID, name, color, amount, actions, subtitle,
-        isLoading, onScrollEnd, children,
+        footer, isLoading, onScrollEnd, children,
     } = props;
 
     const { collapsed, onCollapse } = React.useContext(BoardContext);
@@ -207,6 +207,7 @@ function BoardColumn(props) {
             <Content ref={contentRef} onScroll={handleScroll}>
                 {children}
                 <DropLast className="board-drop-last" />
+                {footer}
                 <ListLoader
                     isHidden={!isLoading}
                     isSmall
@@ -228,6 +229,7 @@ BoardColumn.propTypes = {
     amount      : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     actions     : PropTypes.any,
     subtitle    : PropTypes.any,
+    footer      : PropTypes.any,
     isLoading   : PropTypes.bool,
     onScrollEnd : PropTypes.func,
     children    : PropTypes.any,

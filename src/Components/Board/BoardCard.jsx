@@ -37,15 +37,21 @@ const Container = Styled.div.attrs(({ isSelected }) => ({ isSelected }))`
         pointer-events: none;
         z-index: 1000;
     }
-    &.drop-before::before {
+    &.drop-before::before,
+    &.drop-after::after {
         content: "";
         position: absolute;
-        top: -5px;
         left: 0;
         right: 0;
         height: 2px;
         border-radius: 2px;
         background-color: var(--primary-color);
+    }
+    &.drop-before::before {
+        top: -5px;
+    }
+    &.drop-after::after {
+        bottom: -5px;
     }
 `;
 

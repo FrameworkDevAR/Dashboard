@@ -115,6 +115,7 @@ function Board(props) {
         dragElement   : null,
         dropElement   : null,
         dropCard      : null,
+        dropAfter     : null,
         dropPosition  : 0,
         dragBounds    : {},
         bodyBounds    : {},
@@ -293,25 +294,34 @@ function Board(props) {
         });
         const dropCard = index > -1 ? cards[index] : null;
 
+        // After the last Card the line goes under it, as the Column can have more after its
+        // Cards, and only an empty Column shows its own
+        const lastCard = cards[cards.length - 1];
         if (dropCard) {
             dropCard.classList.add("drop-before");
+        } else if (lastCard) {
+            lastCard.classList.add("drop-after");
         } else {
             dropTarget.classList.add("drop-last");
         }
         // A collapsed Column shows no Cards, so the position is left for the last place
         const isCollapsed = dropTarget.classList.contains("board-collapsed");
         stateRef.current.dropCard     = dropCard;
+        stateRef.current.dropAfter    = dropCard ? null : lastCard || null;
         stateRef.current.dropPosition = isCollapsed ? 0 : (index > -1 ? index : cards.length) + 1;
     };
 
     // Clears the drop target
     const clearDrop = () => {
-        const { dropElement, dropCard } = stateRef.current;
+        const { dropElement, dropCard, dropAfter } = stateRef.current;
         if (dropElement) {
             dropElement.classList.remove("drop", "drop-last");
         }
         if (dropCard) {
             dropCard.classList.remove("drop-before");
+        }
+        if (dropAfter) {
+            dropAfter.classList.remove("drop-after");
         }
     };
 
