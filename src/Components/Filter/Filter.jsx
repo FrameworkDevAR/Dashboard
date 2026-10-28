@@ -33,6 +33,7 @@ const Container = Styled.div.attrs(({ isNarrow }) => ({ isNarrow }))`
     margin: 0 0 calc(var(--main-gap) - 2px) 0;
     padding: 3px 1px 1px;
     width: 100%;
+    min-width: 0;
 
     ${(props) => props.isNarrow && "overflow: auto;"}
 `;

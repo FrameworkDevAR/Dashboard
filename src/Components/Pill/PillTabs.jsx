@@ -12,6 +12,7 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     position: relative;
     box-sizing: border-box;
     display: flex;
+    flex-shrink: 0;
     width: fit-content;
     max-width: 100%;
     gap: 2px;
