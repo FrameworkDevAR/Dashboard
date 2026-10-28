@@ -61,6 +61,10 @@ const Content = Styled.ul`
     overflow: auto;
 `;
 
+const Footer = Styled.div`
+    flex-shrink: 0;
+`;
+
 const Search = Styled.div.attrs(({ atBottom }) => ({ atBottom }))`
     ${(props) => props.atBottom && `
         padding-top: 8px;
@@ -87,7 +91,7 @@ function Menu(props) {
         gap, width, targetRef, iconHeight, minHeight,
         onAction, onClose, onMouseEnter, onMouseLeave,
         withSearch, emptyText, filterText, keyCode,
-        isSubmenu, skipValidation, children,
+        isSubmenu, skipValidation, footer, children,
     } = props;
 
 
@@ -445,7 +449,12 @@ function Menu(props) {
     const showTopSearch    = showSearch && !toTop;
     const showBottomSearch = showSearch && toTop;
     const showEmpty        = Boolean((showSearch || filterText) && !items.length && emptyText);
-    const showMenu         = Boolean(open && (items.length || showSearch || showEmpty));
+    const showMenu         = Boolean(open && (items.length || showSearch || showEmpty || footer));
+
+    // The Footer stays under the items, as it is not filtered nor scrolled with them
+    const footerItems = Utils.getChildren(footer).map((child, index) => React.cloneElement(child, {
+        key : `footer-${index}`, index : -1, onAction, onClose,
+    }));
 
 
     // Do the Render
@@ -490,6 +499,9 @@ function Menu(props) {
                     {NLS.get(emptyText)}
                 </Empty>}
             </Content>
+            {footerItems.length > 0 && <Footer>
+                {footerItems}
+            </Footer>}
 
             {showBottomSearch && <Search atBottom>
                 <InputField
@@ -529,6 +541,7 @@ Menu.propTypes = {
     minHeight      : PropTypes.number,
     maxHeight      : PropTypes.number,
     withSearch     : PropTypes.bool,
+    footer         : PropTypes.any,
     emptyText      : PropTypes.string,
     filterText     : PropTypes.string,
     keyCode        : PropTypes.number,
