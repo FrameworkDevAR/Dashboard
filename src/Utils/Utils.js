@@ -252,32 +252,39 @@ function useScrollUpdate(ref, onUpdate, deps = []) {
 function getCaretPosition(inputElement) {
     const { selectionStart, value } = inputElement;
     const styles = window.getComputedStyle(inputElement);
+    const rect   = inputElement.getBoundingClientRect();
 
-    // Create a temporary span to measure text width
-    const ghost = document.createElement("span");
+    // A hidden copy of the input with the same box and text, as the text can wrap in several
+    // lines and be scrolled, where a mark at the cursor gives its place
+    const ghost = document.createElement("div");
+    const props = [
+        "boxSizing", "width", "padding", "border", "font", "fontFamily", "fontSize", "fontWeight",
+        "fontStyle", "letterSpacing", "lineHeight", "textTransform", "wordSpacing", "textIndent", "tabSize",
+    ];
+    for (const prop of props) {
+        ghost.style[prop] = styles[prop];
+    }
+    ghost.style.position     = "fixed";
+    ghost.style.top          = `${rect.top}px`;
+    ghost.style.left         = `${rect.left}px`;
+    ghost.style.visibility   = "hidden";
+    ghost.style.overflow     = "hidden";
+    ghost.style.whiteSpace   = inputElement.nodeName === "TEXTAREA" ? "pre-wrap" : "pre";
+    ghost.style.overflowWrap = "break-word";
+    ghost.textContent        = value.substring(0, selectionStart);
 
-    // Copy essential styles for accuracy
-    ghost.style.font       = styles.font;
-    ghost.style.padding    = styles.padding;
-    ghost.style.border     = styles.border;
-    ghost.style.whiteSpace = "pre";
-    ghost.style.visibility = "hidden";
-    ghost.style.position   = "absolute";
-
-    // Measure text from start to cursor
-    ghost.textContent = value.substring(0, selectionStart);
+    const mark = document.createElement("span");
+    mark.textContent = "\u200b";
+    ghost.appendChild(mark);
     document.body.appendChild(ghost);
-
-    const textWidth = ghost.getBoundingClientRect().width;
+    const markRect = mark.getBoundingClientRect();
     document.body.removeChild(ghost);
 
-    // Get input's position relative to the viewport
-    const rect = inputElement.getBoundingClientRect();
-
+    const top = markRect.top - inputElement.scrollTop;
     return {
-        top    : rect.top + window.scrollY,
-        bottom : rect.bottom + window.scrollY,
-        left   : rect.left + window.scrollX + textWidth,
+        top    : top + window.scrollY,
+        bottom : top + markRect.height + window.scrollY,
+        left   : markRect.left - inputElement.scrollLeft + window.scrollX,
     };
 }
 
