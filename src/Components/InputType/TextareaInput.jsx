@@ -210,6 +210,24 @@ function TextareaInput(props) {
         };
     }, [ inputRef.current ]);
 
+    // A narrower or wider Textarea fits a different amount of lines, but only the width is
+    // checked, as the rows that change here also change the height
+    React.useEffect(() => {
+        const node = inputRef.current;
+        if (!node) {
+            return () => {};
+        }
+        let width = node.clientWidth;
+        const observer = new ResizeObserver(() => {
+            if (node.clientWidth !== width) {
+                width = node.clientWidth;
+                handleAutoGrow();
+            }
+        });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [ inputRef.current ]);
+
     // Counts the Characters
     const characters = React.useMemo(() => {
         return Array.from(value || "").length;
