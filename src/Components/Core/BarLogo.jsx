@@ -83,7 +83,7 @@ function BarLogo(props) {
             src={logo}
             alt={NLS.get("TITLE")}
         />
-        {showBadge && <Badge isNightly={showNightlyBadge}>
+        {showBadge && <Badge className="bar-logo-badge" isNightly={showNightlyBadge}>
             {showNightlyBadge ? "NGT" : "DEV"}
         </Badge>}
     </Container>;
