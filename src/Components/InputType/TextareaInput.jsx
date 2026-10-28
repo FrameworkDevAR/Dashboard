@@ -158,10 +158,14 @@ function TextareaInput(props) {
         }
     };
 
-    // Handles the Textarea AutoGrow
+    // Handles the Textarea AutoGrow. The value can change once the Textarea is gone, like
+    // when a dialog clears its data as it closes
     const handleAutoGrow = () => {
         const lineHeight  = 20;
         const node        = inputRef.current;
+        if (!node) {
+            return;
+        }
         let   currentRows = Math.floor(node.scrollHeight / lineHeight);
         let   rows        = currentRows;
 

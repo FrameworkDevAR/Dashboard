@@ -39,7 +39,7 @@ function EditDialog(props) {
         hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryLoading, onSecondary,
-        tertiary, tertiaryVariant, onTertiary,
+        tertiary, tertiaryVariant, tertiaryLoading, onTertiary,
         aside, asideWidth, keepAside, children,
     } = props;
 
@@ -98,6 +98,7 @@ function EditDialog(props) {
             onSecondary={onSecondary}
             tertiary={tertiary}
             tertiaryVariant={tertiaryVariant}
+            tertiaryLoading={tertiaryLoading}
             onTertiary={onTertiary}
         />}
     </Dialog>;
@@ -147,6 +148,7 @@ EditDialog.propTypes = {
     onSecondary      : PropTypes.func,
     tertiary         : PropTypes.string,
     tertiaryVariant  : PropTypes.string,
+    tertiaryLoading  : PropTypes.bool,
     onTertiary       : PropTypes.func,
     aside            : PropTypes.any,
     asideWidth       : PropTypes.number,
