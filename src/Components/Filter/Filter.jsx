@@ -88,7 +88,7 @@ const Chips = Styled(ChipList).attrs(({ isNarrow }) => ({ isNarrow }))`
 function Filter(props) {
     const {
         className, icon, message, values, initialValues,
-        showRefresh, outsideLabel, onFilter, children,
+        showRefresh, outsideLabel, autoFocus, onFilter, children,
     } = props;
 
 
@@ -128,6 +128,13 @@ function Filter(props) {
         }
         return () => observer.disconnect();
     }, []);
+
+    // Focus the Search when asked, which opens the list of Filters
+    React.useEffect(() => {
+        if (autoFocus && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [ autoFocus ]);
 
 
     // Parse the Items
@@ -850,6 +857,7 @@ Filter.propTypes = {
     onFilter      : PropTypes.func.isRequired,
     showRefresh   : PropTypes.bool,
     outsideLabel  : PropTypes.bool,
+    autoFocus     : PropTypes.bool,
     children      : PropTypes.any,
 };
 
