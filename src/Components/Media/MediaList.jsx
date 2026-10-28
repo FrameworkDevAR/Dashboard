@@ -15,6 +15,7 @@ import MediaGrid            from "../Media/MediaGrid";
 import MediaTable           from "../Media/MediaTable";
 import PillTabs             from "../Pill/PillTabs";
 import PillTab              from "../Pill/PillTab";
+import ViewTabs             from "../Pill/ViewTabs";
 
 
 
@@ -245,20 +246,7 @@ function MediaList(props) {
                         tooltipWidth={140}
                     />
                 </PillTabs>
-                <PillTabs selected={view} onClick={handleView}>
-                    <PillTab
-                        icon="grid"
-                        value="grid"
-                        tooltip="GENERAL_VIEW_GRID"
-                        tooltipWidth={120}
-                    />
-                    <PillTab
-                        icon="list"
-                        value="list"
-                        tooltip="GENERAL_VIEW_LIST"
-                        tooltipWidth={120}
-                    />
-                </PillTabs>
+                <ViewTabs view={view} onView={handleView} />
             </Toolbar>
 
             {isGrid ? <MediaGrid
