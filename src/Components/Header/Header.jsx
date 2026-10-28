@@ -19,6 +19,18 @@ const Container = Styled.header`
     padding: var(--header-padding);
     gap: var(--main-padding);
     overflow: hidden;
+
+    &.header-compact .header-child {
+        .btn.btn {
+            padding: 4px 8px;
+        }
+        .btn-preicon {
+            margin-right: 0;
+        }
+        .btn-content {
+            display: none;
+        }
+    }
 `;
 
 const Child = Styled.div`
@@ -49,11 +61,57 @@ function Header(props) {
     } = props;
 
 
+    // The References
+    const containerRef = React.useRef(null);
+    const compactRef   = React.useRef(0);
+
+    // The Current State
+    const [ isCompact, setCompact ] = React.useState(false);
+
+
+    // When the Title gets cut, the actions only show their icons. The width where that
+    // happened is kept, so they show their texts again only once the Header is wider,
+    // as with the icons the Title fits, and checking it again would switch them back
+    React.useEffect(() => {
+        const node = containerRef.current;
+        if (!node) {
+            return () => {};
+        }
+
+        const update = () => {
+            const text  = node.querySelector(".title > span:last-child");
+            const width = node.clientWidth;
+            if (compactRef.current && width > compactRef.current) {
+                compactRef.current = 0;
+                setCompact(false);
+            }
+            if (!compactRef.current && text && text.scrollWidth > text.clientWidth + 1) {
+                compactRef.current = width;
+                setCompact(true);
+            }
+        };
+
+        // The actions can render after the Header, so the Title can get cut without the
+        // Header changing its size, and the parts are observed too. It also runs again each
+        // time it changes, as showing the texts can cut the Title once they render
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(node);
+        for (const part of node.querySelectorAll(".title, .header-child")) {
+            observer.observe(part);
+        }
+        return () => observer.disconnect();
+    }, [ isHidden, message, isCompact ]);
+
+
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={className}>
+    return <Container
+        ref={containerRef}
+        className={`${className} ${isCompact ? "header-compact" : ""}`}
+    >
         <Title
             icon={icon}
             iconColor={iconColor}
