@@ -166,7 +166,7 @@ function EditorField(props) {
                         undo redo | blocks |
                         bold italic forecolor align |
                         bullist numlist outdent indent |
-                        image link removeformat fullscreen
+                        image link ${toolbar ? `${toolbar} ` : ""}removeformat fullscreen
                     `,
                     plugins              : [
                         "advlist", "autolink", "lists", "link", "image", "media", "charmap",
