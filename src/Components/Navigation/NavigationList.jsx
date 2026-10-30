@@ -4,6 +4,7 @@ import Styled               from "styled-components";
 
 // Core & Utils
 import NLS                  from "../../Core/NLS";
+import Store                from "../../Core/Store";
 import Utils                from "../../Utils/Utils";
 
 
@@ -37,12 +38,17 @@ const Title = Styled.li`
  * @returns {React.ReactElement}
  */
 function NavigationList(props) {
-    const { isHidden, className, message, useExact, onAction, onClose, children } = props;
+    const { isHidden, className, message, listID, onGrab, useExact, onAction, onClose, children } = props;
+
+    const { smallNav } = Store.useState("core");
 
 
-    // Clone the Children
-    const items = Utils.cloneChildren(children, () => ({
+    // Clone the Children. When the Items can be dragged, the ones with an ID can be grabbed,
+    // and the List says its ID, so they can be dropped in it
+    const canDrag = Boolean(onGrab) && listID !== undefined && !smallNav;
+    const items   = Utils.cloneChildren(children, (child) => ({
         useExact, onAction, onClose,
+        ...(canDrag && child.props.elemID !== undefined && { onGrab }),
     }));
 
 
@@ -50,7 +56,7 @@ function NavigationList(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={className}>
+    return <Container className={className} data-nav-list={canDrag ? listID : undefined}>
         {!!message && <Title>
             {NLS.get(message)}
         </Title>}
@@ -66,6 +72,8 @@ NavigationList.propTypes = {
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
     message   : PropTypes.string,
+    listID    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    onGrab    : PropTypes.func,
     variant   : PropTypes.string,
     useExact  : PropTypes.bool,
     onAction  : PropTypes.func,
