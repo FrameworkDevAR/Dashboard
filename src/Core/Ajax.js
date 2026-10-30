@@ -297,6 +297,18 @@ function post(route, params = {}, showResult = true, abortController = null, ski
 }
 
 /**
+ * Does a Post that is still sent when the page is closed, without waiting for its answer
+ * @param {string}  route
+ * @param {object=} params
+ * @returns {boolean}
+ */
+function beacon(route, params = {}) {
+    const url  = baseUrl(route);
+    const body = createBody(params);
+    return navigator.sendBeacon(url, body);
+}
+
+/**
  * Does a Post that reports the progress of the upload, which a Fetch can not do
  * @param {string}    route
  * @param {object=}   params
@@ -430,6 +442,7 @@ export default {
     setParam,
     get,
     post,
+    beacon,
     upload,
     url,
     route,
