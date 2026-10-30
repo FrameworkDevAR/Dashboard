@@ -66,14 +66,17 @@ function EditorField(props) {
     } = props;
 
 
+    // The References
+    const touchRef = React.useRef(false);
+    const sentRef  = React.useRef(null);
+
     // The Current State
-    const [ firstChange, setFirstChange ] = React.useState(true);
-    const [ reloading,   setReloading   ] = React.useState(false);
+    const [ reloading, setReloading ] = React.useState(false);
 
 
     // Handle the Client change
     React.useEffect(() => {
-        setFirstChange(true);
+        touchRef.current = false;
         setReloading(true);
         setTimeout(() => {
             setReloading(false);
@@ -81,16 +84,30 @@ function EditorField(props) {
     }, [ clientID ]);
 
 
+    // A value that comes from outside, like the text of another language, is rewritten again
+    React.useEffect(() => {
+        if (value !== sentRef.current) {
+            touchRef.current = false;
+        }
+    }, [ value ]);
+
+    // Handles the Editor Setup. The editor rewrites the html that it is given, and reports it as
+    // a change when it loads it, so the changes are only sent once the user edits the text
+    const handleSetup = (editor) => {
+        editor.on("input keydown paste cut drop Undo Redo ExecCommand", () => {
+            touchRef.current = true;
+        });
+        if (onSetup) {
+            onSetup(editor);
+        }
+    };
+
     // Handles the Editor Change
     const handleChange = (newValue) => {
-        if (firstChange) {
-            setFirstChange(false);
-            if (value !== newValue) {
-                onChange(name, newValue);
-            }
-            return;
+        if (touchRef.current && newValue !== value) {
+            sentRef.current = newValue;
+            onChange(name, newValue);
         }
-        onChange(name, newValue);
     };
 
     // Handles the File Picker
@@ -179,11 +196,7 @@ function EditorField(props) {
                         ${contentStyle}
                     `,
                     file_picker_callback : handlePicker,
-                    setup                : (editor) => {
-                        if (onSetup) {
-                            onSetup(editor);
-                        }
-                    },
+                    setup                : handleSetup,
                 }}
             />
             <InputError error={error} />

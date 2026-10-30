@@ -268,6 +268,8 @@ function EditorInput(props) {
     const markRef   = React.useRef(null);
     const colorRefs = { color : React.useRef(null), highlight : React.useRef(null) };
     const resizeRef = React.useRef(null);
+    const touchRef  = React.useRef(false);
+    const sentRef   = React.useRef(null);
 
     // The Current State
     const [ active, setActive ] = React.useState({});
@@ -292,6 +294,12 @@ function EditorInput(props) {
         }
         editor.on("ObjectResizeStart", handleResizeStart);
         editor.on("ObjectResized", handleResized);
+
+        // The editor rewrites the html that it is given, and reports it as a change when it loads
+        // it, so the changes are only sent once the user edits the text
+        editor.on("input keydown paste cut drop Undo Redo ExecCommand", () => {
+            touchRef.current = true;
+        });
 
         // The shortcut of the links opens the dialog of the Link instead of the one of the editor
         editor.addShortcut("meta+k", "", () => openLink());
@@ -340,10 +348,18 @@ function EditorInput(props) {
                 src.startsWith(filesUrl) ? `${start}${src.substring(filesUrl.length)}` : match
             ));
         }
-        if (newValue !== value) {
+        if (touchRef.current && newValue !== value) {
+            sentRef.current = newValue;
             onChange(name, newValue);
         }
     };
+
+    // A value that comes from outside, like the text of another language, is rewritten again
+    React.useEffect(() => {
+        if (value !== sentRef.current) {
+            touchRef.current = false;
+        }
+    }, [ value ]);
 
     // Handles the Media, which picks an image or a file and inserts it where the cursor was. The
     // image is shown and the file is a link with its name
