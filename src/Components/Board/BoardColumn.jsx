@@ -9,6 +9,7 @@ import Store                from "../../Core/Store";
 import BoardContext         from "./BoardContext";
 import Header               from "../Header/Header";
 import Amount               from "../Common/Amount";
+import Icon                 from "../Common/Icon";
 import ScrollFade           from "../Common/ScrollFade";
 import IconLink             from "../Link/IconLink";
 import CircularLoader       from "../Loader/CircularLoader";
@@ -39,7 +40,13 @@ const Container = Styled.section`
     }
 `;
 
-const Top = Styled.div`
+const Top = Styled.div.attrs(({ canRename }) => ({ canRename }))`
+    ${(props) => props.canRename && `
+        .title {
+            cursor: text;
+        }
+    `}
+
     &:hover .header-child,
     &:focus-within .header-child {
         max-width: 120px;
@@ -66,6 +73,42 @@ const Title = Styled(Header)`
         opacity: 0;
         transition: max-width 0.2s ease-in-out, margin-left 0.2s ease-in-out, opacity 0.2s ease-in-out;
     }
+`;
+
+const Rename = Styled.div`
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px var(--column-padding-right) 0 var(--column-padding-left);
+    height: calc(var(--header-height) - var(--main-padding) - 12px);
+`;
+
+const RenameIcon = Styled(Icon)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+`;
+
+const RenameInput = Styled.input`
+    flex-grow: 1;
+    box-sizing: border-box;
+    min-width: 0;
+    margin-left: -6px;
+    padding: 2px 6px;
+    color: var(--title-color);
+    font-family: var(--title-font);
+    font-weight: var(--title-font-weight);
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: var(--title-letter-spacing);
+    background-color: var(--lighter-gray);
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
 `;
 
 const Subtitle = Styled.div`
@@ -148,7 +191,7 @@ const CollapsedTitle = Styled(Header)`
 function BoardColumn(props) {
     const {
         className, columnID, name, color, amount, actions, subtitle,
-        footer, isLoading, onScrollEnd, children,
+        footer, isLoading, onScrollEnd, onRename, children,
     } = props;
 
     const { collapsed, onCollapse } = React.useContext(BoardContext);
@@ -157,6 +200,11 @@ function BoardColumn(props) {
 
     // References
     const contentRef = React.useRef(null);
+    const cancelRef  = React.useRef(false);
+
+    // The Current State
+    const [ isRenaming, setRenaming ] = React.useState(false);
+    const [ newName,    setNewName  ] = React.useState("");
 
 
     // Handles the Collapse
@@ -175,6 +223,37 @@ function BoardColumn(props) {
     };
 
 
+    // Handles the Click on the Top, which starts the Rename when it is on the Title. The Board
+    // does not get it, as a click on the Title is not one on an empty part of it
+    const handleTopClick = (e) => {
+        if (onRename && e.target.closest(".title")) {
+            e.stopPropagation();
+            cancelRef.current = false;
+            setNewName(name);
+            setRenaming(true);
+        }
+    };
+
+    // Handles the Blur, which ends the Rename and saves it if it can
+    const handleRenameEnd = () => {
+        const value = newName.trim();
+        setRenaming(false);
+        if (!cancelRef.current && value && value !== name) {
+            onRename(value);
+        }
+    };
+
+    // Handles the Key Down of the Rename, where the Enter saves it and the Escape cancels it
+    const handleRenameKey = (e) => {
+        if (e.key === "Enter") {
+            e.currentTarget.blur();
+        } else if (e.key === "Escape") {
+            cancelRef.current = true;
+            e.currentTarget.blur();
+        }
+    };
+
+
     // Do the Render
     if (collapsed.includes(columnID)) {
         return <Collapsed className="board-column board-collapsed" data-id={columnID} onClick={handleCollapse}>
@@ -189,8 +268,19 @@ function BoardColumn(props) {
     }
 
     return <Container className={`board-column ${className}`} data-id={columnID}>
-        <Top>
-            <Title message={name} icon="circle" iconColor={color}>
+        <Top canRename={Boolean(onRename)} onClick={handleTopClick}>
+            {isRenaming && <Rename>
+                <RenameIcon icon="circle" color={color} />
+                <RenameInput
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    onBlur={handleRenameEnd}
+                    onKeyDown={handleRenameKey}
+                    autoFocus
+                />
+            </Rename>}
+            {!isRenaming && <Title message={name} icon="circle" iconColor={color}>
                 <IconLink
                     variant="black"
                     icon="prev"
@@ -199,7 +289,7 @@ function BoardColumn(props) {
                     isSmall
                 />
                 {actions}
-            </Title>
+            </Title>}
             {Boolean(subtitle) && <Subtitle>{subtitle}</Subtitle>}
         </Top>
 
@@ -232,6 +322,7 @@ BoardColumn.propTypes = {
     footer      : PropTypes.any,
     isLoading   : PropTypes.bool,
     onScrollEnd : PropTypes.func,
+    onRename    : PropTypes.func,
     children    : PropTypes.any,
 };
 
