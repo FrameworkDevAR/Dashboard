@@ -14,6 +14,7 @@ import BoardContext         from "./BoardContext";
 const DRAG_DISTANCE  = 10;
 const SCROLL_MARGIN  = 30;
 const SCROLL_AMOUNT  = 5;
+const COLUMN_MARGIN  = 60;
 const COLLAPSED_SIZE = "50px";
 
 // Styles
@@ -259,16 +260,18 @@ function Board(props) {
         const posY = e.clientY - diffY;
         dragElement.style.transform = `translate(${posX}px, ${posY}px)`;
 
-        if (timer) {
-            window.clearInterval(timer);
-        }
-        if (containerRef.current && Utils.inBounds(e.clientX, e.clientY, bodyBounds)) {
-            stateRef.current.timer = startAutoScroll(e.clientX, e.clientY);
-        }
-
         // Highlight the Column under the cursor, and the place among its Cards
         const elementsBelow = document.elementsFromPoint(e.clientX, e.clientY);
         const dropTarget    = elementsBelow.find((el) => el.classList.contains("board-column"));
+
+        if (timer) {
+            window.clearInterval(timer);
+            stateRef.current.timer = 0;
+        }
+        if (containerRef.current && Utils.inBounds(e.clientX, e.clientY, bodyBounds)) {
+            stateRef.current.timer = startAutoScroll(e.clientX, e.clientY, dropTarget);
+        }
+
         if (dropTarget) {
             clearDrop();
             setDrop(dropTarget, e.clientY);
@@ -369,8 +372,9 @@ function Board(props) {
         }
     };
 
-    // Starts scrolling the container while the cursor stays close to one of its edges
-    const startAutoScroll = (clientX, clientY) => {
+    // Starts scrolling the container while the cursor stays close to one of its edges, and
+    // the Cards of the Column below it while it is close to the top or the bottom of them
+    const startAutoScroll = (clientX, clientY, column) => {
         const { bodyBounds, scrollX, scrollY } = stateRef.current;
 
         let scrollDeltaX = 0;
@@ -387,13 +391,35 @@ function Board(props) {
             scrollDeltaY = 1;
         }
 
-        if (!scrollDeltaX && !scrollDeltaY) {
+        const content = column ? column.querySelector(".board-content") : null;
+        let columnDelta = 0;
+        if (content) {
+            const bounds  = content.getBoundingClientRect();
+            const canUp   = content.scrollTop > 0;
+            const canDown =content.scrollTop + content.clientHeight < content.scrollHeight - 1;
+            if (canUp && clientY < bounds.top + COLUMN_MARGIN) {
+                columnDelta = -1;
+            } else if (canDown && clientY > bounds.bottom - COLUMN_MARGIN) {
+                columnDelta = 1;
+            }
+        }
+
+        if (!scrollDeltaX && !scrollDeltaY && !columnDelta) {
             return 0;
         }
         return window.setInterval(() => {
-            stateRef.current.scrollX += scrollDeltaX * SCROLL_AMOUNT;
-            stateRef.current.scrollY += scrollDeltaY * SCROLL_AMOUNT;
-            containerRef.current.scrollTo(stateRef.current.scrollX, stateRef.current.scrollY);
+            if (scrollDeltaX || scrollDeltaY) {
+                stateRef.current.scrollX += scrollDeltaX * SCROLL_AMOUNT;
+                stateRef.current.scrollY += scrollDeltaY * SCROLL_AMOUNT;
+                containerRef.current.scrollTo(stateRef.current.scrollX, stateRef.current.scrollY);
+            }
+
+            // The Cards move under the cursor, so the place to drop is found again
+            if (columnDelta) {
+                content.scrollTop += columnDelta * SCROLL_AMOUNT;
+                clearDrop();
+                setDrop(column, clientY);
+            }
         }, 10);
     };
 

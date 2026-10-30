@@ -204,7 +204,7 @@ function BoardColumn(props) {
         </Top>
 
         <Wrapper passedRef={contentRef}>
-            <Content ref={contentRef} onScroll={handleScroll}>
+            <Content ref={contentRef} className="board-content" onScroll={handleScroll}>
                 {children}
                 <DropLast className="board-drop-last" />
                 {footer}
