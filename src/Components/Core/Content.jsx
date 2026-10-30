@@ -16,9 +16,9 @@ import TabList              from "../Tab/TabList";
 
 
 // Styles
-const Section = Styled.section.attrs(({ withDetails, wideDetails, hasTabs, centered }) => ({ withDetails, wideDetails, hasTabs, centered }))`
+const Section = Styled.section.attrs(({ withSpacing, withDetails, wideDetails, hasTabs, centered }) => ({ withSpacing, withDetails, wideDetails, hasTabs, centered }))`
     flex-grow: 1;
-    padding: 0 var(--main-padding) var(--main-padding);
+    padding: ${(props) => props.withSpacing ? "var(--main-padding)" : "0 var(--main-padding) var(--main-padding)"};
     overflow: auto;
 
     ${(props) => props.withDetails && `
@@ -57,7 +57,7 @@ const Section = Styled.section.attrs(({ withDetails, wideDetails, hasTabs, cente
 function Content(props) {
     const {
         className, isLoading, passedRef,
-        withTabs, withFilter, withDetails, wideDetails, children,
+        withTabs, withFilter, withDetails, wideDetails, withSpacing, children,
     } = props;
 
 
@@ -101,6 +101,7 @@ function Content(props) {
     return <Section
         ref={passedRef}
         className={className}
+        withSpacing={withSpacing}
         withDetails={withDetails}
         wideDetails={wideDetails}
         hasTabs={hasTabs}
@@ -121,6 +122,7 @@ Content.propTypes = {
     withFilter  : PropTypes.bool,
     withDetails : PropTypes.bool,
     wideDetails : PropTypes.bool,
+    withSpacing : PropTypes.bool,
     children    : PropTypes.any,
 };
 
@@ -134,6 +136,7 @@ Content.defaultProps = {
     withTabs    : false,
     withFilter  : false,
     withDetails : false,
+    withSpacing : false,
 };
 
 export default Content;
