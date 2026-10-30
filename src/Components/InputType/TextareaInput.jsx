@@ -28,11 +28,15 @@ const Container = Styled(InputContent).attrs(({ withLabel }) => ({ withLabel }))
     }
 `;
 
-const Content = Styled.div.attrs(({ hideOverflow }) => ({ hideOverflow }))`
+const Content = Styled.div.attrs(({ hideOverflow, withAside }) => ({ hideOverflow, withAside }))`
     box-sizing: border-box;
     width: 100%;
     border-radius: var(--input-border-radius, var(--border-radius));
     ${(props) => props.hideOverflow && "overflow: hidden;"}
+    ${(props) => props.withAside && `
+        display: flex;
+        align-items: flex-end;
+    `}
 `;
 
 const Textarea = Styled.textarea.attrs(({ withLabel }) => ({ withLabel }))`
@@ -89,9 +93,10 @@ const Footer = Styled.footer`
 
 const Aside = Styled.aside`
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    width: 100%;
+    flex-shrink: 0;
+    gap: 6px;
+    padding: 4px 6px 4px 0;
 
     p {
         flex-grow: 0;
@@ -239,7 +244,7 @@ function TextareaInput(props) {
 
 
     // Variables
-    const hasEditor   = Boolean(maxLength || (children && children.length));
+    const hasEditor   = Boolean(maxLength || React.Children.toArray(children).length);
     const hasFooter   = Boolean(hasEditor && withEditor);
     const hasAside    = Boolean(hasEditor && !withEditor);
     const counterText = maxLength ? "GENERAL_CHARACTERS_MAX" : "GENERAL_CHARACTERS";
@@ -256,7 +261,7 @@ function TextareaInput(props) {
         withLabel={withLabel}
         withBorder
     >
-        <Content hideOverflow={!hasAside}>
+        <Content hideOverflow={!hasAside} withAside={hasAside}>
             <Textarea
                 ref={inputRef}
                 className="input-textarea"
