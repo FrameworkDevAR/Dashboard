@@ -39,7 +39,7 @@ const Children = Styled.div`
 function ConfirmDialog(props) {
     const {
         open, className, icon, title, message, content, isLoading, isWide,
-        bigSpacing, primary, primaryVariant, cancel, result,
+        bigSpacing, primary, primaryVariant, cancel, result, noBottom,
         onSubmit, onClose, children,
     } = props;
 
@@ -63,8 +63,9 @@ function ConfirmDialog(props) {
             {result ? <DialogResult
                 variant={result}
                 message={body}
-            /> : <Content variant="h3">{body}</Content>}
-            {!!children && <Children>{children}</Children>}
+                noBottom={noBottom}
+            >{children}</DialogResult> : <Content variant="h3">{body}</Content>}
+            {!result && !!children && <Children>{children}</Children>}
         </DialogBody>
         <DialogFooter
             primary={primary}
@@ -91,6 +92,7 @@ ConfirmDialog.propTypes = {
     primaryVariant : PropTypes.string,
     cancel         : PropTypes.string,
     result         : PropTypes.string,
+    noBottom       : PropTypes.bool,
     isLoading      : PropTypes.bool,
     bigSpacing     : PropTypes.bool,
     isWide         : PropTypes.bool,
@@ -108,6 +110,7 @@ ConfirmDialog.defaultProps = {
     isLoading  : false,
     bigSpacing : true,
     isWide     : false,
+    noBottom   : false,
 };
 
 export default ConfirmDialog;

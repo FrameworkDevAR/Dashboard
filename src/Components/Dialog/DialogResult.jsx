@@ -25,7 +25,7 @@ const draw = keyframes`
 `;
 
 // Styles
-const Container = Styled.div.attrs(({ topSpace, bottomSpace }) => ({ topSpace, bottomSpace }))`
+const Container = Styled.div.attrs(({ topSpace, bottomSpace, noBottom }) => ({ topSpace, bottomSpace, noBottom }))`
     flex-grow: 2;
     display: flex;
     flex-direction: column;
@@ -37,6 +37,7 @@ const Container = Styled.div.attrs(({ topSpace, bottomSpace }) => ({ topSpace, b
 
     ${(props) => props.topSpace && `margin-top: ${props.topSpace}px;`}
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
+    ${(props) => props.noBottom && "padding-bottom: 0;"}
 `;
 
 const Circle = Styled.div.attrs(({ variant }) => ({ variant }))`
@@ -100,7 +101,7 @@ const Description = Styled(Html)`
 function DialogResult(props) {
     const {
         isHidden, className, variant, icon, message, description,
-        topSpace, bottomSpace, children,
+        topSpace, bottomSpace, noBottom, children,
     } = props;
 
 
@@ -116,6 +117,7 @@ function DialogResult(props) {
         className={className}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
+        noBottom={noBottom}
     >
         <Circle variant={variant}>
             <Symbol>
@@ -149,6 +151,7 @@ DialogResult.propTypes = {
     description : PropTypes.string,
     topSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    noBottom    : PropTypes.bool,
     children    : PropTypes.any,
 };
 
@@ -161,6 +164,7 @@ DialogResult.defaultProps = {
     className   : "",
     variant     : "error",
     description : "",
+    noBottom    : false,
 };
 
 export default DialogResult;
