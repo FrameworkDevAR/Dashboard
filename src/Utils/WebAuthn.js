@@ -275,11 +275,11 @@ function stopOffer() {
 function getDeviceName() {
     const agent    = navigator.userAgent;
     const browsers = [[ "Edg/", "Edge" ], [ "OPR/", "Opera" ], [ "Firefox/", "Firefox" ], [ "Chrome/", "Chrome" ], [ "Safari/", "Safari" ]];
-    const systems  = [[ "iPhone", "iPhone" ], [ "iPad", "iPad" ], [ "Android", "Android" ], [ "Mac OS X", "macOS" ], [ "Windows", "Windows" ], [ "Linux", "Linux" ]];
+    const systems  = [[ "iPhone", "iPhone" ], [ "iPad", "iPad" ], [ "Android", "Android" ], [ "Mac OS X", "MacOS" ], [ "Windows", "Windows" ], [ "Linux", "Linux" ]];
 
     const browser  = browsers.find(([ key ]) => agent.includes(key));
     const system   = systems.find(([ key ]) => agent.includes(key));
-    return [ browser ? browser[1] : "", system ? system[1] : "" ].filter(Boolean).join(" - ");
+    return [ system ? system[1] : "", browser ? browser[1] : "" ].filter(Boolean).join(" ");
 }
 
 
