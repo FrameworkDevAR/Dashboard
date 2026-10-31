@@ -435,6 +435,16 @@ function Filter(props) {
         selectedRef.current = -1;
     };
 
+    // Handles the Mouse Down on an Option
+    const handleOption = (e, name, value, hasMenu) => {
+        // An Option with a Menu keeps the focus in the Search, as the blur closes the Options
+        if (hasMenu) {
+            e.preventDefault();
+        } else {
+            handleSelect(name, value);
+        }
+    };
+
     // Handles the Blur
     const handleBlur = () => {
         setShowOptions(false);
@@ -806,7 +816,7 @@ function Filter(props) {
                 icon={getIcon(name, value, Boolean(isOption))}
                 content={text || message}
                 isSelected={selectedRef.current === index}
-                onMouseDown={!options.length ? () => handleSelect(name, value) : undefined}
+                onMouseDown={(e) => handleOption(e, name, value, options.length > 0)}
                 onClose={handleClose}
             >
                 {options.map((option, subIndex) => <MenuItem
