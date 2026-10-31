@@ -24,6 +24,7 @@ const OPTIONS = {
     isCreate   : false,
     isCopy     : false,
     isEdit     : false,
+    isReplace  : false,
     isMulti    : false,
     isDelete   : false,
     isRemove   : false,
@@ -111,6 +112,12 @@ const ACTIONS = {
         icon       : "edit",
         message    : "GENERAL_EDIT",
         isMulti    : true,
+    },
+    "REPLACE" : {
+        ...OPTIONS,
+        icon       : "upload",
+        message    : "GENERAL_REPLACE",
+        isReplace  : true,
     },
     "DELETE" : {
         ...OPTIONS,

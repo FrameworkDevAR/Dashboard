@@ -1,6 +1,6 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
+import Styled, { keyframes } from "styled-components";
 
 // Core & Utils
 import NLS                  from "../../Core/NLS";
@@ -14,8 +14,14 @@ import PromptDialog         from "../Dialogs/PromptDialog";
 
 
 
+// Animations
+const slide = keyframes`
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(250%); }
+`;
+
 // Styles
-const Container = Styled.div`
+const Container = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -33,14 +39,25 @@ const Container = Styled.div`
     &:hover {
         border-color: var(--primary-color);
     }
+
+    ${(props) => props.isStacked && `
+        flex-direction: column;
+        gap: 20px;
+        min-height: 186px;
+        margin-bottom: 0;
+        padding: 32px 24px;
+        text-align: center;
+    `}
 `;
 
-const Content = Styled.div`
+const Content = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
     display: flex;
     align-items: center;
-    flex-grow: 2;
+    flex-grow: ${(props) => props.isStacked ? 0 : 2};
     gap: 10px;
     min-width: 0;
+
+    ${(props) => props.isStacked && "flex-direction: column;"}
 `;
 
 const UploadIcon = Styled(Icon)`
@@ -83,10 +100,10 @@ const FileName = Styled(Title)`
     text-overflow: ellipsis;
 `;
 
-const Bar = Styled.div`
+const Bar = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
     flex-shrink: 0;
     width: 240px;
-    max-width: 40%;
+    max-width: ${(props) => props.isStacked ? "100%" : "40%"};
     height: 8px;
     border-radius: 4px;
     background-color: var(--lighter-gray);
@@ -100,6 +117,11 @@ const Fill = Styled.div`
     transition: width 0.2s;
 `;
 
+const WaitingFill = Styled(Fill)`
+    width: 40%;
+    animation: ${slide} 1.2s ease-in-out infinite;
+`;
+
 
 
 /**
@@ -109,7 +131,7 @@ const Fill = Styled.div`
  */
 function DropZone(props) {
     const {
-        isHidden, onlyImages, withSVG, maxSize, maxVideoSize, upload,
+        isHidden, isSingle, isStacked, withoutDrop, accept, onlyImages, withSVG, maxSize, maxVideoSize, upload,
         onDrop, onError, onUrl,
     } = props;
 
@@ -225,10 +247,18 @@ function DropZone(props) {
 
 
     // Do the Render
-    const prefix   = onlyImages ? "DROPZONE_IMAGES_" : "DROPZONE_FILES_";
+    let   prefix   = onlyImages ? "DROPZONE_IMAGES_" : "DROPZONE_FILES_";
     const percent  = upload ? Math.round((upload.index + upload.progress) / upload.total * 100) : 0;
     let   sizeText = NLS.format("DROPZONE_MAX_SIZE", String(maxSize));
     let   amount   = `${percent}%`;
+
+    // The browser only knows of the bytes it sends, so there is nothing to show before the
+    // first ones leave and once they arrived, while the server stores the file
+    const isProcessing = Boolean(upload && upload.progress >= 1);
+    const isWaiting    = Boolean(upload && (upload.progress <= 0 || isProcessing));
+    if (isWaiting) {
+        amount = "";
+    }
 
     if (Number(maxVideoSize) && !onlyImages) {
         sizeText = NLS.format("DROPZONE_MAX_SIZE_VIDEO", String(maxSize), String(maxVideoSize));
@@ -236,12 +266,15 @@ function DropZone(props) {
     if (upload && upload.total > 1) {
         amount = `${NLS.format("DROPZONE_UPLOADING_AMOUNT", String(upload.index + 1), String(upload.total))} · ${percent}%`;
     }
+    if (isSingle) {
+        prefix = "DROPZONE_FILE_";
+    }
     if (isHidden) {
         return <React.Fragment />;
     }
     return <>
         <DragDrop
-            isHidden={isHidden || Boolean(upload)}
+            isHidden={isHidden || withoutDrop || Boolean(upload)}
             onlyImages={onlyImages}
             withSVG={withSVG}
             maxSize={maxSize}
@@ -250,21 +283,21 @@ function DropZone(props) {
             onError={onError}
         />
 
-        <Container ref={containerRef} className="dropzone-upload">
+        <Container ref={containerRef} className="dropzone-upload" isStacked={isStacked}>
             {!!upload && <>
-                <Content>
+                <Content isStacked={isStacked}>
                     <UploadIcon icon="upload" />
                     <Info>
-                        <FileName>{NLS.format("DROPZONE_UPLOADING", upload.name)}</FileName>
+                        <FileName>{NLS.format(isProcessing ? "DROPZONE_PROCESSING" : "DROPZONE_UPLOADING", upload.name)}</FileName>
                         <Text>{amount}</Text>
                     </Info>
                 </Content>
-                <Bar>
-                    <Fill style={{ width : `${percent}%` }} />
+                <Bar isStacked={isStacked}>
+                    {isWaiting ? <WaitingFill /> : <Fill style={{ width : `${percent}%` }} />}
                 </Bar>
             </>}
 
-            {!upload && <Content>
+            {!upload && <Content isStacked={isStacked}>
                 <UploadIcon icon="upload" />
                 <div>
                     <Title>{NLS.get(`${prefix}TITLE`)}</Title>
@@ -291,10 +324,10 @@ function DropZone(props) {
             <Input
                 ref={inputRef}
                 type="file"
-                accept={onlyImages ? "image/*" : ""}
+                accept={accept || (onlyImages ? "image/*" : "")}
                 className="dropzone-input"
                 onChange={handleSubmit}
-                multiple
+                multiple={!isSingle}
             />
         </Container>
 
@@ -304,8 +337,8 @@ function DropZone(props) {
             icon="link"
             title="MEDIA_UPLOAD_URL_TITLE"
             inputLabel="MEDIA_UPLOAD_URL"
-            secInputLabel="MEDIA_UPLOAD_URL_NAME"
-            secHelperText="MEDIA_UPLOAD_URL_NAME_TIP"
+            secInputLabel={isSingle ? "" : "MEDIA_UPLOAD_URL_NAME"}
+            secHelperText={isSingle ? "" : "MEDIA_UPLOAD_URL_NAME_TIP"}
             onSubmit={handleUploadUrl}
             onClose={handleUploadClose}
             error={error}
@@ -322,6 +355,10 @@ function DropZone(props) {
  */
 DropZone.propTypes = {
     isHidden     : PropTypes.bool,
+    isSingle     : PropTypes.bool,
+    isStacked    : PropTypes.bool,
+    withoutDrop  : PropTypes.bool,
+    accept       : PropTypes.string,
     onlyImages   : PropTypes.bool,
     withSVG      : PropTypes.bool,
     maxSize      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),

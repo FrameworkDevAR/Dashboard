@@ -191,10 +191,11 @@ function MediaItem(props) {
     const info   = isBack ? parent : (isDir ?
         (total !== undefined ? NLS.pluralize("MEDIA_AMOUNT", total) : "") :
         (size !== undefined ? Utils.formatSize(size) : ""));
-    const select = Action.get("SELECT");
-    const view   = Action.get("VIEW");
-    const edit   = Action.get("EDIT");
-    const remove = Action.get("DELETE");
+    const select  = Action.get("SELECT");
+    const view    = Action.get("VIEW");
+    const edit    = Action.get("EDIT");
+    const replace = Action.get("REPLACE");
+    const remove  = Action.get("DELETE");
 
 
     // Handles the Action
@@ -256,6 +257,13 @@ function MediaItem(props) {
                 icon={edit.icon}
                 tooltip={edit.message}
                 onClick={(e) => handleAction(e, edit)}
+                isSmall
+            />
+            <IconLink
+                isHidden={isDir}
+                icon={replace.icon}
+                tooltip={replace.message}
+                onClick={(e) => handleAction(e, replace)}
                 isSmall
             />
             <IconLink

@@ -231,9 +231,10 @@ function MediaTable(props) {
                 </TableRow>)}
             </TableBody>
             <TableActionList onAction={handleAction} canEdit={canEdit}>
-                <TableAction action="VIEW"   message="GENERAL_VIEW"   hide={hideView}   />
-                <TableAction action="EDIT"   message="GENERAL_EDIT"   hide={hideAction} />
-                <TableAction action="DELETE" message="GENERAL_DELETE" hide={hideAction} />
+                <TableAction action="VIEW"    message="GENERAL_VIEW"    hide={hideView}   />
+                <TableAction action="EDIT"    message="GENERAL_EDIT"    hide={hideAction} />
+                <TableAction action="REPLACE" message="GENERAL_REPLACE" hide={hideView}   />
+                <TableAction action="DELETE"  message="GENERAL_DELETE"  hide={hideAction} />
             </TableActionList>
         </List>
 
