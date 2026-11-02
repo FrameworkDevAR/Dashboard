@@ -25,14 +25,20 @@ const COMMANDS  = IS_APPLE ? "⌘ K" : "Ctrl K";
 
 // Styles
 const Container = Styled.header`
-    position: relative;
     display: flex;
     align-items: center;
+    gap: 8px;
     z-index: var(--z-search);
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         display: none;
     }
+`;
+
+const Search = Styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
 `;
 
 const Trigger = Styled.button`
@@ -160,7 +166,7 @@ const Field = Styled(InputField).attrs(({ hasValue }) => ({ hasValue }))`
 const MenuField = Styled(Field).attrs(({ isOpen, inlineWidth }) => ({ isOpen, inlineWidth }))`
     --input-plain-height: 32px;
 
-    width: 34px;
+    width: 32px;
     transition: width 0.2s ease;
 
     .input-content {
@@ -171,6 +177,15 @@ const MenuField = Styled(Field).attrs(({ isOpen, inlineWidth }) => ({ isOpen, in
         opacity: 0;
         cursor: pointer;
     }
+
+    ${(props) => !props.isOpen && `
+        .input-content {
+            padding-left: 6px;
+        }
+        .input-content .icon {
+            margin: 0;
+        }
+    `}
 
     ${(props) => props.isOpen && `
         ${props.inlineWidth ? `
@@ -205,7 +220,7 @@ const MenuField = Styled(Field).attrs(({ isOpen, inlineWidth }) => ({ isOpen, in
 function TopSearch(props) {
     const {
         isHidden, placeholder, value, results, onSelect, onOpen, forCommands,
-        onChange, onInput, onSubmit, onClear,
+        onChange, onInput, onSubmit, onClear, children,
     } = props;
 
     const isForMenu = Responsive.useIsForMenu();
@@ -336,71 +351,82 @@ function TopSearch(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
+    // On the small screens what goes next to the Search is hidden while it is open, as the
+    // open Search takes the space up to the Avatar
     if (isForMenu) {
         if (!searchNode) {
             return <React.Fragment />;
         }
-        return ReactDOM.createPortal(<MenuField
-            passedRef={fieldRef}
-            name="search"
-            icon="search"
-            placeholder={isOpen ? placeholder : ""}
-            value={value}
-            hasValue={!!value}
-            isOpen={isOpen}
-            inlineWidth={inlineWidth}
-            onChange={onChange}
-            onInput={onInput}
-            onSubmit={onSubmit}
-            onClear={handleClear}
-            onFocus={() => setIsOpen(true)}
-            onBlur={() => setIsOpen(Boolean(value))}
-            hasClear={isOpen}
-        />, searchNode);
+        return ReactDOM.createPortal(<>
+            <MenuField
+                passedRef={fieldRef}
+                name="search"
+                icon="search"
+                placeholder={isOpen ? placeholder : ""}
+                value={value}
+                hasValue={!!value}
+                isOpen={isOpen}
+                inlineWidth={inlineWidth}
+                onChange={onChange}
+                onInput={onInput}
+                onSubmit={onSubmit}
+                onClear={handleClear}
+                onFocus={() => setIsOpen(true)}
+                onBlur={() => setIsOpen(Boolean(value))}
+                hasClear={isOpen}
+            />
+            {!isOpen && children}
+        </>, searchNode);
     }
     // The Search only opens something else, so it is a Button and not a Field. It shows
     // the shortcut of the Commands when it opens them, as that one opens them everywhere
     if (onOpen) {
         return <Container className="top-search">
-            <Trigger onClick={onOpen}>
-                <Icon icon="search" />
-                {NLS.get(placeholder)}
-            </Trigger>
-            <Shortcut>{forCommands ? COMMANDS : SHORTCUT}</Shortcut>
+            <Search>
+                <Trigger onClick={onOpen}>
+                    <Icon icon="search" />
+                    {NLS.get(placeholder)}
+                </Trigger>
+                <Shortcut>{forCommands ? COMMANDS : SHORTCUT}</Shortcut>
+            </Search>
+            {children}
         </Container>;
     }
 
     return <Container className="top-search">
-        <Field
-            passedRef={fieldRef}
-            name="search"
-            icon="search"
-            placeholder={placeholder}
-            value={value}
-            hasValue={!!value}
-            onChange={onChange}
-            onInput={onInput}
-            onSubmit={handleSubmit}
-            onClear={onClear}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setShowResults(true)}
-            onBlur={() => setShowResults(false)}
-            hasClear
-        />
-        {!value && <Shortcut>{SHORTCUT}</Shortcut>}
+        <Search>
+            <Field
+                passedRef={fieldRef}
+                name="search"
+                icon="search"
+                placeholder={placeholder}
+                value={value}
+                hasValue={!!value}
+                onChange={onChange}
+                onInput={onInput}
+                onSubmit={handleSubmit}
+                onClear={onClear}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setShowResults(true)}
+                onBlur={() => setShowResults(false)}
+                hasClear
+            />
+            {!value && <Shortcut>{SHORTCUT}</Shortcut>}
 
-        {hasResults && <Results>
-            {results.map((elem, index) => <Result
-                key={elem.key}
-                isSelected={index === selectedIdx}
-                onMouseDown={() => handleSelect(elem)}
-                onMouseEnter={() => setSelectedIdx(index)}
-            >
-                {!!elem.icon && <Icon icon={elem.icon} />}
-                <b>{NLS.get(elem.message)}</b>
-                {!!elem.section && <span>{NLS.get(elem.section)}</span>}
-            </Result>)}
-        </Results>}
+            {hasResults && <Results>
+                {results.map((elem, index) => <Result
+                    key={elem.key}
+                    isSelected={index === selectedIdx}
+                    onMouseDown={() => handleSelect(elem)}
+                    onMouseEnter={() => setSelectedIdx(index)}
+                >
+                    {!!elem.icon && <Icon icon={elem.icon} />}
+                    <b>{NLS.get(elem.message)}</b>
+                    {!!elem.section && <span>{NLS.get(elem.section)}</span>}
+                </Result>)}
+            </Results>}
+        </Search>
+        {children}
     </Container>;
 }
 
@@ -420,6 +446,7 @@ TopSearch.propTypes = {
     onInput     : PropTypes.func,
     onSubmit    : PropTypes.func,
     onClear     : PropTypes.func,
+    children    : PropTypes.any,
 };
 
 /**
