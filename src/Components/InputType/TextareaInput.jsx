@@ -16,7 +16,7 @@ const Container = Styled(InputContent).attrs(({ withLabel }) => ({ withLabel }))
     position: relative;
 
     ${(props) => props.withLabel && `
-        padding-top: calc(var(--input-label) - (20px - var(--input-label)) * 2) !important;
+        padding-top: calc(var(--input-label) + 1px) !important;
     `}
 
     .input-clear {
