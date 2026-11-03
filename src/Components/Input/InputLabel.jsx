@@ -5,6 +5,9 @@ import Styled               from "styled-components";
 // Core
 import NLS                  from "../../Core/NLS";
 
+// Components
+import Icon                 from "../Common/Icon";
+
 
 
 // Styles
@@ -71,6 +74,14 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
     `}
 `;
 
+const Help = Styled(Icon)`
+    margin-left: 4px;
+    color: var(--font-lighter);
+    vertical-align: middle;
+    pointer-events: auto;
+    cursor: help;
+`;
+
 
 
 /**
@@ -81,7 +92,7 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
 function InputLabel(props) {
     const {
         className, isRequired, withTransform, withValue,
-        isFocused, isBigger, isOutside, message, onClick,
+        isFocused, isBigger, isOutside, message, tooltip, onClick,
     } = props;
 
 
@@ -98,6 +109,13 @@ function InputLabel(props) {
         onClick={onClick}
     >
         {NLS.get(message)}
+        {!!tooltip && <Help
+            icon="help"
+            size="18"
+            tooltip={tooltip}
+            tooltipWidth={300}
+            tooltipBreaks
+        />}
     </Label>;
 }
 
@@ -114,6 +132,7 @@ InputLabel.propTypes = {
     isBigger      : PropTypes.bool,
     isOutside     : PropTypes.bool,
     message       : PropTypes.string.isRequired,
+    tooltip       : PropTypes.string,
     onClick       : PropTypes.func,
 };
 

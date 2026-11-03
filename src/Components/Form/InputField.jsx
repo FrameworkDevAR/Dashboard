@@ -68,7 +68,7 @@ const FieldNumber = Styled.span`
 function InputField(props) {
     const {
         passedRef, isHidden, className, type, name,
-        label, icon, postIcon, prefixText, suffixText, value,
+        label, labelTooltip, icon, postIcon, prefixText, suffixText, value,
         error, helperText, helperSteps, width, fullWidth, isRequired,
         onChange, onInput, onFocus, onBlur,
         autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel, sideLabel,
@@ -219,6 +219,7 @@ function InputField(props) {
             isBigger={bigLabel}
             isOutside={hasOutside}
             message={label}
+            tooltip={labelTooltip}
             onClick={(hasOutside && canFocus) ? handleLabel : undefined}
         />}
         {(hasHelperText && hasOutside) && <FieldHelper className="inputfield-helper" isOutside>
@@ -285,6 +286,7 @@ InputField.propTypes = {
     inputType         : PropTypes.string,
     name              : PropTypes.string,
     label             : PropTypes.string,
+    labelTooltip      : PropTypes.string,
     placeholder       : PropTypes.string,
     title             : PropTypes.string,
     getAfterTitle     : PropTypes.func,
