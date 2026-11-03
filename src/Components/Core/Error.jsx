@@ -178,7 +178,18 @@ function Error() {
         // Parse an SQL error
         if (error.message.includes("MySQL Error")) {
             const title = "PHP: MySQL Error";
-            const dump  = SQL.toHtml(error.message.replace("MySQL Error: ", ""));
+            const text  = error.message.replace("MySQL Error: ", "");
+
+            // The params of the query come after it as JSON, which is shown as it is, as the
+            // formatter would read it as a part of the query
+            const index  = text.lastIndexOf("\n\n");
+            const params = index > -1 && text.slice(index + 2).startsWith("[") ? text.slice(index + 2).trim() : "";
+            const query  = params ? text.slice(0, index) : text;
+
+            let dump = SQL.toHtml(query);
+            if (params && params !== "[]") {
+                dump += `<br><br>${params.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}`;
+            }
             return { title, message : "", filePath : "", fileName : "", line : "", stackLines : [], dump, isSQL : true };
         }
 
