@@ -256,8 +256,8 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
             --button-border: var(--border-color-medium);
             --button-background: var(--content-color);
             --button-hover-color: var(--font-color);
-            --button-hover-border: var(--darker-gray);
-            --button-hover-background: var(--lighter-gray);
+            --button-hover-border: var(--darkest-gray);
+            --button-hover-background: var(--light-gray);
 
             &:disabled,
             &:disabled:hover,

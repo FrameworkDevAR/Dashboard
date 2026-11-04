@@ -37,8 +37,8 @@ function ViewDialog(props) {
         width, isWide, isNarrow, minHeight, fullHeight,
         withSpacing, bigSpacing, bigGap, withFade, zIndex,
         hideFooter, primary, primaryVariant, onSubmit,
-        secondary, onSecondary, secondaryLoading,
-        tertiary, onTertiary, tertiaryLoading,
+        secondary, secondaryVariant, secondaryIcon, onSecondary, secondaryLoading,
+        tertiary, tertiaryVariant, tertiaryIcon, onTertiary, tertiaryLoading,
         cancel, onClose, children,
     } = props;
 
@@ -74,9 +74,13 @@ function ViewDialog(props) {
             primaryVariant={primaryVariant}
             onSubmit={onSubmit}
             secondary={secondary}
+            secondaryVariant={secondaryVariant}
+            secondaryIcon={secondaryIcon}
             onSecondary={onSecondary}
             secondaryLoading={secondaryLoading}
             tertiary={tertiary}
+            tertiaryVariant={tertiaryVariant}
+            tertiaryIcon={tertiaryIcon}
             tertiaryLoading={tertiaryLoading}
             onTertiary={onTertiary}
             cancel={cancel}
@@ -112,8 +116,12 @@ ViewDialog.propTypes = {
     primaryVariant   : PropTypes.string,
     onSubmit         : PropTypes.func,
     secondary        : PropTypes.string,
+    secondaryVariant : PropTypes.string,
+    secondaryIcon    : PropTypes.string,
     secondaryLoading : PropTypes.bool,
     tertiary         : PropTypes.string,
+    tertiaryVariant  : PropTypes.string,
+    tertiaryIcon     : PropTypes.string,
     tertiaryLoading  : PropTypes.bool,
     onSecondary      : PropTypes.func,
     onTertiary       : PropTypes.func,

@@ -38,8 +38,8 @@ function EditDialog(props) {
         error, isDisabled, dontClose, noAutoFocus, bigGap,
         hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
-        secondary, secondaryVariant, secondaryLoading, onSecondary,
-        tertiary, tertiaryVariant, tertiaryLoading, onTertiary,
+        secondary, secondaryVariant, secondaryIcon, secondaryLoading, onSecondary,
+        tertiary, tertiaryVariant, tertiaryIcon, tertiaryLoading, onTertiary,
         aside, asideWidth, keepAside, children,
     } = props;
 
@@ -94,10 +94,12 @@ function EditDialog(props) {
             onCancel={onCancel}
             secondary={secondary}
             secondaryVariant={secondaryVariant}
+            secondaryIcon={secondaryIcon}
             secondaryLoading={secondaryLoading}
             onSecondary={onSecondary}
             tertiary={tertiary}
             tertiaryVariant={tertiaryVariant}
+            tertiaryIcon={tertiaryIcon}
             tertiaryLoading={tertiaryLoading}
             onTertiary={onTertiary}
         />}
@@ -144,10 +146,12 @@ EditDialog.propTypes = {
     onCancel         : PropTypes.func,
     secondary        : PropTypes.string,
     secondaryVariant : PropTypes.string,
+    secondaryIcon    : PropTypes.string,
     secondaryLoading : PropTypes.bool,
     onSecondary      : PropTypes.func,
     tertiary         : PropTypes.string,
     tertiaryVariant  : PropTypes.string,
+    tertiaryIcon     : PropTypes.string,
     tertiaryLoading  : PropTypes.bool,
     onTertiary       : PropTypes.func,
     aside            : PropTypes.any,

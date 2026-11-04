@@ -70,6 +70,7 @@ function PasskeyDialog(props) {
         primary="PASSKEY_OFFER_CREATE"
         onSubmit={handleCreate}
         secondary="PASSKEY_OFFER_NEVER"
+        secondaryIcon="hide"
         onSecondary={handleNever}
         cancel="PASSKEY_OFFER_LATER"
         onClose={handleLater}

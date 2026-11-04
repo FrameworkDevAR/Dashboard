@@ -40,6 +40,7 @@ function FilterDialog(props) {
         title={title}
         primary="GENERAL_FILTER"
         secondary={hasFilter ? "GENERAL_REMOVE_FILTER" : ""}
+        secondaryIcon="filter-clear"
         onSubmit={handleSubmit}
         onSecondary={() => onSubmit({ ...initialData }, false)}
         onClose={onClose}

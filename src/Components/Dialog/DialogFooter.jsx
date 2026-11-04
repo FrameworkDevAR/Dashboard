@@ -49,10 +49,10 @@ const Secondary = Styled.div`
 function DialogFooter(props) {
     const {
         isHidden, className, onAction,
-        primary, primaryVariant, onSubmit,
-        secondary, secondaryVariant, secondaryLoading, onSecondary,
-        tertiary, tertiaryVariant, tertiaryLoading, onTertiary,
-        cancel, cancelVariant, dontClose, onClose, onCancel,
+        primary, primaryVariant, primaryIcon, onSubmit,
+        secondary, secondaryVariant, secondaryIcon, secondaryLoading, onSecondary,
+        tertiary, tertiaryVariant, tertiaryIcon, tertiaryLoading, onTertiary,
+        cancel, cancelVariant, cancelIcon, dontClose, onClose, onCancel,
         isLoading, isDisabled, children,
     } = props;
 
@@ -75,6 +75,13 @@ function DialogFooter(props) {
     }
 
 
+    // A delete is the only primary that is not a confirmation, so it gets its own icon
+    let mainIcon = primaryIcon;
+    if (!mainIcon) {
+        mainIcon = primaryVariant === "error" ? "delete" : "check";
+    }
+
+
     if (isHidden) {
         return <React.Fragment />;
     }
@@ -86,7 +93,9 @@ function DialogFooter(props) {
                 <Button
                     isHidden={!secondary}
                     variant={secondaryVariant}
+                    icon={secondaryIcon}
                     message={secondary}
+                    inLowerCase
                     isLoading={secondaryLoading}
                     isDisabled={secondaryLoading}
                     onClick={onSecondary}
@@ -94,7 +103,9 @@ function DialogFooter(props) {
                 <Button
                     isHidden={!tertiary}
                     variant={tertiaryVariant}
+                    icon={tertiaryIcon}
                     message={tertiary}
+                    inLowerCase
                     isLoading={tertiaryLoading}
                     isDisabled={isDisabled || tertiaryLoading}
                     onClick={onTertiary}
@@ -105,14 +116,18 @@ function DialogFooter(props) {
             <Button
                 isHidden={!primary}
                 variant={primaryVariant}
+                icon={mainIcon}
                 message={primary}
+                inLowerCase
                 isDisabled={isDisabled}
                 onClick={handleSubmit}
             />
             <Button
                 isHidden={dontClose}
                 variant={cancelVariant}
+                icon={cancelIcon}
                 message={cancel}
+                inLowerCase
                 onClick={onCancel || onClose}
             />
         </Primary>
@@ -129,17 +144,21 @@ DialogFooter.propTypes = {
     onAction         : PropTypes.func,
     primary          : PropTypes.string,
     primaryVariant   : PropTypes.string,
+    primaryIcon      : PropTypes.string,
     onSubmit         : PropTypes.func,
     secondary        : PropTypes.string,
     secondaryVariant : PropTypes.string,
+    secondaryIcon    : PropTypes.string,
     secondaryLoading : PropTypes.bool,
     onSecondary      : PropTypes.func,
     tertiary         : PropTypes.string,
     tertiaryVariant  : PropTypes.string,
+    tertiaryIcon     : PropTypes.string,
     tertiaryLoading  : PropTypes.bool,
     onTertiary       : PropTypes.func,
     cancel           : PropTypes.string,
     cancelVariant    : PropTypes.string,
+    cancelIcon       : PropTypes.string,
     dontClose        : PropTypes.bool,
     onClose          : PropTypes.func,
     onCancel         : PropTypes.func,
@@ -160,7 +179,8 @@ DialogFooter.defaultProps = {
     secondaryLoading : false,
     tertiaryVariant  : "outlined",
     cancel           : "GENERAL_CANCEL",
-    cancelVariant    : "outlined",
+    cancelVariant    : "outlined-gray",
+    cancelIcon       : "close",
     dontClose        : false,
     isLoading        : false,
     isDisabled       : false,

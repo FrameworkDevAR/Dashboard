@@ -21,8 +21,10 @@ function DialogAction(props) {
 
     return <Button
         variant="primary"
+        icon={act.icon}
         message={NLS.get(message || act.message)}
         onClick={() => onAction(act)}
+        inLowerCase
     />;
 }
 

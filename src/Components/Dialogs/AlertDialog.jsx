@@ -33,7 +33,7 @@ const Content = Styled(Html)`
 function AlertDialog(props) {
     const {
         open, icon, title, message, content, isLoading,
-        onClose, secondary, onSecondary,
+        onClose, secondary, secondaryIcon, onSecondary,
     } = props;
 
 
@@ -59,6 +59,7 @@ function AlertDialog(props) {
         <DialogFooter
             cancel="GENERAL_ACCEPT"
             secondary={secondary}
+            secondaryIcon={secondaryIcon}
             onSecondary={onSecondary}
         />
     </Dialog>;
@@ -69,15 +70,16 @@ function AlertDialog(props) {
  * @type {object} propTypes
  */
 AlertDialog.propTypes = {
-    open        : PropTypes.bool.isRequired,
-    icon        : PropTypes.string,
-    title       : PropTypes.string.isRequired,
-    message     : PropTypes.string,
-    content     : PropTypes.string,
-    isLoading   : PropTypes.bool,
-    onClose     : PropTypes.func.isRequired,
-    secondary   : PropTypes.string,
-    onSecondary : PropTypes.func,
+    open          : PropTypes.bool.isRequired,
+    icon          : PropTypes.string,
+    title         : PropTypes.string.isRequired,
+    message       : PropTypes.string,
+    content       : PropTypes.string,
+    isLoading     : PropTypes.bool,
+    onClose       : PropTypes.func.isRequired,
+    secondary     : PropTypes.string,
+    secondaryIcon : PropTypes.string,
+    onSecondary   : PropTypes.func,
 };
 
 /**
