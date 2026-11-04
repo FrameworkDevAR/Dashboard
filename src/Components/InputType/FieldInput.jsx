@@ -19,6 +19,12 @@ import Icon                 from "../Common/Icon";
 
 // Styles
 const Container = Styled.div.attrs(({ withBorder, isDisabled }) => ({ withBorder, isDisabled }))`
+    --input-row-height: var(--input-field-height, var(--input-height));
+    --input-row-radius: var(--input-field-radius, var(--input-border-radius));
+    --input-row-label-offset: var(--input-field-label-offset, 12px);
+    --input-row-label-color: var(--input-field-label-color, var(--input-label-color, var(--font-color)));
+    --input-row-label-weight: var(--input-field-label-weight, normal);
+
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -73,7 +79,7 @@ const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, wit
         &[style*="position: fixed"]::before {
             display: none;
         }
-        .inputfield-label {
+        .inputfield-label.inputfield-outside {
             margin-bottom: 5px;
             color: var(--font-lighter);
             font-size: 12px;

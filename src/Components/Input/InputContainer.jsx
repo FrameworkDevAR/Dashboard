@@ -97,9 +97,16 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
         padding-bottom: 8px;
     `}
 
-    &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)):not(.inputfield-toggle):not(.inputfield-checkbox):not(.inputfield-radiobox) {
+    &:not(:has(> .inputfield-label)):not(:has(> .inputview-label)):not(.inputfield-toggle):not(.inputfield-checkbox):not(.inputfield-radiobox):not(.inputfield-fields) {
         --input-height: var(--input-plain-height, 38px);
         --input-border-radius: var(--input-border-radius-small);
+    }
+    .inputfield-fields &:has(> .inputfield-label) {
+        --input-height: var(--input-row-height);
+        --input-border-radius: var(--input-row-radius);
+        --input-label-offset: var(--input-row-label-offset);
+        --input-label-color: var(--input-row-label-color);
+        --input-label-weight: var(--input-row-label-weight);
     }
 
     ${(props) => props.outsideLabel && `

@@ -23,7 +23,7 @@ const Children = Styled.div.attrs(({ withLabel }) => ({ withLabel }))`
     align-items: center;
     margin-right: -6px;
 
-    ${(props) => props.withLabel && "margin-top: -4px;"}
+    ${(props) => props.withLabel && "margin-top: -8px;"}
 `;
 
 // A masked value is hidden with dots without being a password, which a browser offers to save

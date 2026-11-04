@@ -23,6 +23,7 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
     background-color: var(--input-label-background, var(--content-color));
     color: var(--input-label-color, var(--font-color));
     font-size: 12px;
+    font-weight: var(--input-label-weight, normal);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -38,7 +39,7 @@ const Label = Styled.p.attrs(({ isRequired, withTransform, withValue, isFocused,
     `}
     ${(props) => props.withTransform && `
         transform-origin: top left;
-        transform: translateY(12px) scale(1.2);
+        transform: translateY(var(--input-label-offset, 12px)) scale(1.2);
     `}
     ${(props) => props.withValue && `
         transform: translateY(0) scale(1);
@@ -98,7 +99,7 @@ function InputLabel(props) {
 
     // Do the Render
     return <Label
-        className={className}
+        className={isOutside ? `${className} inputfield-outside` : className}
         isRequired={isRequired}
         withTransform={withTransform}
         withValue={withValue}
