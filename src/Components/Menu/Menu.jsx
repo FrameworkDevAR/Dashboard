@@ -61,8 +61,11 @@ const Content = Styled.ul`
     overflow: auto;
 `;
 
-const Footer = Styled.div`
+const Footer = Styled.ul`
     flex-shrink: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 `;
 
 const Search = Styled.div.attrs(({ atBottom }) => ({ atBottom }))`
