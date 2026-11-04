@@ -330,6 +330,8 @@ InputField.propTypes = {
     suggestParams     : PropTypes.object,
     suggestWidth      : PropTypes.number,
     keepSuggestions   : PropTypes.bool,
+    suggestOnFocus    : PropTypes.bool,
+    suggestHint       : PropTypes.string,
     addButton         : PropTypes.string,
     error             : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     errors            : PropTypes.object,

@@ -32,7 +32,7 @@ function SuggestInput(props) {
         inputRef, className, icon,
         isFocused, isDisabled, isSmall, withBorder, withLabel,
         id, name, value, placeholder, emptyText, searchText,
-        suggestID, suggestFetch, suggestParams, keepSuggestions,
+        suggestID, suggestFetch, suggestParams, keepSuggestions, suggestOnFocus, suggestHint,
         suggestWidth, createOption, showCreate, onCreate,
         onChange, onClear, onFocus, onBlur,
     } = props;
@@ -83,6 +83,8 @@ function SuggestInput(props) {
                 timerRef.current = window.setTimeout(() => {
                     fetchValue(newSearch);
                 }, 1000);
+            } else if (suggestOnFocus && !newSearch) {
+                fetchValue("");
             } else {
                 setSuggestions([]);
             }
@@ -140,6 +142,11 @@ function SuggestInput(props) {
         });
         onFocus();
         selectedIdxRef.current = -1;
+
+        // Some Suggests show their options before writing anything
+        if (suggestOnFocus && !search) {
+            fetchValue("");
+        }
     };
 
     // Handles the Blur
@@ -256,7 +263,8 @@ function SuggestInput(props) {
     const showEmpty           = Boolean(hasSearch && !searching && !suggestions.length && emptyText);
     const showLine            = Boolean(hasValue && (showSearch || showEmpty || suggestions.length));
     const showFilteredOptions = Boolean(filteredOptions.length && !searching);
-    const hasOptions          = Boolean(showOptions && (hasValue || showSearch || showEmpty || filteredOptions.length));
+    const showHint            = Boolean(suggestOnFocus && suggestHint && !search);
+    const hasOptions          = Boolean(showOptions && (hasValue || showSearch || showEmpty || showHint || filteredOptions.length));
     const isOnlyOption        = Boolean(filteredOptions.length === 1 && !hasValue);
 
 
@@ -330,6 +338,11 @@ function SuggestInput(props) {
                 isSelected={selectedIdxRef.current === index}
                 onMouseDown={(e) => handleSelect(e, elem.id, elem.title, elem)}
             />)}
+
+            <InputOption
+                isHidden={!showHint}
+                message={suggestHint}
+            />
         </InputOptions>}
     </InputContent>;
 }
@@ -360,6 +373,8 @@ SuggestInput.propTypes = {
     suggestNone     : PropTypes.string,
     suggestWidth    : PropTypes.number,
     keepSuggestions : PropTypes.bool,
+    suggestOnFocus  : PropTypes.bool,
+    suggestHint     : PropTypes.string,
     createOption    : PropTypes.string,
     showCreate      : PropTypes.bool,
     onCreate        : PropTypes.func,

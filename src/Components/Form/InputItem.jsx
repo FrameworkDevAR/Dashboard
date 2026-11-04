@@ -74,6 +74,8 @@ InputItem.propTypes = {
     suggestParams   : PropTypes.object,
     suggestWidth    : PropTypes.number,
     keepSuggestions : PropTypes.bool,
+    suggestOnFocus  : PropTypes.bool,
+    suggestHint     : PropTypes.string,
     columns         : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     hide            : PropTypes.func,
     getType         : PropTypes.func,
