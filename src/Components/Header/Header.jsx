@@ -57,7 +57,7 @@ function Header(props) {
     const {
         isHidden, className, icon, iconColor, emoji,
         message, fallback, href, backIcon,
-        subTitle, subCircle, hasChanges, tabs, children,
+        subTitle, subCircle, hasChanges, hasErrors, tabs, children,
     } = props;
 
 
@@ -121,10 +121,15 @@ function Header(props) {
             href={href}
             backIcon={backIcon}
         />
-        {hasChanges ? <Subtitle
+        {hasErrors && <Subtitle
+            message="GENERAL_ERROR_FIELDS"
+            circle="red"
+        />}
+        {!hasErrors && hasChanges && <Subtitle
             message="GENERAL_UNSAVED_CHANGES"
             circle="orange"
-        /> : <Subtitle
+        />}
+        {!hasErrors && !hasChanges && <Subtitle
             message={subTitle}
             circle={subCircle}
         />}
@@ -152,6 +157,7 @@ Header.propTypes = {
     subTitle   : PropTypes.string,
     subCircle  : PropTypes.string,
     hasChanges : PropTypes.bool,
+    hasErrors  : PropTypes.bool,
     tabs       : PropTypes.node,
     children   : PropTypes.any,
 };
