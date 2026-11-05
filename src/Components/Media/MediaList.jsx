@@ -26,6 +26,7 @@ const CRUMB_SPACE = 28 + GAP_SPACE;
 const DROP_SPACE  = 60 + DROP_MARGIN + GAP_SPACE;
 const TIP_SPACE   = 42 + GAP_SPACE;
 const ADDED_TIME  = 1500;
+const TWO_ROWS    = 148 * 2 + 12 + 4 * 2;
 
 // Styles
 const Container = Styled.div.attrs(({ inDialog, isCentered }) => ({ inDialog, isCentered }))`
@@ -36,7 +37,7 @@ const Container = Styled.div.attrs(({ inDialog, isCentered }) => ({ inDialog, is
 
     ${(props) => props.inDialog ? `
         --media-height: calc(var(--dialog-content, var(--dialog-body)) - 2px);
-        min-height: calc(148px * 2 + 12px + 12px + 27px);
+        min-height: ${TWO_ROWS + CRUMB_SPACE}px;
     ` : `
         --media-height: calc(var(--main-height) - var(--main-padding) - var(--header-height) - 2px);
     `}
@@ -76,9 +77,12 @@ function MediaList(props) {
     // The References
     const containerRef = React.useRef(null);
     const knownRef     = React.useRef({ path : null, paths : [] });
+    const loadingRef   = React.useRef(isLoading);
+    const scrolledRef  = React.useRef(null);
 
     // The Current State
     const [ openElem,   setOpenElem   ] = React.useState(null);
+    const [ isOpening,  setOpening    ] = React.useState(false);
     const [ addedPaths, setAddedPaths ] = React.useState([]);
     const [ view,     setView     ] = React.useState(localStorage.getItem("dashboard-media-view") || "grid");
     const [ sort,     setSort     ] = React.useState(localStorage.getItem("dashboard-media-sort") || "name");
@@ -98,9 +102,10 @@ function MediaList(props) {
     }), [ items, sort ]);
 
     // Variables
-    const showLoader = Boolean(isLoading && !items.length);
+    // A Directory that is being opened shows the loader instead of the one it leaves
+    const showLoader = Boolean(isLoading && (!items.length || isOpening));
     const showNone   = Boolean(!isLoading && !items.length);
-    const showItems  = Boolean(items.length);
+    const showItems  = Boolean(items.length && !showLoader);
     const amount     = items.filter((elem) => !elem.isBack).length;
     const isGrid     = view === "grid";
 
@@ -123,8 +128,9 @@ function MediaList(props) {
 
     // Handles the Action, keeping the Directory that is being opened
     const handleAction = (action, elem, e) => {
-        if (action.isSelect && (elem.isDir || elem.isBack)) {
+        if ((action.isSelect || action.isView) && (elem.isDir || elem.isBack)) {
             setOpenElem(elem);
+            setOpening(true);
         }
         if (onAction) {
             onAction(action, elem, e);
@@ -164,17 +170,22 @@ function MediaList(props) {
     const handleBreadcrumb = (href) => {
         if (onAction) {
             const path = href === "/" ? "" : href;
+            setOpening(true);
             onAction(Action.get("VIEW"), { isDir : true, path });
         }
     };
 
-    // The Directory stops loading when the content is fetched
+    // The Directory stops loading when the content is fetched. It only happens when a load
+    // ends, as the items can change on any render and that would end the one being opened
     React.useEffect(() => {
-        if (!isLoading) {
+        const wasLoading = loadingRef.current;
+        loadingRef.current = isLoading;
+        if (wasLoading && !isLoading) {
             setOpenElem(null);
+            setOpening(false);
             resetDrag();
         }
-    }, [ isLoading, items ]);
+    }, [ isLoading ]);
 
     // Marks the Items added to the Directory since it was loaded, to animate them
     React.useEffect(() => {
@@ -201,11 +212,13 @@ function MediaList(props) {
         return () => window.clearTimeout(timer);
     }, [ addedPaths ]);
 
-    // Scrolls to the selected Item, as the list can start with it out of the view
+    // Scrolls to the selected Item, as the list can start with it out of the view. It is done
+    // once for each Directory that loads, as doing it again moves the list while scrolling it
     React.useEffect(() => {
-        if (isLoading || !containerRef.current) {
+        if (isLoading || !containerRef.current || scrolledRef.current === path) {
             return;
         }
+        scrolledRef.current = path;
         const index = sortedItems.findIndex((elem) => isSelected(elem));
         if (index < 0) {
             return;

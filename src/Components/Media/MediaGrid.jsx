@@ -10,6 +10,8 @@ import ScrollFade           from "../Common/ScrollFade";
 
 // Constants
 const SHADOW_SPACE = 4;
+const DIALOG_ITEM  = 148;
+const DIALOG_GAP   = 12;
 
 // Styles
 const Fade = Styled(ScrollFade)`
@@ -29,7 +31,8 @@ const Section = Styled.section.attrs(({ inDialog, extraSpace }) => ({ inDialog, 
     ${(props) => props.inDialog && `
         --media-item-height: 100px;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 12px;
+        gap: ${DIALOG_GAP}px;
+        min-height: ${DIALOG_ITEM * 2 + DIALOG_GAP + SHADOW_SPACE * 2}px;
     `}
 `;
 

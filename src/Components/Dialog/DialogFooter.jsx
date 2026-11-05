@@ -104,6 +104,8 @@ function DialogFooter(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
+
+    // While the Dialog loads only the Cancel is shown, so nothing is done with what is not there
     const twoRows = Boolean(secondary || tertiary);
     return <Footer className={className} twoRows={twoRows}>
         <Secondary as={Row} twoRows={twoRows}>
@@ -134,7 +136,7 @@ function DialogFooter(props) {
         </Secondary>
         <Primary as={Row} twoRows={twoRows} atEnd>
             <Button
-                isHidden={!primary}
+                isHidden={!primary || isLoading}
                 variant={primaryVariant}
                 icon={mainIcon}
                 message={primary}
