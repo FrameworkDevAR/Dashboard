@@ -36,7 +36,7 @@ function EditDialog(props) {
         width, isNarrow, isWide, minHeight, maxHeight, keepHeight, fullHeight,
         noOverflow, withSpacing, bigSpacing, withFade,
         error, isDisabled, dontClose, noAutoFocus, bigGap,
-        hideFooter, hidePrimary, primary, primaryVariant, onSubmit,
+        hideFooter, hidePrimary, primary, primaryVariant, primaryIcon, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryIcon, secondaryLoading, onSecondary,
         tertiary, tertiaryVariant, tertiaryIcon, tertiaryLoading, onTertiary,
@@ -88,6 +88,7 @@ function EditDialog(props) {
             isDisabled={isLoading || isDisabled}
             primary={hidePrimary ? "" : primary}
             primaryVariant={primaryVariant}
+            primaryIcon={primaryIcon}
             onSubmit={onSubmit}
             cancel={cancel}
             cancelVariant={cancelVariant}
@@ -140,6 +141,7 @@ EditDialog.propTypes = {
     hidePrimary      : PropTypes.bool,
     primary          : PropTypes.string,
     primaryVariant   : PropTypes.string,
+    primaryIcon      : PropTypes.string,
     onSubmit         : PropTypes.func,
     cancel           : PropTypes.string,
     cancelVariant    : PropTypes.string,

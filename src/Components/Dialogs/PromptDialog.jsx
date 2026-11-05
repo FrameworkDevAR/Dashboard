@@ -39,7 +39,7 @@ const Content = Styled(Html)`
 function PromptDialog(props) {
     const {
         open, title, message, content, icon, isError, isLoading,
-        isWide, isNarrow, bigSpacing, primary, primaryVariant,
+        isWide, isNarrow, bigSpacing, primary, primaryVariant, primaryIcon,
         inputType, inputLabel, inputIcon, placeholder, helperText, outsideLabel,
         initialValue, inputOptions, error, showError, confirmText,
         maxLength, rows, maxRows, spellCheck, keepOnClose,
@@ -172,6 +172,7 @@ function PromptDialog(props) {
         <DialogFooter
             primary={primary}
             primaryVariant={primaryVariant}
+            primaryIcon={primaryIcon}
             onSubmit={handleSubmit}
             isDisabled={isDisabled}
         />
@@ -191,6 +192,7 @@ PromptDialog.propTypes = {
     isError         : PropTypes.bool,
     primary         : PropTypes.string,
     primaryVariant  : PropTypes.string,
+    primaryIcon     : PropTypes.string,
     inputType       : PropTypes.string,
     inputLabel      : PropTypes.string,
     placeholder     : PropTypes.string,
