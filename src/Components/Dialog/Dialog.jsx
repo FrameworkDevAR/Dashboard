@@ -20,7 +20,7 @@ const openDialogs = [];
 
 
 // Styles
-const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter }) => ({ zIndex, hasFooter }))`
+const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter, twoRowsFooter }) => ({ zIndex, hasFooter, twoRowsFooter }))`
     ${(props) => !props.hasFooter && "--dialog-footer: 0px;"}
 
     --dialog-tabs: 0px;
@@ -32,6 +32,7 @@ const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter }) => ({ zIndex, h
 
     @media (max-width: 500px) {
         --dialog-spacing: var(--main-padding);
+        ${(props) => props.twoRowsFooter && "--dialog-footer: var(--dialog-footer-rows, 104px);"}
     }
 `;
 
@@ -224,12 +225,15 @@ function Dialog(props) {
     const items      = [];
     let   hasTabs    = false;
     let   withFooter = Boolean(hasFooter);
+    let   twoRows    = false;
 
+    // A footer with a secondary button takes two rows on a phone, so the body leaves the space
     for (const [ key, child ] of Utils.getChildren(children).entries()) {
         if (child.type === TabList) {
             hasTabs = true;
         } else if (child.type === DialogFooter) {
             withFooter = true;
+            twoRows    = Boolean(child.props.secondary || child.props.tertiary);
         }
         items.push(React.cloneElement(child, {
             key, isLoading, loadingMessage, isNarrow, dontClose,
@@ -261,6 +265,7 @@ function Dialog(props) {
         contentRef={contentRef}
         zIndex={zIndex}
         hasFooter={withFooter}
+        twoRowsFooter={twoRows}
         isClosing={isClosing}
         onClose={handleBackClose}
     >

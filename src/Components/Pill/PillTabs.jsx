@@ -8,7 +8,7 @@ import Utils                from "../../Utils/Utils";
 
 
 // Styles
-const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, bottomSpace }) => ({ fillWidth, isMedium, isCentered, topSpace, bottomSpace }))`
+const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, bottomSpace, fadeLeft, fadeRight }) => ({ fillWidth, isMedium, isCentered, topSpace, bottomSpace, fadeLeft, fadeRight }))`
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -37,6 +37,10 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     `}
     ${(props) => props.topSpace && `margin-top: ${props.topSpace}px;`}
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
+
+    ${(props) => (props.fadeLeft || props.fadeRight) && `
+        mask-image: linear-gradient(to right, ${props.fadeLeft ? "transparent, black 32px" : "black"}, ${props.fadeRight ? "black calc(100% - 32px), transparent" : "black"});
+    `}
 `;
 
 const Sticky = Styled.div.attrs(({ isCentered }) => ({ isCentered }))`
@@ -82,6 +86,7 @@ function PillTabs(props) {
 
     // The Current State
     const [ bounds, setBounds ] = React.useState({ left : 0, width : 0 });
+    const [ fades,  setFades  ] = React.useState({ left : false, right : false });
 
 
     // Clone the Children
@@ -117,6 +122,29 @@ function PillTabs(props) {
         return () => observer.disconnect();
     }, [ isHidden, selected, items.length ]);
 
+    // When the Pills scroll, the side that has more of them fades, so it is known there are more
+    React.useEffect(() => {
+        const node = contentRef.current;
+        if (!node) {
+            return () => {};
+        }
+        const update = () => {
+            const canScroll = node.scrollWidth > node.clientWidth + 1;
+            setFades({
+                left  : canScroll && node.scrollLeft > 1,
+                right : canScroll && node.scrollLeft + node.clientWidth < node.scrollWidth - 1,
+            });
+        };
+        update();
+        node.addEventListener("scroll", update, { passive : true });
+        const observer = new ResizeObserver(update);
+        observer.observe(node);
+        return () => {
+            node.removeEventListener("scroll", update);
+            observer.disconnect();
+        };
+    }, [ isHidden, items.length ]);
+
 
     // Do the Render
     if (isHidden) {
@@ -130,6 +158,8 @@ function PillTabs(props) {
         isCentered={isCentered}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
+        fadeLeft={fades.left}
+        fadeRight={fades.right}
     >
         <Indicator
             left={bounds.left}

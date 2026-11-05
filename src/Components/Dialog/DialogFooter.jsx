@@ -12,7 +12,7 @@ import Button               from "../Form/Button";
 
 
 // Styles
-const Footer = Styled.footer`
+const Footer = Styled.footer.attrs(({ twoRows }) => ({ twoRows }))`
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -21,8 +21,18 @@ const Footer = Styled.footer`
     padding: 0 var(--dialog-padding);
     gap: 8px;
 
+    .btn {
+        white-space: nowrap;
+    }
+
     @media (max-width: 500px) {
         padding: 0 16px;
+
+        ${(props) => props.twoRows && `
+            flex-wrap: wrap;
+            align-content: center;
+            padding: 8px 16px;
+        `}
     }
 `;
 
@@ -37,6 +47,15 @@ const Secondary = Styled.div`
     justify-content: space-between;
     align-items: center;
     gap: 8px;
+`;
+
+const Row = Styled.div.attrs(({ twoRows, atEnd }) => ({ twoRows, atEnd }))`
+    @media (max-width: 500px) {
+        ${(props) => props.twoRows && `
+            width: 100%;
+            justify-content: ${props.atEnd ? "flex-end" : "flex-start"};
+        `}
+    }
 `;
 
 
@@ -85,8 +104,9 @@ function DialogFooter(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Footer className={className}>
-        <Secondary>
+    const twoRows = Boolean(secondary || tertiary);
+    return <Footer className={className} twoRows={twoRows}>
+        <Secondary as={Row} twoRows={twoRows}>
             {!isLoading && <>
                 {actions}
                 {items}
@@ -112,7 +132,7 @@ function DialogFooter(props) {
                 />
             </>}
         </Secondary>
-        <Primary>
+        <Primary as={Row} twoRows={twoRows} atEnd>
             <Button
                 isHidden={!primary}
                 variant={primaryVariant}

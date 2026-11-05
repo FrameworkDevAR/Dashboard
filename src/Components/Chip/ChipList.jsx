@@ -25,14 +25,14 @@ const Container = Styled.ul`
  * @returns {React.ReactElement}
  */
 function ChipList(props) {
-    const { isHidden, className, children } = props;
+    const { passedRef, isHidden, className, children } = props;
 
 
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={`chips ${className}`}>
+    return <Container ref={passedRef} className={`chips ${className}`}>
         {children}
     </Container>;
 }
@@ -42,6 +42,7 @@ function ChipList(props) {
  * @type {object} propTypes
  */
 ChipList.propTypes = {
+    passedRef : PropTypes.any,
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
     children  : PropTypes.any,

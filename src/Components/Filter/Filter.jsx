@@ -25,7 +25,7 @@ import IconLink             from "../Link/IconLink";
 
 
 // Styles
-const Container = Styled.div.attrs(({ isNarrow }) => ({ isNarrow }))`
+const Container = Styled.div.attrs(({ isNarrow, wrapChips }) => ({ isNarrow, wrapChips }))`
     display: flex;
     gap: calc(var(--main-gap) / 2);
     box-sizing: border-box;
@@ -36,6 +36,10 @@ const Container = Styled.div.attrs(({ isNarrow }) => ({ isNarrow }))`
     min-width: 0;
 
     ${(props) => props.isNarrow && "overflow: auto;"}
+    ${(props) => props.wrapChips && `
+        flex-wrap: wrap;
+        height: auto;
+    `}
 `;
 
 const Content = Styled.div`
@@ -60,10 +64,17 @@ const FilterIcon = Styled(IconLink)`
     background-color: var(--filter-input-background);
 `;
 
-const Chips = Styled(ChipList).attrs(({ isNarrow }) => ({ isNarrow }))`
+const Chips = Styled(ChipList).attrs(({ isNarrow, wrapChips }) => ({ isNarrow, wrapChips }))`
     flex-grow: 2;
     flex-wrap: nowrap;
     margin-left: calc(var(--main-gap) / 2);
+
+    ${(props) => props.wrapChips && `
+        flex-basis: 100%;
+        margin-left: 0;
+        padding-bottom: 2px;
+        overflow: auto;
+    `}
 
     li {
         padding-top: 5px;
@@ -95,6 +106,7 @@ function Filter(props) {
     // The References
     const containerRef   = React.useRef(null);
     const contentRef     = React.useRef(null);
+    const chipsRef       = React.useRef(null);
     const inputRef       = React.useRef(null);
     const optionsRef     = React.useRef(null);
     const selectedRef    = React.useRef(-1);
@@ -102,6 +114,7 @@ function Filter(props) {
 
     // The Current State
     const [ isNarrow,     setIsNarrow   ] = React.useState(false);
+    const [ wrapChips,    setWrapChips  ] = React.useState(false);
     const [ search,      setSearch      ] = React.useState("");
     const [ data,        setData        ] = React.useState({});
     const [ showOptions, setShowOptions ] = React.useState(false);
@@ -112,7 +125,8 @@ function Filter(props) {
     const [ update,      setUpdate      ] = React.useState(0);
 
 
-    // Detect if the Filter is Narrow
+    // Detect if the Filter is Narrow, and if the Chips do not fit next to the input, which
+    // sends them to a row of their own instead of leaving them without a width
     React.useEffect(() => {
         const observer = new ResizeObserver(() => {
             if (!containerRef.current || !contentRef.current) {
@@ -120,11 +134,16 @@ function Filter(props) {
             }
             const containerBounds = containerRef.current.getBoundingClientRect();
             const contentBounds   = contentRef.current.getBoundingClientRect();
+            const chipsWidth      = chipsRef.current ? chipsRef.current.scrollWidth : 0;
             setIsNarrow(containerBounds.width < contentBounds.width);
+            setWrapChips(chipsWidth > 0 && containerBounds.width < contentBounds.width + chipsWidth + 24);
         });
 
         if (containerRef.current) {
             observer.observe(containerRef.current);
+        }
+        if (chipsRef.current) {
+            observer.observe(chipsRef.current);
         }
         return () => observer.disconnect();
     }, []);
@@ -759,6 +778,7 @@ function Filter(props) {
             ref={containerRef}
             className={className}
             isNarrow={isNarrow}
+            wrapChips={wrapChips}
         >
             <Content ref={contentRef}>
                 <Search
@@ -788,7 +808,7 @@ function Filter(props) {
                 />
             </Content>
 
-            <Chips isNarrow={isNarrow}>
+            <Chips passedRef={chipsRef} isNarrow={isNarrow} wrapChips={wrapChips}>
                 {chipList.map(({ key, name, value, message, forDates, forRange }) => <ChipItem
                     key={key}
                     message={message}

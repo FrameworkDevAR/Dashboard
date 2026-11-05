@@ -83,6 +83,7 @@ const TData = Styled.td.attrs(props)`
         @media (max-width: ${Responsive.WIDTH_FOR_MOBILE}px) {
             && {
                 display: flex;
+                flex-wrap: wrap;
                 align-items: center;
                 text-align: left;
                 margin: 4px;
@@ -91,11 +92,23 @@ const TData = Styled.td.attrs(props)`
                 min-width: 0;
                 max-width: none;
 
-                ${props.bigMobile  && "grid-column: 1 / -1;"}
+                ${(props.bigMobile || props.isTitle) && "grid-column: 1 / -1;"}
                 ${props.hideMobile && "display: none;"}
             }
         }
     `}
+`;
+
+const Label = Styled.span`
+    display: none;
+    margin-right: 6px;
+    color: var(--font-lighter);
+    font-size: 12px;
+    white-space: nowrap;
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MOBILE}px) {
+        display: inline;
+    }
 `;
 
 
@@ -107,7 +120,7 @@ const TData = Styled.td.attrs(props)`
  */
 function TableCell(props) {
     const {
-        isHidden, message,
+        isHidden, message, label,
         tooltip, tooltipVariant, tooltipWidth, tooltipDelay, tooltipBreaks,
         className, textColor, circle, circleTooltip, hideCircle,
         colSpan, grow, shrink, width, minWidth, maxWidth, align,
@@ -135,6 +148,10 @@ function TableCell(props) {
     const hasMessage  = message !== undefined && !hasHtml;
     const hasChildren = !hasMessage;
     const isColor     = Boolean(textColor) && (/^(#|rgb|hsl)/i).test(textColor);
+
+    // On a phone the cells lose their header, so the columns that ask for it, like the dates
+    // and the amounts, say what their value is. The editable tables keep the header
+    const hasLabel    = Boolean(label && !isEditable && (hasMessage ? content !== "" : hasChildren));
 
 
     // Do the Render
@@ -166,6 +183,7 @@ function TableCell(props) {
         onMouseEnter={handleTooltip}
         onMouseLeave={hideTooltip}
     >
+        {hasLabel && <Label>{NLS.get(label)}:</Label>}
         {!!circle && !hideCircle && <Circle
             color={circle}
             tooltip={circleTooltip}
@@ -187,6 +205,7 @@ function TableCell(props) {
 TableCell.propTypes = {
     isHidden       : PropTypes.bool,
     message        : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    label          : PropTypes.string,
     tooltip        : PropTypes.string,
     tooltipVariant : PropTypes.string,
     tooltipWidth   : PropTypes.number,

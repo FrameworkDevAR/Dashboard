@@ -123,11 +123,7 @@ const TRow = Styled.tr.attrs(({ hasHover, hasChecks, hasActions, isEditable, isS
         }
 
         @media (max-width: 650px) {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        }
-
-        @media (max-width: 380px) {
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         }
     `}
 `;

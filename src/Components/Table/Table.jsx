@@ -94,7 +94,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
     ${(props) => props.isEditable && props.scrollsLeft && `
         tr > th:first-child,
         tbody tr > td:first-child {
-            box-shadow: 6px 0 6px -6px rgba(0, 0, 0, 0.2);
+            box-shadow: 8px 0 10px -6px rgba(0, 0, 0, 0.35);
         }
         tr > th:first-child::after {
             content: "";
@@ -111,7 +111,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
     ${(props) => props.isEditable && props.scrollsRight && `
         tr > th:last-child,
         tbody tr > td:last-child {
-            box-shadow: -6px 0 6px -6px rgba(0, 0, 0, 0.2);
+            box-shadow: -8px 0 10px -6px rgba(0, 0, 0, 0.35);
         }
         tr > th:last-child::before {
             content: "";
@@ -333,6 +333,7 @@ function Table(props) {
             for (const [ index, tableHead ] of Utils.getChildren(child.props.children).entries()) {
                 const data = {
                     id          : tableHead.props.field,
+                    label       : tableHead.props.mobileLabel ? tableHead.props.message : "",
                     isHidden    : !!tableHead.props.isHidden,
                     isTitle     : !!tableHead.props.isTitle,
                     isSmall     : !!tableHead.props.isSmall,

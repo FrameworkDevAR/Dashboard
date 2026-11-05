@@ -38,6 +38,10 @@ const TitleIcon = Styled(Icon)`
     height: 24px;
     font-size: var(--navigation-title-icon, 20px);
     color: var(--navigation-title-color, var(--title-color));
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MOBILE}px) {
+        display: none;
+    }
 `;
 
 const Search = Styled.div`
