@@ -232,10 +232,8 @@ function MultipleInput(props) {
         } catch(e) {
             result = [];
         }
-        for (const [ index, item ] of result.entries()) {
-            result[index] = String(item);
-        }
-        return result;
+        // The parts are a copy, as the value given can be an array that the caller keeps
+        return result.map((item) => String(item));
     }, [ value ]);
 
 
