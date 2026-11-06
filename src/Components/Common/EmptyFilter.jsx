@@ -12,7 +12,7 @@ import Button               from "../Form/Button";
 const Container = Styled(EmptyContent).attrs(({ hasFilter, hasTabs, statsAmount }) => ({ hasFilter, hasTabs, statsAmount }))`
     height: calc(
         var(--page-height)
-        - ${(props) => props.hasFilter ? "var(--filter-height)" : "0px"}
+        - ${(props) => props.hasFilter ? "calc(var(--filter-height) + var(--filter-chips-height, 0px))" : "0px"}
         - ${(props) => props.hasTabs ? "var(--tabs-table)" : "0px"}
         - ${(props) => props.statsAmount > 0 ? `calc((var(--stats-height) + var(--main-gap)) * ${props.statsAmount})` : "0px"}
     );

@@ -34,7 +34,7 @@ const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, h
     `}
 
     --table-header-height: 28px;
-    --table-filter-height: ${(props) => props.hasFilter ? "var(--filter-height)" : "0px"};
+    --table-filter-height: ${(props) => props.hasFilter ? "calc(var(--filter-height) + var(--filter-chips-height, 0px))" : "0px"};
     --table-stats-height: ${(props) => props.statsAmount > 0 ? `calc((var(--stats-height) + var(--main-gap)) * ${props.statsAmount})` : "0px"};
     --table-tabs-height: ${(props) => props.hasTabs ? "var(--tabs-table)" : "0px"};
     --table-alert-height: ${(props) => props.hasAlert ? "var(--alert-height)" : "0px"};

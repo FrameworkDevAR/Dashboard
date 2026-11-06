@@ -183,6 +183,13 @@ function InputOption(props) {
     const iconValue = hasChecks ? (isChecked ? "checkbox-on" : "checkbox-off") : (icon || "");
     const hasMenu   = Boolean(children && children.length);
 
+    // The Menu leaves a part of the Options to its left in sight, as it moves over them when it
+    // does not fit to their right, which happens on a phone
+    let menuWidth = 0;
+    if (hasMenu && menuOpen && itemRef.current) {
+        menuWidth = Math.max(window.innerWidth - itemRef.current.getBoundingClientRect().left - 120, 160);
+    }
+
 
     // Do the Render
     if (isHidden) {
@@ -245,6 +252,7 @@ function InputOption(props) {
             open={menuOpen}
             targetRef={itemRef}
             direction={direction}
+            maxWidth={menuWidth}
             onMouseEnter={() => setMenuOpen(true)}
             onMouseLeave={() => setMenuOpen(false)}
             onClose={onClose}

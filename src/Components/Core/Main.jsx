@@ -36,6 +36,9 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
         --header-height: calc(var(--main-padding) + var(--filter-height));
         --page-height: calc(var(--main-height) - var(--header-height) - var(--main-padding));
     }
+    &:has(> .main-header-filter .filter-wrapped) {
+        --header-height: calc(var(--main-padding) + var(--filter-height) + var(--main-gap) / 2 + 30px);
+    }
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         width: 100vw !important;
@@ -43,6 +46,9 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
 
         &:has(> .main-header-filter) {
             --header-height: calc(var(--main-padding) / 2 + var(--filter-height));
+        }
+        &:has(> .main-header-filter .filter-wrapped) {
+            --header-height: calc(var(--main-padding) / 2 + var(--filter-height) + var(--main-gap) / 2 + 30px);
         }
     }
 `;

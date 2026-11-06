@@ -91,7 +91,7 @@ const Empty = Styled.li`
 function Menu(props) {
     const {
         containerRef, className, open, variant, direction,
-        gap, width, targetRef, iconHeight, minHeight,
+        gap, width, maxWidth, targetRef, iconHeight, minHeight,
         onAction, onClose, onMouseEnter, onMouseLeave,
         withSearch, emptyText, filterText, keyCode,
         isSubmenu, skipValidation, footer, children,
@@ -313,7 +313,7 @@ function Menu(props) {
 
         // Calculate the Bounds of the Menu without Styles
         const cntBounds   = contentRef.getBoundingClientRect();
-        const boundWidth  = width || cntBounds.width;
+        const boundWidth  = width || (maxWidth ? Math.min(cntBounds.width, maxWidth) : cntBounds.width);
         let   boundHeight = cntBounds.height;
         if (maxHeight) {
             boundHeight = Math.min(cntBounds.height, maxHeight);
@@ -443,6 +443,9 @@ function Menu(props) {
                 style.maxHeight = `${winHeight - 16}px`;
             }
         }
+        if (maxWidth) {
+            style.maxWidth = `${maxWidth}px`;
+        }
         return [ true, hasStyles, style, winWidth, toTop ];
     }, [ open, contentRef ]);
 
@@ -541,6 +544,7 @@ Menu.propTypes = {
     right          : PropTypes.number,
     gap            : PropTypes.number,
     width          : PropTypes.number,
+    maxWidth       : PropTypes.number,
     minHeight      : PropTypes.number,
     maxHeight      : PropTypes.number,
     withSearch     : PropTypes.bool,
@@ -569,6 +573,7 @@ Menu.defaultProps = {
     iconHeight     : 0,
     gap            : 0,
     width          : 0,
+    maxWidth       : 0,
     minHeight      : 160,
     maxHeight      : 0,
     withSearch     : false,

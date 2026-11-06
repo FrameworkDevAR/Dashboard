@@ -21,11 +21,13 @@ import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
 import MenuItem             from "../Menu/MenuItem";
 import IconLink             from "../Link/IconLink";
+import MainHeaderContext    from "../Header/MainHeaderContext";
 
 
 
 // Styles
 const Container = Styled.div.attrs(({ isNarrow, wrapChips }) => ({ isNarrow, wrapChips }))`
+    position: relative;
     display: flex;
     gap: calc(var(--main-gap) / 2);
     box-sizing: border-box;
@@ -35,23 +37,47 @@ const Container = Styled.div.attrs(({ isNarrow, wrapChips }) => ({ isNarrow, wra
     width: 100%;
     min-width: 0;
 
-    ${(props) => props.isNarrow && "overflow: auto;"}
     ${(props) => props.wrapChips && `
         flex-wrap: wrap;
         height: auto;
+
+        .filter-content {
+            flex: 1 1 0;
+        }
     `}
+`;
+
+const Actions = Styled.div`
+    flex-shrink: 0;
+    order: 1;
+    align-self: center;
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
 `;
 
 const Content = Styled.div`
     display: flex;
     gap: calc(var(--main-gap) / 2);
+    min-width: 0;
+    max-width: 100%;
 `;
 
-const Search = Styled(FilterField)`
+const Search = Styled(FilterField).attrs(({ isExpanded }) => ({ isExpanded }))`
     --input-border-radius: var(--filter-border-radius, var(--input-border-radius));
 
-    flex-shrink: 0;
+    flex-shrink: 1;
     width: var(--filter-input-width, 300px);
+    min-width: 0;
+
+    ${(props) => props.isExpanded && `
+        position: absolute;
+        top: 3px;
+        left: 1px;
+        right: 1px;
+        z-index: 2;
+        width: auto;
+    `}
 `;
 
 const FilterIcon = Styled(IconLink)`
@@ -59,18 +85,22 @@ const FilterIcon = Styled(IconLink)`
     --link-radius: var(--border-radius);
     --link-background: var(--filter-input-hover);
 
+    flex-shrink: 0;
     padding: 4px;
     font-size: 16px;
     background-color: var(--filter-input-background);
 `;
 
-const Chips = Styled(ChipList).attrs(({ isNarrow, wrapChips }) => ({ isNarrow, wrapChips }))`
+const Chips = Styled(ChipList).attrs(({ isNarrow, wrapChips, fadeLeft, fadeRight }) => ({ isNarrow, wrapChips, fadeLeft, fadeRight }))`
     flex-grow: 2;
+    flex-basis: 0;
     flex-wrap: nowrap;
+    min-width: 0;
     margin-left: calc(var(--main-gap) / 2);
 
     ${(props) => props.wrapChips && `
         flex-basis: 100%;
+        order: 2;
         margin-left: 0;
         padding-bottom: 2px;
         overflow: auto;
@@ -87,6 +117,10 @@ const Chips = Styled(ChipList).attrs(({ isNarrow, wrapChips }) => ({ isNarrow, w
         background-color: var(--light-gray);
     }
     ${(props) => !props.isNarrow && "overflow: auto;"}
+
+    ${(props) => (props.fadeLeft || props.fadeRight) && `
+        mask-image: linear-gradient(to right, ${props.fadeLeft ? "transparent, black 32px" : "black"}, ${props.fadeRight ? "black calc(100% - 32px), transparent" : "black"});
+    `}
 `;
 
 
@@ -107,6 +141,7 @@ function Filter(props) {
     const containerRef   = React.useRef(null);
     const contentRef     = React.useRef(null);
     const chipsRef       = React.useRef(null);
+    const actionsRef     = React.useRef(null);
     const inputRef       = React.useRef(null);
     const optionsRef     = React.useRef(null);
     const selectedRef    = React.useRef(-1);
@@ -118,32 +153,60 @@ function Filter(props) {
     const [ search,      setSearch      ] = React.useState("");
     const [ data,        setData        ] = React.useState({});
     const [ showOptions, setShowOptions ] = React.useState(false);
-    const [ bounds,      setBounds      ] = React.useState({ top : 0, left : 0, width : 0, maxHeight : 0 });
+    const [ isExpanded,  setIsExpanded  ] = React.useState(false);
+    const [ fades,       setFades       ] = React.useState({ left : false, right : false });
+    const [ bounds,      setBounds      ] = React.useState({ top : 0, left : 0, width : 0, maxWidth : 300, maxHeight : 0 });
     const [ showDates,   setShowDates   ] = React.useState(false);
     const [ showRange,   setShowRange   ] = React.useState(false);
     const [ editItem,    setEditItem    ] = React.useState({ name : "", message : "", withHour : false, onlyHour : false, prefix : "", suffix : "" });
     const [ update,      setUpdate      ] = React.useState(0);
 
 
-    // Detect if the Filter is Narrow, and if the Chips do not fit next to the input, which
-    // sends them to a row of their own instead of leaving them without a width
-    React.useEffect(() => {
-        const observer = new ResizeObserver(() => {
-            if (!containerRef.current || !contentRef.current) {
-                return;
-            }
-            const containerBounds = containerRef.current.getBoundingClientRect();
-            const contentBounds   = contentRef.current.getBoundingClientRect();
-            const chipsWidth      = chipsRef.current ? chipsRef.current.scrollWidth : 0;
-            setIsNarrow(containerBounds.width < contentBounds.width);
-            setWrapChips(chipsWidth > 0 && containerBounds.width < contentBounds.width + chipsWidth + 24);
-        });
+    // The actions of the Main Header go at the end of the first row
+    const { actions, setHasFilter } = React.useContext(MainHeaderContext);
+    const hasActions = Boolean(actions);
+    React.useLayoutEffect(() => {
+        setHasFilter(true);
+        return () => setHasFilter(false);
+    }, []);
 
+    // Detect if the Filter is Narrow, and if the Chips do not fit next to the input, which
+    // sends them to a row of their own instead of leaving them without a width. The list of
+    // Chips grows to take the whole row, so what they need is the width of each one plus the gaps
+    const measure = () => {
+        if (!containerRef.current || !contentRef.current) {
+            return;
+        }
+        // The Search shrinks when there is no space, so the Content is measured with the width
+        // that the Search asks for instead of the one it has
+        const containerWidth = containerRef.current.getBoundingClientRect().width;
+        const contentStyle   = window.getComputedStyle(contentRef.current);
+        const contentGap     = parseFloat(contentStyle.columnGap) || 0;
+        const searchWidth    = parseFloat(contentStyle.getPropertyValue("--filter-input-width")) || 300;
+        const contentItems   = Array.from(contentRef.current.children);
+        const contentWidth   = contentItems.reduce((total, item, index) => {
+            return total + (index === 0 ? searchWidth : item.getBoundingClientRect().width);
+        }, 0) + contentGap * (contentItems.length - 1);
+        const chips          = chipsRef.current ? Array.from(chipsRef.current.children) : [];
+
+        let chipsWidth = 0;
+        if (chips.length) {
+            const gap  = parseFloat(window.getComputedStyle(chipsRef.current).columnGap) || 0;
+            chipsWidth = chips.reduce((total, chip) => total + chip.getBoundingClientRect().width, 0) + gap * (chips.length - 1);
+        }
+        setIsNarrow(containerWidth < contentWidth);
+        const actionsWidth = actionsRef.current ? actionsRef.current.getBoundingClientRect().width + contentGap : 0;
+        setWrapChips(chipsWidth > 0 && containerWidth < contentWidth + chipsWidth + actionsWidth + 24);
+    };
+
+    React.useEffect(() => {
+        // The actions can show later, like one that waits for something to load
+        const observer = new ResizeObserver(measure);
         if (containerRef.current) {
             observer.observe(containerRef.current);
         }
-        if (chipsRef.current) {
-            observer.observe(chipsRef.current);
+        if (actionsRef.current) {
+            observer.observe(actionsRef.current);
         }
         return () => observer.disconnect();
     }, []);
@@ -443,16 +506,39 @@ function Filter(props) {
 
     // Handles the Focus
     const handleFocus = () => {
-        const bounds = Utils.getBounds(inputRef);
-        setBounds({
-            top       : bounds.bottom + 6,
-            left      : bounds.left - 32,
-            width     : bounds.width,
-            maxHeight : window.innerHeight - bounds.bottom - 10,
-        });
+        // A Search that is narrower than it should, as on a phone, takes the whole Filter while
+        // it is used, over the icons and the actions, and the Options follow its new width
+        const searchWidth = parseFloat(window.getComputedStyle(contentRef.current).getPropertyValue("--filter-input-width")) || 300;
+        const field       = contentRef.current.firstElementChild;
+        if (field && field.getBoundingClientRect().width < searchWidth - 1) {
+            setIsExpanded(true);
+        } else {
+            updateBounds();
+        }
         setShowOptions(true);
         selectedRef.current = -1;
     };
+
+    // Places the Options below the Search, leaving the same gap to the right of the window
+    // as the one to its left
+    const updateBounds = () => {
+        const bounds = Utils.getBounds(inputRef);
+        const left   = bounds.left - 32;
+        setBounds({
+            top       : bounds.bottom + 6,
+            left      : left,
+            width     : bounds.width,
+            maxWidth  : window.innerWidth - left * 2,
+            maxHeight : window.innerHeight - bounds.bottom - 10,
+        });
+    };
+
+    // The Options are placed once the Search has its new width
+    React.useLayoutEffect(() => {
+        if (isExpanded) {
+            updateBounds();
+        }
+    }, [ isExpanded ]);
 
     // Handles the Mouse Down on an Option
     const handleOption = (e, name, value, hasMenu) => {
@@ -467,6 +553,7 @@ function Filter(props) {
     // Handles the Blur
     const handleBlur = () => {
         setShowOptions(false);
+        setIsExpanded(false);
         setSearch("");
         selectedRef.current    = -1;
         selectedSubRef.current = -1;
@@ -734,6 +821,32 @@ function Filter(props) {
         return result;
     }, [ JSON.stringify(data) ]);
 
+    // Adding or removing a Chip does not resize the Filter, so it is measured again
+    React.useLayoutEffect(measure, [ chipList ]);
+
+    // When the Chips scroll, the side that has more of them fades, so it is known there are more
+    React.useEffect(() => {
+        const node = chipsRef.current;
+        if (!node) {
+            return () => {};
+        }
+        const update = () => {
+            const canScroll = node.scrollWidth > node.clientWidth + 1;
+            setFades({
+                left  : canScroll && node.scrollLeft > 1,
+                right : canScroll && node.scrollLeft + node.clientWidth < node.scrollWidth - 1,
+            });
+        };
+        update();
+        node.addEventListener("scroll", update, { passive : true });
+        const observer = new ResizeObserver(update);
+        observer.observe(node);
+        return () => {
+            node.removeEventListener("scroll", update);
+            observer.disconnect();
+        };
+    }, [ chipList, wrapChips ]);
+
     // Checks if it has any Filter
     const hasAnyFilter = React.useMemo(() => {
         for (const value of Object.values(data)) {
@@ -776,13 +889,14 @@ function Filter(props) {
     return <>
         <Container
             ref={containerRef}
-            className={className}
+            className={wrapChips ? `${className} filter-wrapped` : className}
             isNarrow={isNarrow}
             wrapChips={wrapChips}
         >
-            <Content ref={contentRef}>
+            <Content ref={contentRef} className="filter-content">
                 <Search
                     passedRef={inputRef}
+                    isExpanded={isExpanded}
                     type="text"
                     name="search"
                     icon={icon}
@@ -808,7 +922,13 @@ function Filter(props) {
                 />
             </Content>
 
-            <Chips passedRef={chipsRef} isNarrow={isNarrow} wrapChips={wrapChips}>
+            <Chips
+                passedRef={chipsRef}
+                isNarrow={isNarrow}
+                wrapChips={wrapChips}
+                fadeLeft={fades.left}
+                fadeRight={fades.right}
+            >
                 {chipList.map(({ key, name, value, message, forDates, forRange }) => <ChipItem
                     key={key}
                     message={message}
@@ -818,6 +938,10 @@ function Filter(props) {
                     onClose={() => handleRemove(name, value)}
                 />)}
             </Chips>
+
+            {hasActions && <Actions ref={actionsRef}>
+                {actions}
+            </Actions>}
         </Container>
 
         {hasOptions && <InputOptions
@@ -825,9 +949,9 @@ function Filter(props) {
             inputRef={inputRef}
             top={bounds.top}
             left={bounds.left}
-            width={bounds.width}
+            width={Math.min(bounds.width, bounds.maxWidth)}
             maxHeight={bounds.maxHeight}
-            minWidth={300}
+            minWidth={Math.min(300, bounds.maxWidth)}
             gap={4}
         >
             {optionList.map(({ key, name, value, text, message, isOption, options, dontClose }, index) => <InputOption

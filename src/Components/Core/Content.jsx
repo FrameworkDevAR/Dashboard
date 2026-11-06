@@ -21,6 +21,10 @@ const Section = Styled.section.attrs(({ withSpacing, withDetails, wideDetails, h
     padding: ${(props) => props.withSpacing ? "var(--main-padding)" : "0 var(--main-padding) var(--main-padding)"};
     overflow: auto;
 
+    &:has(> .filter-wrapped, > * > .filter-wrapped) {
+        --filter-chips-height: calc(var(--main-gap) / 2 + 30px);
+    }
+
     ${(props) => props.withDetails && `
         display: grid;
         grid-template-columns: minmax(0, 1fr) var(--details-width${props.wideDetails ? "-wide" : ""});

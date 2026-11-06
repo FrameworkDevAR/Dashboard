@@ -7,6 +7,7 @@ import Responsive           from "../../Core/Responsive";
 
 // Dashboard
 import Header               from "./Header";
+import MainHeaderContext    from "./MainHeaderContext";
 
 
 
@@ -50,6 +51,11 @@ const FilterContent = Styled.div`
 function MainHeader(props) {
     const { className, withTitle, message, icon, filter, children } = props;
 
+    // The Filter shows the actions next to its input, so it can place them when its chips
+    // take a row of their own, and it says when it does
+    const [ hasFilter, setHasFilter ] = React.useState(false);
+    const context = React.useMemo(() => ({ actions : children, setHasFilter }), [ children ]);
+
 
     // Do the Render
     if (withTitle) {
@@ -69,8 +75,10 @@ function MainHeader(props) {
 
     // The Main makes the header taller when it has a Filter, so the Filter keeps its gap
     return <Container className={`${className} ${filter ? "main-header-filter" : ""}`}>
-        <Grow>{filter}</Grow>
-        <Actions>{children}</Actions>
+        <MainHeaderContext.Provider value={context}>
+            <Grow>{filter}</Grow>
+        </MainHeaderContext.Provider>
+        {!(filter && hasFilter) && <Actions>{children}</Actions>}
     </Container>;
 }
 
