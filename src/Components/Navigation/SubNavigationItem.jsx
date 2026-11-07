@@ -16,7 +16,7 @@ import Icon                 from "../Common/Icon";
 
 
 // Styles
-const Content = Styled.div.attrs(({ hideActions, canDrag }) => ({ hideActions, canDrag }))`
+const Content = Styled.div.attrs(({ hideActions, canDrag, withAccent, isSelected }) => ({ hideActions, canDrag, withAccent, isSelected }))`
     position: relative;
     margin-bottom: 4px;
 
@@ -36,9 +36,18 @@ const Content = Styled.div.attrs(({ hideActions, canDrag }) => ({ hideActions, c
             background-color: var(--navigation-hover, rgba(0, 0, 0, 0.1));
         }
     `}
+
+    ${(props) => props.withAccent && props.isSelected && `
+        & > .subnav-drag {
+            color: var(--navigation-selected-color, var(--title-color));
+        }
+        &:hover > .subnav-actions {
+            background-color: var(--navigation-selected-icon, rgba(0, 0, 0, 0.1));
+        }
+    `}
 `;
 
-const NavMenu = Styled(MenuLink).attrs(({ actionsAmount }) => ({ actionsAmount }))`
+const NavMenu = Styled(MenuLink).attrs(({ actionsAmount, withAccent }) => ({ actionsAmount, withAccent }))`
     --link-icon: 18px;
     --link-color: var(--navigation-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
@@ -55,6 +64,11 @@ const NavMenu = Styled(MenuLink).attrs(({ actionsAmount }) => ({ actionsAmount }
         margin-left: 0;
         margin-right: -4px;
     }
+
+    ${(props) => props.withAccent && `
+        --link-selected-bg: var(--navigation-selected-bg, rgba(0, 0, 0, 0.1));
+        --link-selected-color: var(--navigation-selected-color, var(--link-color));
+    `}
 
     ${(props) => props.actionsAmount > 0 && `
         padding-right: calc(10px + ${props.actionsAmount} * 20px);
@@ -98,7 +112,7 @@ function SubNavigationItem(props) {
     const {
         action, isSelected, message, url, href, emoji, icon, iconColor, afterIcon,
         amount, badge, onAction, onClick, onClose, noClose,
-        hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, onGrab, children,
+        hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, onGrab, withAccent, children,
     } = props;
 
 
@@ -177,6 +191,8 @@ function SubNavigationItem(props) {
         <Content
             hideActions={hideActions}
             canDrag={canDrag}
+            withAccent={withAccent}
+            isSelected={isSelected}
             onMouseDown={canDrag ? handleGrab : undefined}
         >
             {canDrag && <DragHandle
@@ -194,6 +210,7 @@ function SubNavigationItem(props) {
                 iconColor={iconColor}
                 afterIcon={afterIcon}
                 actionsAmount={actionsAmount}
+                withAccent={withAccent}
                 onClick={handleClick}
                 amount={amount}
                 badge={badge}
@@ -258,6 +275,7 @@ SubNavigationItem.propTypes = {
     isCollapsed : PropTypes.bool,
     elemID      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onGrab      : PropTypes.func,
+    withAccent  : PropTypes.bool,
     children    : PropTypes.any,
 };
 
@@ -268,6 +286,7 @@ SubNavigationItem.propTypes = {
 SubNavigationItem.defaultProps = {
     isHidden   : false,
     isSelected : false,
+    withAccent : false,
 };
 
 export default SubNavigationItem;
