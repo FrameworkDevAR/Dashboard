@@ -437,8 +437,10 @@ function SearchDialog(props) {
             <div><b>Esc</b>{NLS.get(search ? "GENERAL_KEY_CLEAR" : "GENERAL_KEY_CLOSE")}</div>
             <Close
                 variant="outlined"
+                icon="close"
                 message="GENERAL_CLOSE"
                 onClick={onClose}
+                inLowerCase
             />
         </Footer>
     </Container>;
