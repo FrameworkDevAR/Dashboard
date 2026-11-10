@@ -43,7 +43,7 @@ const Container = Styled.ul.attrs(({ fillWidth, isMedium, isCentered, topSpace, 
     `}
 `;
 
-const Sticky = Styled.div.attrs(({ isCentered }) => ({ isCentered }))`
+const Sticky = Styled.div.attrs(({ isCentered, hasActions }) => ({ isCentered, hasActions }))`
     position: sticky;
     top: -4px;
     display: flex;
@@ -52,6 +52,12 @@ const Sticky = Styled.div.attrs(({ isCentered }) => ({ isCentered }))`
     padding: 4px 0;
     background-color: var(--content-color);
     z-index: 4;
+
+    ${(props) => props.hasActions && `
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    `}
 `;
 
 const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
@@ -77,7 +83,7 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
 function PillTabs(props) {
     const {
         isHidden, className, fillWidth, isFit, isMedium, isCentered, isSticky,
-        topSpace, bottomSpace, selected, onClick, children,
+        topSpace, bottomSpace, selected, onClick, actions, children,
     } = props;
 
 
@@ -168,9 +174,15 @@ function PillTabs(props) {
         {items}
     </Container>;
 
+    // What goes next to the Pills shares their bar, so it stays at the top with them
     if (isSticky) {
-        return <Sticky isCentered={isCentered}>
+        return <Sticky
+            className="pills-sticky"
+            isCentered={isCentered}
+            hasActions={Boolean(actions)}
+        >
             {content}
+            {actions}
         </Sticky>;
     }
     return content;
@@ -192,6 +204,7 @@ PillTabs.propTypes = {
     bottomSpace : PropTypes.number,
     selected    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     onClick     : PropTypes.func,
+    actions     : PropTypes.node,
     children    : PropTypes.any,
 };
 

@@ -12,6 +12,13 @@ const PIN_TIME     = 400;
 const SCROLL_SPACE = 16;
 
 // Styles
+const Container = Styled.div`
+    & > .pills-sticky {
+        margin-bottom: 8px;
+        padding: 12px 0 8px;
+    }
+`;
+
 const Spacer = Styled.div`
     display: none;
     height: 0;
@@ -251,7 +258,7 @@ function AccordionList(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <div
+    return <Container
         className={`accordion ${className}`}
         ref={(node) => {
             listRef.current = node;
@@ -263,7 +270,7 @@ function AccordionList(props) {
         {header}
         {items}
         <Spacer ref={spacerRef} />
-    </div>;
+    </Container>;
 }
 
 /**
