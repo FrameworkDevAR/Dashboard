@@ -71,7 +71,7 @@ const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace,
         background-color: ${props.noBorder ? "transparent" : "var(--lightest-gray)"};
 
         .banner-icon {
-            color: var(--primary-color);
+            color: var(--banner-info-color, var(--primary-color));
         }
     `}
     ${(props) => props.iconColor && `
