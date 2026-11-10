@@ -296,8 +296,12 @@ function EditorInput(props) {
         editor.on("ObjectResized", handleResized);
 
         // The editor rewrites the html that it is given, and reports it as a change when it loads
-        // it, so the changes are only sent once the user edits the text
-        editor.on("input keydown paste cut drop Undo Redo ExecCommand", () => {
+        // it, so the changes are only sent once the user edits the text. Focusing it runs a
+        // command too, which does not edit it
+        editor.on("input keydown paste cut drop Undo Redo ExecCommand", (e) => {
+            if (e.type === "execcommand" && e.command === "mceFocus") {
+                return;
+            }
             touchRef.current = true;
         });
 
