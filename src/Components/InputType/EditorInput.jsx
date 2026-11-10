@@ -44,6 +44,7 @@ const COLORS      = [
         style   : "backgroundColor",
     },
 ];
+const SIZES = [ 10, 12, 14, 16, 18, 20, 22, 24, 36, 48 ];
 const ALIGNS = [
     { key : "alignleft",    icon : "align-left",    message : "GENERAL_FORMAT_ALIGN_LEFT",    command : "JustifyLeft"   },
     { key : "aligncenter",  icon : "align-center",  message : "GENERAL_FORMAT_ALIGN_CENTER",  command : "JustifyCenter" },
@@ -144,17 +145,18 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
             font-size: 15px;
         }
         p {
-            margin: 0 0 6px;
+            margin: 0 0 12px;
         }
         ul, ol {
-            margin: 0 0 6px;
+            margin: 0 0 12px;
             padding-left: 22px;
         }
         a {
-            color: var(--primary-color);
+            color: var(--editor-link-color, hsl(216, 98%, 44%));
+            text-decoration: underline;
         }
         table {
-            margin: 0 0 6px;
+            margin: 0 0 12px;
             border-collapse: collapse;
         }
         th, td {
@@ -251,7 +253,7 @@ function EditorInput(props) {
     const {
         inputRef, className, isFocused, isDisabled, withLabel,
         name, value, placeholder, rows, maxRows, titles, filesUrl, variables,
-        withColors, withAlign, withLinks, withFiles, withTables, outsideLabel,
+        withColors, withSizes, withAlign, withLinks, withFiles, withTables, outsideLabel,
         onChange, onFocus, onBlur, onMedia,
     } = props;
 
@@ -263,6 +265,7 @@ function EditorInput(props) {
     const numberRef = React.useRef(null);
     const tableRef  = React.useRef(null);
     const alignRef  = React.useRef(null);
+    const sizeRef   = React.useRef(null);
     const barRef    = React.useRef(null);
     const varRef    = React.useRef(null);
     const markRef   = React.useRef(null);
@@ -409,7 +412,16 @@ function EditorInput(props) {
             align     : ALIGNS.find((align) => editor.formatter.match(align.key))?.key || "alignleft",
             color     : getColor(editor, COLORS[0].style),
             highlight : getColor(editor, COLORS[1].style),
+            size      : getSize(editor),
         });
+    };
+
+    // Returns the font size in pixels that was set where the cursor is, or 0 for the normal one,
+    // as the size of the input is not the one where the text is shown
+    const getSize = (editor) => {
+        const hasSize = (elem) => Boolean(elem.style && elem.style.fontSize);
+        const node    = editor.dom.getParent(editor.selection.getNode(), hasSize);
+        return node ? Math.round(parseFloat(node.style.fontSize)) || 0 : 0;
     };
 
     // Returns the color in hex that the given style has where the cursor is, if it was set
@@ -425,8 +437,8 @@ function EditorInput(props) {
         return `#${hex.join("")}`;
     };
 
-    // Removes the given color from the selection, or from the word where the cursor is
-    const removeColor = (format) => {
+    // Removes the given color or size from the selection, or from the word where the cursor is
+    const removeStyle = (format) => {
         const editor = editorRef.current;
         markRef.current = null;
         if (editor) {
@@ -638,6 +650,20 @@ function EditorInput(props) {
                     </Block>
                     <Line />
                 </>}
+                {withSizes && <>
+                    <Block ref={sizeRef} onClick={(e) => handleMenu(e, "size")}>
+                        <BlockNames>
+                            <BlockName isHidden={Boolean(active.size)}>
+                                {NLS.get("GENERAL_FORMAT_SIZE_NORMAL")}
+                            </BlockName>
+                            {SIZES.map((size) => <BlockName key={size} isHidden={active.size !== size}>
+                                {NLS.format("GENERAL_FORMAT_SIZE_PX", size)}
+                            </BlockName>)}
+                        </BlockNames>
+                        <Icon icon="expand" />
+                    </Block>
+                    <Line />
+                </>}
                 {FORMATS.map((action) => <Action
                     key={action.key}
                     variant="black"
@@ -760,6 +786,25 @@ function EditorInput(props) {
                         onClick={() => runCommand("FormatBlock", block.key)}
                     />)}
                 </Menu>
+                <Menu
+                    open={menu === "size"}
+                    targetRef={sizeRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    <MenuItem
+                        message="GENERAL_FORMAT_SIZE_NORMAL"
+                        isSelected={!active.size}
+                        onClick={() => removeStyle("fontsize")}
+                    />
+                    {SIZES.map((size) => <MenuItem
+                        key={size}
+                        message={NLS.format("GENERAL_FORMAT_SIZE_PX", size)}
+                        isSelected={active.size === size}
+                        onClick={() => runCommand("FontSize", `${size}px`)}
+                    />)}
+                </Menu>
                 {LISTS.map((list) => <Menu
                     key={list.key}
                     open={menu === list.key}
@@ -786,7 +831,7 @@ function EditorInput(props) {
                     <EditorColors
                         value={active[color.key]}
                         onSelect={(value) => runCommand(color.command, value)}
-                        onClear={() => removeColor(color.format)}
+                        onClear={() => removeStyle(color.format)}
                     />
                 </Menu>)}
                 <Menu
@@ -883,6 +928,7 @@ EditorInput.propTypes = {
     withFiles    : PropTypes.bool,
     withTables   : PropTypes.bool,
     withColors   : PropTypes.bool,
+    withSizes    : PropTypes.bool,
     withAlign    : PropTypes.bool,
     filesUrl     : PropTypes.string,
     outsideLabel : PropTypes.bool,
@@ -909,6 +955,7 @@ EditorInput.defaultProps = {
     withFiles    : true,
     withTables   : true,
     withColors   : true,
+    withSizes    : false,
     withAlign    : true,
     filesUrl     : "",
     outsideLabel : false,
