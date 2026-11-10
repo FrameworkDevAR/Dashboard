@@ -112,7 +112,7 @@ const Aside = Styled.aside`
  */
 function TextareaInput(props) {
     const {
-        inputRef, className, isFocused, isDisabled, withLabel,
+        inputRef, className, isFocused, isDisabled, withLabel, withBorder,
         id, name, value, placeholder, rows, maxRows, withEditor, noNewLines,
         onChange, onClear, onInput, onPaste,
         onFocus, onBlur, onKeyDown, onKeyUp,
@@ -152,11 +152,11 @@ function TextareaInput(props) {
         }
     };
 
-    // Handles the Key Down, stopping the Enter when the text has to stay in a single line
+    // Handles the Key Down, stopping the Enter when the text has to stay in a single line,
+    // which is still given to the parent, as a list uses it to add a row
     const handleKeyDown = (e) => {
         if (noNewLines && e.keyCode === KeyCode.DOM_VK_RETURN) {
             e.preventDefault();
-            return;
         }
         if (onKeyDown) {
             onKeyDown(e);
@@ -259,7 +259,7 @@ function TextareaInput(props) {
         isDisabled={isDisabled}
         onClear={onClear}
         withLabel={withLabel}
-        withBorder
+        withBorder={withBorder}
     >
         <Content hideOverflow={!hasAside} withAside={hasAside}>
             <Textarea
@@ -306,6 +306,7 @@ TextareaInput.propTypes = {
     isFocused   : PropTypes.bool,
     isDisabled  : PropTypes.bool,
     withLabel   : PropTypes.bool,
+    withBorder  : PropTypes.bool,
     withEditor  : PropTypes.bool,
     noNewLines  : PropTypes.bool,
     id          : PropTypes.string,
@@ -335,6 +336,7 @@ TextareaInput.defaultProps = {
     className   : "",
     isFocused   : false,
     isDisabled  : false,
+    withBorder  : true,
     withEditor  : true,
     placeholder : "",
     maxLength   : 0,

@@ -112,7 +112,7 @@ function ListInput(props) {
         inputType, name, value, indexes, addButton,
         placeholder, options, noneText, noneValue,
         onFocus, onBlur, onChange,
-        isSortable, onSort, errors, maxAmount, maxLength,
+        isSortable, onSort, errors, maxAmount, maxLength, noNewLines,
         children,
     } = props;
 
@@ -354,6 +354,7 @@ function ListInput(props) {
                             onBlur={onBlur}
                             isDisabled={isDisabled}
                             maxLength={maxLength}
+                            noNewLines={noNewLines}
                             withLabel={false}
                             withBorder={false}
                             hideClear
@@ -403,6 +404,7 @@ ListInput.propTypes = {
     withLabel   : PropTypes.bool,
     name        : PropTypes.string.isRequired,
     inputType   : PropTypes.string,
+    noNewLines  : PropTypes.bool,
     value       : PropTypes.any,
     placeholder : PropTypes.string,
     indexes     : PropTypes.any,
@@ -434,6 +436,7 @@ ListInput.defaultProps = {
     withBorder  : true,
     withLabel   : true,
     inputType   : InputType.TEXT,
+    noNewLines  : false,
     placeholder : "",
     noneText    : "",
     isSortable  : false,
