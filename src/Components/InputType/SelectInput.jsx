@@ -211,9 +211,21 @@ function SelectInput(props) {
             }
         }
 
-        // Remove the Titles that ended without Options
+        // Remove the Titles that ended without Options. A Title with a level keeps the Titles
+        // inside it, so it stays when an Option comes before the next Title of its level or above
         result = result.filter((option, index) => {
-            return !option.isTitle || (result[index + 1] && !result[index + 1].isTitle);
+            if (!option.isTitle) {
+                return true;
+            }
+            for (let i = index + 1; i < result.length; i++) {
+                if (!result[i].isTitle) {
+                    return true;
+                }
+                if ((result[i].level || 0) <= (option.level || 0)) {
+                    return false;
+                }
+            }
+            return false;
         });
 
         if (hasCustom) {

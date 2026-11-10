@@ -233,11 +233,14 @@ const Error = Styled(InputError)`
     border-radius: var(--border-radius);
 `;
 
-const Footer = Styled.footer.attrs(({ withTitle }) => ({ withTitle }))`
+const Footer = Styled.footer.attrs(({ withTitle, smallGap }) => ({ withTitle, smallGap }))`
     display: flex;
     width: 100%;
     margin-top: 8px;
 
+    ${(props) => props.smallGap && `
+        margin-top: 0;
+    `}
     ${(props) => props.withTitle && `
         margin-top: 4px;
         padding-top: 12px;
@@ -257,7 +260,7 @@ function FieldInput(props) {
         className, isDisabled, withBorder, withLine, smallGap, outsideLabel, withHeader,
         name, value, indexes, addButton, onChange,
         title, getAfterTitle, columns,
-        errors, maxAmount, allowEmpty, noneText,
+        errors, maxAmount, allowEmpty, noneText, hideAdd,
         isSortable, onSort, extraIcon, getExtraIcon, onExtraIcon, children,
     } = props;
 
@@ -443,7 +446,7 @@ function FieldInput(props) {
 
     // Variables
     const withTitle    = Boolean(title);
-    const canAdd       = Boolean(!isDisabled && (maxAmount === 0 || partsRef.current.length < maxAmount));
+    const canAdd       = Boolean(!isDisabled && !hideAdd && (maxAmount === 0 || partsRef.current.length < maxAmount));
     const canSort      = Boolean(!isDisabled && isSortable && partsRef.current.length > 1);
     const canRemove    = Boolean(!isDisabled && (allowEmpty || partsRef.current.length > 1));
     const hasExtraIcon = Boolean((extraIcon || getExtraIcon) && onExtraIcon);
@@ -619,7 +622,7 @@ function FieldInput(props) {
             <b>{NLS.get(noneText)}</b>
         </Container>}
 
-        {canAdd && <Footer withTitle={withTitle}>
+        {canAdd && <Footer withTitle={withTitle} smallGap={smallGap}>
             <Button
                 variant="outlined"
                 icon="add"
@@ -662,6 +665,7 @@ FieldInput.propTypes = {
     getExtraIcon  : PropTypes.func,
     onExtraIcon   : PropTypes.func,
     maxAmount     : PropTypes.number,
+    hideAdd       : PropTypes.bool,
     errors        : PropTypes.object,
     children      : PropTypes.any,
 };
@@ -681,6 +685,7 @@ FieldInput.defaultProps = {
     allowEmpty : false,
     isSortable : false,
     maxAmount  : 0,
+    hideAdd    : false,
     noneText   : "",
     extraIcon  : "",
 };

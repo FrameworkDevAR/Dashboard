@@ -26,7 +26,7 @@ import ScrollFade           from "../Common/ScrollFade";
 
 
 // Styles
-const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasChecks, hasActions, notFixed, isEditable, extraSpace }) => ({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasChecks, hasActions, notFixed, isEditable, extraSpace }))`
+const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }) => ({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }))`
     ${(props) => props.inDialog ? `
         --table-height: calc(var(--dialog-content, var(--dialog-body)) - 2px);
     ` : `
@@ -38,7 +38,7 @@ const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, h
     --table-stats-height: ${(props) => props.statsAmount > 0 ? `calc((var(--stats-height) + var(--main-gap)) * ${props.statsAmount})` : "0px"};
     --table-tabs-height: ${(props) => props.hasTabs ? "var(--tabs-table)" : "0px"};
     --table-alert-height: ${(props) => props.hasAlert ? "var(--alert-height)" : "0px"};
-    --table-paging-height: ${(props) => props.hasPaging ? "32px" : "0px"};
+    --table-paging-height: ${(props) => props.hasPaging ? "32px" : (props.hasFooter ? "28px" : "0px")};
     --table-extra-space: ${(props) => props.extraSpace ? `${props.extraSpace}px` : "0px"};
 
     --table-checks-width: ${(props) => props.hasChecks ? "28px" : "0px"};
@@ -493,6 +493,7 @@ function Table(props) {
             hasTabs={hasTabs}
             hasAlert={hasAlert}
             hasPaging={hasPaging}
+            hasFooter={hasFooter}
             hasChecks={hasChecks}
             hasActions={hasActions}
             notFixed={notFixed}
@@ -518,6 +519,7 @@ function Table(props) {
         hasTabs={hasTabs}
         hasAlert={hasAlert}
         hasPaging={hasPaging}
+        hasFooter={hasFooter}
         hasChecks={hasChecks}
         hasActions={hasActions}
         notFixed={notFixed}

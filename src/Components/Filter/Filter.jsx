@@ -691,7 +691,7 @@ function Filter(props) {
             if ((search || item.showOptions) && item.options) {
                 let added = false;
                 for (const option of item.options || []) {
-                    if (Utils.searchValue(option.value, search)) {
+                    if (!option.isTitle && Utils.searchValue(option.value, search)) {
                         result.push({
                             key           : `${item.name}-${option.key}`,
                             name          : item.name,
@@ -967,6 +967,8 @@ function Filter(props) {
                     key={option.key}
                     icon={getIcon(name, option.key, true)}
                     message={option.value}
+                    isTitle={Boolean(option.isTitle)}
+                    level={Number(option.level) || 0}
                     isSelected={selectedSubRef.current === subIndex}
                     onClick={() => handleSelect(name, option.key)}
                     dontClose={dontClose}

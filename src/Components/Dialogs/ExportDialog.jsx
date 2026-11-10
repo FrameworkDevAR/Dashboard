@@ -28,7 +28,7 @@ const Summary = Styled.div`
     padding: 8px 0 20px;
 `;
 
-const SummaryIcon = Styled(Icon)`
+const SummaryIcon = Styled(Icon).attrs(({ iconColor }) => ({ iconColor }))`
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -36,8 +36,8 @@ const SummaryIcon = Styled(Icon)`
     width: 44px;
     height: 44px;
     font-size: 24px;
-    color: var(--primary-color);
-    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: ${(props) => props.iconColor || "var(--primary-color)"};
+    background-color: color-mix(in srgb, ${(props) => props.iconColor || "var(--primary-color)"} 12%, transparent);
     border-radius: var(--border-radius);
 `;
 
@@ -155,7 +155,7 @@ const Text = Styled.p`
  */
 function ExportDialog(props) {
     const {
-        open, icon, title, message, total, error, format, isLoading,
+        open, icon, iconColor, title, message, total, error, format, isLoading,
         onFormat, onSubmit, onClose,
     } = props;
 
@@ -187,7 +187,7 @@ function ExportDialog(props) {
         <DialogHeader message={title} icon="export" />
         <DialogBody withSpacing>
             <Summary>
-                <SummaryIcon icon={icon} />
+                <SummaryIcon icon={icon} iconColor={iconColor} />
                 <SummaryText>
                     <Total>{NLS.pluralize(message, total || 0)}</Total>
                     <Description isError={!!error}>
@@ -240,6 +240,7 @@ function ExportDialog(props) {
 ExportDialog.propTypes = {
     open      : PropTypes.bool.isRequired,
     icon      : PropTypes.string.isRequired,
+    iconColor : PropTypes.string,
     title     : PropTypes.string.isRequired,
     message   : PropTypes.string.isRequired,
     total     : PropTypes.number,

@@ -101,6 +101,7 @@ const Content = Styled.div.attrs(({ isSelected, isTitle }) => ({ isSelected, isT
         font-size: 12px;
         white-space: nowrap;
         color: var(--font-lighter);
+        opacity: 0.6;
         cursor: default;
 
         &:hover {

@@ -51,6 +51,23 @@ function isEmpty(object) {
 }
 
 /**
+ * Returns true if both Objects have the same values, compared as strings, like the values of
+ * the Filters, where an empty value is the same as a missing one
+ * @param {object} first
+ * @param {object} second
+ * @returns {boolean}
+ */
+function isSameValues(first, second) {
+    const keys = new Set([ ...Object.keys(first || {}), ...Object.keys(second || {}) ]);
+    for (const key of keys) {
+        if (String(first?.[key] ?? "") !== String(second?.[key] ?? "")) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * Returns the Property as a boolean
  * @param {(number|string)} property
  * @returns {boolean}
@@ -1963,6 +1980,7 @@ export default {
     isNumeric,
     isObject,
     isEmpty,
+    isSameValues,
     isActive,
     hasProp,
     count,

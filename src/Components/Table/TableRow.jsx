@@ -18,7 +18,7 @@ import CheckboxInput        from "../InputType/CheckboxInput";
  */
 function TableRow(props) {
     const {
-        className, hasChecks, hasActions, isEditable, isSelected, elemID,
+        className, hasChecks, hasActions, noMenu, isEditable, isSelected, elemID,
         handleRowClick, handleRowDoubleClick, handleMenuOpen, columns, checked, setChecked,
         onMouseDown, children,
     } = props;
@@ -104,7 +104,8 @@ function TableRow(props) {
 
         {items}
 
-        {hasActions && <td ref={linkRef}>
+        {hasActions && noMenu && <td />}
+        {hasActions && !noMenu && <td ref={linkRef}>
             <IconLink
                 variant="light"
                 icon="more"
@@ -124,6 +125,7 @@ TableRow.propTypes = {
     className            : PropTypes.string,
     hasChecks            : PropTypes.bool,
     hasActions           : PropTypes.bool,
+    noMenu               : PropTypes.bool,
     isEditable           : PropTypes.bool,
     isSelected           : PropTypes.bool,
     elemID               : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
@@ -144,6 +146,7 @@ TableRow.propTypes = {
 TableRow.defaultProps = {
     hasChecks  : false,
     hasActions : false,
+    noMenu     : false,
     isEditable : false,
     isSelected : false,
 };

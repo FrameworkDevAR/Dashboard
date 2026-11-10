@@ -35,7 +35,7 @@ const ShortcutKey = Styled.span`
     transition: all 0.2s;
 `;
 
-const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace }) => ({ isSelected, isDisabled, isSmall, leftSpace }))`
+const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace, isTitle, level }) => ({ isSelected, isDisabled, isSmall, leftSpace, isTitle, level }))`
     display: flex;
     align-items: center;
     gap: 10px;
@@ -71,6 +71,20 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace 
     ${(props) => props.isDisabled && `
         color: var(--darkest-gray);
         cursor: not-allowed;
+        &:hover {
+            background-color: transparent;
+        }
+    `}
+    ${(props) => props.level > 0 && `
+        margin-left: ${props.level * 16}px;
+    `}
+    ${(props) => props.isTitle && `
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-size: 12px;
+        color: var(--font-lighter);
+        opacity: 0.6;
+        cursor: default;
         &:hover {
             background-color: transparent;
         }
@@ -129,7 +143,7 @@ function MenuItem(props) {
     const {
         className, action, icon, iconColor, avatar, circle, title, message, description, shortcut,
         url, href, target,
-        isDisabled, isSelected, isSmall, leftSpace, noIcon,
+        isDisabled, isSelected, isSmall, leftSpace, noIcon, isTitle, level,
         onAction, onClick, dontClose, onClose,
         direction, index, selectedIdx, filter,
         trigger, setTrigger, children,
@@ -148,8 +162,9 @@ function MenuItem(props) {
     const icn         = icon || act.icon;
     const uri         = url ? NLS.baseUrl(url) : href;
     const navigate    = Navigate.useGotoUrl();
-    const isSelection = !isDisabled && (isSelected || selectedIdx === index);
-    const hasIcon     = Boolean(icn && !noIcon);
+    const isInactive  = isDisabled || isTitle;
+    const isSelection = !isInactive && (isSelected || selectedIdx === index);
+    const hasIcon     = Boolean(icn && !noIcon && !isTitle);
     const hasCircle   = Boolean(circle);
     const hasMenu     = Boolean(children && children.length);
 
@@ -177,7 +192,7 @@ function MenuItem(props) {
 
     // Handles the Click
     const handleClick = (e) => {
-        if (!isDisabled) {
+        if (!isInactive) {
             handleAction();
         }
         e.preventDefault();
@@ -209,6 +224,8 @@ function MenuItem(props) {
             isDisabled={isDisabled}
             isSmall={isSmall}
             leftSpace={leftSpace}
+            isTitle={isTitle}
+            level={level}
             onMouseDown={handleClick}
             onMouseEnter={() => setMenuOpen(true)}
             onMouseLeave={() => setMenuOpen(false)}
@@ -283,6 +300,8 @@ MenuItem.propTypes = {
     href        : PropTypes.string,
     target      : PropTypes.string,
     isDisabled  : PropTypes.bool,
+    isTitle     : PropTypes.bool,
+    level       : PropTypes.number,
     isSelected  : PropTypes.bool,
     isSmall     : PropTypes.bool,
     leftSpace   : PropTypes.bool,
@@ -308,6 +327,8 @@ MenuItem.defaultProps = {
     className  : "",
     target     : "_self",
     isDisabled : false,
+    isTitle    : false,
+    level      : 0,
     isSelected : false,
     isSmall    : false,
     noIcon     : false,
