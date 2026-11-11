@@ -205,15 +205,15 @@ const Content = Styled.div.attrs(({ centerImages, minHeight, maxHeight }) => ({ 
             color: var(--font-lighter);
         }
         a:not([contenteditable="false"]) {
-            color: var(--primary-color);
+            color: var(--editor-link-color, var(--primary-color));
             text-decoration: none;
             border-radius: var(--border-radius-small);
             transition: color 0.2s, background-color 0.2s;
         }
         a:not([contenteditable="false"]):hover {
-            color: color-mix(in srgb, var(--primary-color) 80%, var(--black-color));
+            color: color-mix(in srgb, var(--editor-link-color, var(--primary-color)) 80%, var(--black-color));
             text-decoration: underline;
-            background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
+            background-color: color-mix(in srgb, var(--editor-link-color, var(--primary-color)) 8%, transparent);
         }
         table {
             border-collapse: collapse;
