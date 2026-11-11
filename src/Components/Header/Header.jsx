@@ -40,10 +40,6 @@ const Child = Styled.div`
     align-items: center;
     flex-shrink: 0;
     gap: 8px;
-
-    .tab-item {
-        margin-bottom: 0;
-    }
 `;
 
 

@@ -40,10 +40,6 @@ const Start = Styled.div`
         font-size: 24px;
         margin-right: 8px;
     }
-    & > .tabs {
-        margin-left: 32px;
-        margin-bottom: 0;
-    }
 `;
 
 const End = Styled.div`

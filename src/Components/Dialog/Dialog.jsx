@@ -9,7 +9,6 @@ import Utils                from "../../Utils/Utils";
 // Components
 import DialogFooter         from "./DialogFooter";
 import Backdrop             from "../Common/Backdrop";
-import TabList              from "../Tab/TabList";
 
 // Module Variables
 // The open Dialogs in the order they opened, as only the last one closes. A Dialog can
@@ -23,9 +22,8 @@ const openDialogs = [];
 const Container = Styled(Backdrop).attrs(({ zIndex, hasFooter, twoRowsFooter }) => ({ zIndex, hasFooter, twoRowsFooter }))`
     ${(props) => !props.hasFooter && "--dialog-footer: 0px;"}
 
-    --dialog-tabs: 0px;
     --dialog-height: calc(var(--full-height) - var(--dialog-spacing) * 2);
-    --dialog-body: calc(var(--dialog-height) - var(--dialog-header) - var(--dialog-tabs) - var(--dialog-footer));
+    --dialog-body: calc(var(--dialog-height) - var(--dialog-header) - var(--dialog-footer));
 
     padding: var(--dialog-spacing);
     z-index: ${(props) => props.zIndex ? props.zIndex : "var(--z-dialog)"};
@@ -60,7 +58,7 @@ const AsideBox = Styled.div.attrs(({ asideWidth }) => ({ asideWidth }))`
     }
 `;
 
-const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosing }) => ({ width, isWide, isNarrow, hasTabs, isClosing }))`
+const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, isClosing }) => ({ width, isWide, isNarrow, isClosing }))`
     position: static;
     display: block;
     margin: 0;
@@ -84,7 +82,6 @@ const Content = Styled.dialog.attrs(({ width, isWide, isNarrow, hasTabs, isClosi
     ${(props) => props.width    ?  `max-width: ${props.width}px;` : ""}
     ${(props) => props.isWide   && "max-width: 1000px;"}
     ${(props) => (props.isNarrow && !props.width) && "max-width: 400px;"}
-    ${(props) => props.hasTabs  && "--dialog-tabs: var(--tabs-dialog);"}
 
     @media (max-width: 500px) {
         max-width: none;
@@ -223,15 +220,12 @@ function Dialog(props) {
     // The Aside hides while the Dialog loads, unless it is kept, as when saving
     const showAside  = open && !isClosing && (!isLoading || keepAside);
     const items      = [];
-    let   hasTabs    = false;
     let   withFooter = Boolean(hasFooter);
     let   twoRows    = false;
 
     // A footer with a secondary button takes two rows on a phone, so the body leaves the space
     for (const [ key, child ] of Utils.getChildren(children).entries()) {
-        if (child.type === TabList) {
-            hasTabs = true;
-        } else if (child.type === DialogFooter) {
+        if (child.type === DialogFooter) {
             withFooter = true;
             twoRows    = Boolean(child.props.secondary || child.props.tertiary);
         }
@@ -251,7 +245,6 @@ function Dialog(props) {
         width={width}
         isWide={isWide}
         isNarrow={isNarrow}
-        hasTabs={hasTabs}
         isClosing={isClosing}
         open
     >

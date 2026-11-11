@@ -10,7 +10,6 @@ import Utils                from "../../Utils/Utils";
 import PageLoader           from "../Loader/PageLoader";
 import FilterList           from "../Filter/FilterList";
 import FilterBar            from "../Filter/FilterBar";
-import TabList              from "../Tab/TabList";
 import PillTabs             from "../Pill/PillTabs";
 
 
@@ -85,7 +84,7 @@ function Content(props) {
     for (const child of Utils.getVisibleChildren(children)) {
         if (child.type === FilterList || child.type === FilterBar) {
             hasFilter = true;
-        } else if (child.type === TabList || child.type === PillTabs) {
+        } else if (child.type === PillTabs) {
             hasTabs = true;
         }
     }
