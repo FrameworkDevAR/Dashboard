@@ -134,7 +134,8 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
             --button-color: white;
             --button-border: var(--primary-color);
             --button-background: var(--primary-color);
-            --button-hover-color: var(--primary-color);
+            --button-hover-color: var(--button-primary-hover-color, var(--primary-color));
+            --button-hover-background: var(--button-primary-hover-bg, var(--content-color));
         `;
 
         case Variant.CANCEL: return `
@@ -175,8 +176,8 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         `;
 
         case Variant.OUTLINED: return `
-            --button-color: var(--primary-color);
-            --button-border: var(--primary-border, var(--primary-color));
+            --button-color: var(--button-outlined-color, var(--primary-color));
+            --button-border: var(--button-outlined-border, var(--primary-border, var(--primary-color)));
             --button-background: var(--content-color);
             --button-hover-color: white;
             --button-hover-border: var(--primary-color);
