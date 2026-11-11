@@ -386,7 +386,7 @@ const FileInput = Styled.input`
  */
 function EditorInput(props) {
     const {
-        inputRef, className, isFocused, isDisabled, centerImages, withLabel,
+        inputRef, className, isFocused, isDisabled, centerImages, fixedToolbar, withLabel,
         name, value, placeholder, rows, maxRows, titles, filesUrl, variables, init,
         toolbar, outsideLabel,
         onChange, onFocus, onBlur, onMedia, onUpload, onInit, onKeyUp, onKeyDown, onMouseDown,
@@ -1005,20 +1005,21 @@ function EditorInput(props) {
     const hasFiles  = has("file") && Boolean(onMedia || onUpload);
 
     // The Input grows up while the text is written, showing the Toolbar over what is above it,
-    // so the text does not move when it shows
-    const showToolbar = !isDisabled && (isFocused || Boolean(menu));
+    // so the text does not move when it shows. A fixed Toolbar is always shown in its place
+    const showToolbar = !isDisabled && (fixedToolbar || isFocused || Boolean(menu));
+    const liftToolbar = showToolbar && !fixedToolbar;
 
     // The Input goes up as much as the Toolbar is tall, which changes when its actions wrap
     React.useLayoutEffect(() => {
         const node = barRef.current;
-        if (!showToolbar || !node) {
+        if (!liftToolbar || !node) {
             return undefined;
         }
         const observer = new ResizeObserver(() => setLift(node.offsetHeight));
         setLift(node.offsetHeight);
         observer.observe(node);
         return () => observer.disconnect();
-    }, [ showToolbar ]);
+    }, [ liftToolbar ]);
 
 
     // Do the Render
@@ -1027,7 +1028,7 @@ function EditorInput(props) {
             passedRef={boxRef}
             className={className}
             isFocused={isFocused || Boolean(menu)}
-            isOpen={showToolbar}
+            isOpen={liftToolbar}
             lift={lift}
             isDisabled={isDisabled}
             withLabel={withLabel}
@@ -1385,6 +1386,7 @@ EditorInput.propTypes = {
     isFocused    : PropTypes.bool,
     isDisabled   : PropTypes.bool,
     centerImages : PropTypes.bool,
+    fixedToolbar : PropTypes.bool,
     withLabel    : PropTypes.bool,
     name         : PropTypes.string,
     value        : PropTypes.string,
@@ -1417,6 +1419,7 @@ EditorInput.defaultProps = {
     isFocused    : false,
     isDisabled   : false,
     centerImages : false,
+    fixedToolbar : false,
     withLabel    : false,
     value        : "",
     placeholder  : "",
