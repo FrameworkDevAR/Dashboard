@@ -77,11 +77,11 @@ const Indicator = Styled.div.attrs(({ left, width }) => ({ left, width }))`
 
 
 /**
- * The Pill Tabs Component
+ * The Tab List Component
  * @param {object} props
  * @returns {React.ReactElement}
  */
-function PillTabs(props) {
+function TabList(props) {
     const {
         isHidden, className, fillWidth, isFit, isMedium, isCentered, isSticky,
         topSpace, bottomSpace, selected, onClick, actions, children,
@@ -208,7 +208,7 @@ function PillTabs(props) {
  * The Property Types
  * @type {object} propTypes
  */
-PillTabs.propTypes = {
+TabList.propTypes = {
     isHidden    : PropTypes.bool,
     className   : PropTypes.string,
     fillWidth   : PropTypes.bool,
@@ -228,7 +228,7 @@ PillTabs.propTypes = {
  * The Default Properties
  * @type {object} defaultProps
  */
-PillTabs.defaultProps = {
+TabList.defaultProps = {
     isHidden   : false,
     className  : "",
     fillWidth  : false,
@@ -238,4 +238,4 @@ PillTabs.defaultProps = {
     isSticky   : false,
 };
 
-export default PillTabs;
+export default TabList;

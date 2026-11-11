@@ -2,8 +2,8 @@ import React                from "react";
 import PropTypes            from "prop-types";
 
 // Components
-import PillTabs             from "./PillTabs";
-import PillTab              from "./PillTab";
+import TabList              from "./TabList";
+import TabItem              from "./TabItem";
 
 
 
@@ -17,18 +17,18 @@ function ViewTabs(props) {
 
 
     // Do the Render
-    return <PillTabs selected={view} onClick={onView}>
-        <PillTab
+    return <TabList selected={view} onClick={onView}>
+        <TabItem
             icon="grid"
             value="grid"
             tooltip="GENERAL_VIEW_GRID"
         />
-        <PillTab
+        <TabItem
             icon="list"
             value="list"
             tooltip="GENERAL_VIEW_LIST"
         />
-    </PillTabs>;
+    </TabList>;
 }
 
 /**

@@ -58,7 +58,7 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isFit }) => ({ isSe
     `}
 `;
 
-const PillBadge = Styled(Badge)`
+const TabBadge = Styled(Badge)`
     position: static;
     flex-shrink: 0;
 `;
@@ -79,11 +79,11 @@ const Amount = Styled.span`
 
 
 /**
- * The Pill Tab Component
+ * The Tab Item Component
  * @param {object} props
  * @returns {React.ReactElement}
  */
-function PillTab(props) {
+function TabItem(props) {
     const {
         isHidden, className, icon, message, badge, amount,
         tooltip, tooltipVariant, tooltipWidth,
@@ -134,7 +134,7 @@ function PillTab(props) {
         {!!icon && <Icon icon={icon} />}
         {!!message && NLS.get(message)}
         {amount !== undefined && <Amount>{amount}</Amount>}
-        <PillBadge value={badge} />
+        <TabBadge value={badge} />
     </Container>;
 }
 
@@ -142,7 +142,7 @@ function PillTab(props) {
  * The Property Types
  * @type {object} propTypes
  */
-PillTab.propTypes = {
+TabItem.propTypes = {
     isHidden   : PropTypes.bool,
     className  : PropTypes.string,
     icon       : PropTypes.string,
@@ -165,7 +165,7 @@ PillTab.propTypes = {
  * The Default Properties
  * @type {object} defaultProps
  */
-PillTab.defaultProps = {
+TabItem.defaultProps = {
     tooltipVariant : "bottom",
     isHidden   : false,
     className  : "",
@@ -174,4 +174,4 @@ PillTab.defaultProps = {
     isFit      : false,
 };
 
-export default PillTab;
+export default TabItem;

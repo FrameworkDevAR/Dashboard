@@ -13,9 +13,9 @@ import CircularLoader       from "../Loader/CircularLoader";
 import Breadcrumb           from "../Header/Breadcrumb";
 import MediaGrid            from "../Media/MediaGrid";
 import MediaTable           from "../Media/MediaTable";
-import PillTabs             from "../Pill/PillTabs";
-import PillTab              from "../Pill/PillTab";
-import ViewTabs             from "../Pill/ViewTabs";
+import TabList              from "../Tab/TabList";
+import TabItem              from "../Tab/TabItem";
+import ViewTabs             from "../Tab/ViewTabs";
 
 
 
@@ -245,20 +245,20 @@ function MediaList(props) {
                     amount={NLS.pluralize("MEDIA_AMOUNT", amount)}
                     onClick={handleBreadcrumb}
                 />
-                <PillTabs selected={sort} onClick={handleSort}>
-                    <PillTab
+                <TabList selected={sort} onClick={handleSort}>
+                    <TabItem
                         icon="sort-alpha"
                         value="name"
                         tooltip="MEDIA_SORT_NAME"
                         tooltipWidth={140}
                     />
-                    <PillTab
+                    <TabItem
                         icon="time"
                         value="time"
                         tooltip="MEDIA_SORT_TIME"
                         tooltipWidth={140}
                     />
-                </PillTabs>
+                </TabList>
                 <ViewTabs view={view} onView={handleView} />
             </Toolbar>
 
