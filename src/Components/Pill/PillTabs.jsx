@@ -3,6 +3,7 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
+import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
 
 
@@ -92,12 +93,27 @@ function PillTabs(props) {
 
     // The Current State
     const [ bounds, setBounds ] = React.useState({ left : 0, width : 0 });
+    const [ clicked, setClicked ] = React.useState(null);
+
+
+    // The Pill moves on the click, as the selected value can come after a load. Once
+    // the selected value changes, it is the one shown again
+    const current = clicked ?? selected;
+
+    React.useEffect(() => {
+        setClicked(null);
+    }, [ selected ]);
     const [ fades,  setFades  ] = React.useState({ left : false, right : false });
 
 
     // Clone the Children
     const items = Utils.cloneChildren(children, (child, index) => {
-        return { index, selected, isFit, onClick };
+        const { url, value } = child.props;
+        const handleClick = (id) => {
+            setClicked(url ? NLS.url(url) : (value ?? index));
+            onClick(id);
+        };
+        return { index, selected : current, isFit, onClick : onClick ? handleClick : undefined };
     });
 
 
@@ -126,7 +142,7 @@ function PillTabs(props) {
         const observer = new ResizeObserver(update);
         observer.observe(node);
         return () => observer.disconnect();
-    }, [ isHidden, selected, items.length ]);
+    }, [ isHidden, current, items.length ]);
 
     // When the Pills scroll, the side that has more of them fades, so it is known there are more
     React.useEffect(() => {
