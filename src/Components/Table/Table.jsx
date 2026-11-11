@@ -26,7 +26,7 @@ import ScrollFade           from "../Common/ScrollFade";
 
 
 // Styles
-const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }) => ({ inDialog, hasFilter, statsAmount, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }))`
+const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }) => ({ inDialog, hasFilter, hasTabs, hasAlert, hasPaging, hasFooter, hasChecks, hasActions, notFixed, isEditable, extraSpace }))`
     ${(props) => props.inDialog ? `
         --table-height: calc(var(--dialog-content, var(--dialog-body)) - 2px);
     ` : `
@@ -35,7 +35,6 @@ const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, h
 
     --table-header-height: 28px;
     --table-filter-height: ${(props) => props.hasFilter ? "calc(var(--filter-height) + var(--filter-chips-height, 0px))" : "0px"};
-    --table-stats-height: ${(props) => props.statsAmount > 0 ? `calc((var(--stats-height) + var(--main-gap)) * ${props.statsAmount})` : "0px"};
     --table-tabs-height: ${(props) => props.hasTabs ? "var(--tabs-table)" : "0px"};
     --table-alert-height: ${(props) => props.hasAlert ? "var(--alert-height)" : "0px"};
     --table-paging-height: ${(props) => props.hasPaging ? "32px" : (props.hasFooter ? "28px" : "0px")};
@@ -50,7 +49,6 @@ const Wrapper = Styled.div.attrs(({ inDialog, hasFilter, statsAmount, hasTabs, h
         overflow: auto;
         height: calc(
             var(--table-height)
-            - var(--table-stats-height)
             - var(--table-tabs-height)
             - var(--table-alert-height)
             - var(--table-filter-height)
@@ -167,7 +165,7 @@ const Container = Styled.table.attrs(({ isEditable, totalWidth, minWidth, hasAct
 function Table(props) {
     const {
         isHidden, className, sort, fetch, isLoading, none, hideEmpty,
-        noClick, onRowClick, onRowDoubleClick, inDialog, hasFade, hasFilter, statsAmount, hasTabs, hasAlert,
+        noClick, onRowClick, onRowDoubleClick, inDialog, hasFade, hasFilter, hasTabs, hasAlert,
         noSorting, notFixed, columnData, onColumnEdit,
         checked, setChecked, hasCheckAll, extraSpace, minWidth, children,
     } = props;
@@ -489,7 +487,6 @@ function Table(props) {
         return <Loading
             inDialog={inDialog}
             hasFilter={hasFilter}
-            statsAmount={statsAmount}
             hasTabs={hasTabs}
             hasAlert={hasAlert}
             hasPaging={hasPaging}
@@ -515,7 +512,6 @@ function Table(props) {
         ref={tableRef}
         inDialog={inDialog}
         hasFilter={hasFilter}
-        statsAmount={statsAmount}
         hasTabs={hasTabs}
         hasAlert={hasAlert}
         hasPaging={hasPaging}
@@ -585,7 +581,6 @@ Table.propTypes = {
     inDialog         : PropTypes.bool,
     hasFade          : PropTypes.bool,
     hasFilter        : PropTypes.bool,
-    statsAmount      : PropTypes.number,
     hasTabs          : PropTypes.bool,
     hasAlert         : PropTypes.bool,
     noSorting        : PropTypes.bool,
@@ -616,7 +611,6 @@ Table.defaultProps = {
     isLoading   : false,
     hasFade     : false,
     hasFilter   : false,
-    statsAmount : 0,
     hasTabs     : false,
     noSorting   : false,
     notFixed    : false,

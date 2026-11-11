@@ -10,7 +10,6 @@ import Utils                from "../../Utils/Utils";
 import PageLoader           from "../Loader/PageLoader";
 import FilterList           from "../Filter/FilterList";
 import FilterBar            from "../Filter/FilterBar";
-import StatList             from "../Stats/StatList";
 import TabList              from "../Tab/TabList";
 
 
@@ -81,20 +80,17 @@ function Content(props) {
     const items       = [];
     let   hasTabs     = withTabs;
     let   hasFilter   = withFilter;
-    let   statsAmount = 0;
 
     for (const child of Utils.getVisibleChildren(children)) {
         if (child.type === FilterList || child.type === FilterBar) {
             hasFilter = true;
-        } else if (child.type === StatList) {
-            statsAmount += 1;
         } else if (child.type === TabList) {
             hasTabs = true;
         }
     }
     for (const [ key, child ] of Utils.getVisibleEntries(children)) {
         if (typeof child.type !== "string") {
-            items.push(React.cloneElement(child, { key, hasFilter, statsAmount, hasTabs }));
+            items.push(React.cloneElement(child, { key, hasFilter, hasTabs }));
         } else {
             items.push(React.cloneElement(child, { key }));
         }
