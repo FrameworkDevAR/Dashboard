@@ -1,6 +1,6 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled, { keyframes } from "styled-components";
+import Styled               from "styled-components";
 
 // Core & Utils
 import NLS                  from "../../Core/NLS";
@@ -9,16 +9,11 @@ import Utils                from "../../Utils/Utils";
 // Components
 import DragDrop             from "./DragDrop";
 import Icon                 from "../Common/Icon";
+import LinearLoader         from "../Loader/LinearLoader";
 import Button               from "../Form/Button";
 import PromptDialog         from "../Dialogs/PromptDialog";
 
 
-
-// Animations
-const slide = keyframes`
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(250%); }
-`;
 
 // Styles
 const Container = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
@@ -100,26 +95,9 @@ const FileName = Styled(Title)`
     text-overflow: ellipsis;
 `;
 
-const Bar = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
-    flex-shrink: 0;
+const Bar = Styled(LinearLoader).attrs(({ isStacked }) => ({ isStacked }))`
     width: 240px;
     max-width: ${(props) => props.isStacked ? "100%" : "40%"};
-    height: 8px;
-    border-radius: 4px;
-    background-color: var(--lighter-gray);
-    overflow: hidden;
-`;
-
-const Fill = Styled.div`
-    height: 100%;
-    border-radius: 4px;
-    background-color: var(--primary-color);
-    transition: width 0.2s;
-`;
-
-const WaitingFill = Styled(Fill)`
-    width: 40%;
-    animation: ${slide} 1.2s ease-in-out infinite;
 `;
 
 
@@ -292,9 +270,11 @@ function DropZone(props) {
                         <Text>{amount}</Text>
                     </Info>
                 </Content>
-                <Bar isStacked={isStacked}>
-                    {isWaiting ? <WaitingFill /> : <Fill style={{ width : `${percent}%` }} />}
-                </Bar>
+                <Bar
+                    isStacked={isStacked}
+                    percent={percent}
+                    isWaiting={isWaiting}
+                />
             </>}
 
             {!upload && <Content isStacked={isStacked}>

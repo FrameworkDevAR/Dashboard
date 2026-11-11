@@ -2,55 +2,39 @@ import React                 from "react";
 import PropTypes             from "prop-types";
 import Styled, { keyframes } from "styled-components";
 
-// Core
-import NLS                   from "../../Core/NLS";
+// Variants
+const Variant = {
+    PRIMARY : "primary",
+    ERROR   : "error",
+};
 
 
 
 // Animations
-const loading = keyframes`
-    0%   { width:   0%; }
-    25%  { width:  22%; }
-    50%  { width:  55%; }
-    75%  { width:  83%; }
-    100% { width: 100%; }
+const slide = keyframes`
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(250%); }
 `;
 
 // Styles
-const Div = Styled.div.attrs(({ open }) => ({ open }))`
-    display: ${(props) => props.open ? "block" : "none"};
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    text-indent: 200%;
-    white-space: nowrap;
+const Track = Styled.div`
+    flex-shrink: 0;
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--lighter-gray);
     overflow: hidden;
+`;
 
-    &::after {
-        content: "";
-        animation-name: ${loading};
-        animation-duration: ${(props) => props.open ? "5s" : "0s"};
-        animation-fill-mode: both;
-        animation-timing-function: ease;
-        animation-iteration-count: infinite;
-        background: black;
-        height: 5px;
-        left: 0;
-        position: fixed;
-        top: 0;
-        width: 0%;
-        z-index: 9999;
-        user-select: none;
-    }
+const Fill = Styled.div.attrs(({ variant }) => ({ variant }))`
+    height: 100%;
+    border-radius: 4px;
+    background-color: ${(props) => props.variant === Variant.ERROR ? "var(--error-color)" : "var(--primary-color)"};
+    transition: width 0.2s;
+`;
 
-    @media (max-width: 1000px) {
-        &::after {
-            background: white;
-        }
-    }
+const WaitingFill = Styled(Fill)`
+    width: 40%;
+    animation: ${slide} 1.2s ease-in-out infinite;
 `;
 
 
@@ -61,11 +45,22 @@ const Div = Styled.div.attrs(({ open }) => ({ open }))`
  * @returns {React.ReactElement}
  */
 function LinearLoader(props) {
-    const { open } = props;
+    const { isHidden, className, variant, percent, isWaiting } = props;
 
-    return <Div open={open}>
-        {NLS.get("GENERAL_LOADING")}
-    </Div>;
+
+    // Do the Render
+    if (isHidden) {
+        return <React.Fragment />;
+    }
+
+    // A percent outside of the bar would draw past its ends
+    const width = Math.min(100, Math.max(0, Number(percent) || 0));
+    return <Track className={className}>
+        {isWaiting ? <WaitingFill variant={variant} /> : <Fill
+            variant={variant}
+            style={{ width : `${width}%` }}
+        />}
+    </Track>;
 }
 
 /**
@@ -73,7 +68,23 @@ function LinearLoader(props) {
  * @type {object} propTypes
  */
 LinearLoader.propTypes = {
-    open : PropTypes.bool.isRequired,
+    isHidden  : PropTypes.bool,
+    className : PropTypes.string,
+    variant   : PropTypes.string,
+    percent   : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    isWaiting : PropTypes.bool,
+};
+
+/**
+ * The Default Properties
+ * @type {object} defaultProps
+ */
+LinearLoader.defaultProps = {
+    isHidden  : false,
+    className : "",
+    variant   : Variant.PRIMARY,
+    percent   : 0,
+    isWaiting : false,
 };
 
 export default LinearLoader;
