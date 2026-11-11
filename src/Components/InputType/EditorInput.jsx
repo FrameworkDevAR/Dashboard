@@ -1,7 +1,7 @@
 // spell-checker: ignore autolink
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
+import Styled, { keyframes } from "styled-components";
 import { Editor }           from "@tinymce/tinymce-react";
 
 // Core & Utils
@@ -56,6 +56,7 @@ const INDENTS = [
     { key : "indent",  icon : "indent",  tooltip : "GENERAL_FORMAT_INDENT",  command : "Indent"  },
 ];
 const IMAGE_SRC   = /(<img[^>]*?\ssrc=["'])([^"']+)/gi;
+const IMAGE_FILE  = /\.(png|jpe?g|gif|bmp|webp|svg)$/i;
 const FORMATS     = [
     { key : "bold",      icon : "bold",      tooltip : "GENERAL_FORMAT_BOLD",      command : "Bold"      },
     { key : "italic",    icon : "italic",    tooltip : "GENERAL_FORMAT_ITALIC",    command : "Italic"    },
@@ -86,6 +87,32 @@ const LISTS = [
     },
 ];
 
+// The patterns of the editor, which are its default ones and the three dashes of a line, as
+// giving them replaces the defaults
+const TEXT_PATTERNS = [
+    { start : "*",      end : "*",  format : "italic" },
+    { start : "**",     end : "**", format : "bold" },
+    { start : "`",      end : "`",  format : "code" },
+    { start : "#",      format : "h1" },
+    { start : "##",     format : "h2" },
+    { start : "###",    format : "h3" },
+    { start : "####",   format : "h4" },
+    { start : "#####",  format : "h5" },
+    { start : "######", format : "h6" },
+    { start : ">",      format : "blockquote" },
+    { start : "1. ",    cmd : "InsertOrderedList" },
+    { start : "* ",     cmd : "InsertUnorderedList" },
+    { start : "- ",     cmd : "InsertUnorderedList" },
+    { start : "---",    replacement : "<hr>" },
+];
+
+// A list of tasks is a list with a class, where the items that are done have another one.
+// The box of each item is drawn before it, in a space of this width at its left
+const CHECK_LIST  = "task-list";
+const CHECK_DONE  = "task-done";
+const CHECK_WIDTH = 24;
+const CHECK_REGEX = /^\[( |x|X)?\] $/;
+
 // Styles
 const Container = Styled(InputContent).attrs(({ isOpen, lift }) => ({ isOpen, lift }))`
     --editor-toolbar-height: 36px;
@@ -101,7 +128,7 @@ const Container = Styled(InputContent).attrs(({ isOpen, lift }) => ({ isOpen, li
     `}
 `;
 
-const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, maxHeight }))`
+const Content = Styled.div.attrs(({ centerImages, minHeight, maxHeight }) => ({ centerImages, minHeight, maxHeight }))`
     box-sizing: border-box;
     width: 100%;
     cursor: text;
@@ -112,8 +139,8 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
     `}
 
     .mce-content-body {
-        min-height: ${(props) => props.minHeight}px;
-        padding: 8px var(--input-horiz-padding, 12px);
+        min-height: calc(${(props) => props.minHeight}px + var(--editor-padding-y, 8px) * 2);
+        padding: var(--editor-padding-y, 8px) var(--editor-padding-x, var(--input-horiz-padding, 12px));
         font-size: var(--input-font);
         line-height: 1.5;
         color: var(--font-color);
@@ -123,8 +150,8 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
         outline: none;
     }
     .mce-content-body[data-mce-placeholder]::before {
-        top: 8px !important;
-        left: var(--input-horiz-padding, 12px) !important;
+        top: var(--editor-padding-y, 8px) !important;
+        left: var(--editor-padding-x, var(--input-horiz-padding, 12px)) !important;
         color: var(--darkest-gray) !important;
     }
 
@@ -136,27 +163,59 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
             color: var(--title-color);
         }
         h1 {
-            font-size: 18px;
-        }
-        h2 {
             font-size: 16px;
         }
-        h3, h4 {
+        h2 {
             font-size: 15px;
         }
-        p {
-            margin: 0 0 12px;
+        h3, h4 {
+            font-size: 14px;
+        }
+        p, ul, ol, table, pre, blockquote {
+            margin: 0 0 var(--editor-spacing, 12px);
         }
         ul, ol {
-            margin: 0 0 12px;
             padding-left: 22px;
         }
-        a {
-            color: var(--editor-link-color, hsl(216, 98%, 44%));
+        ul.${CHECK_LIST} {
+            padding-left: 2px;
+            list-style: none;
+        }
+        ul.${CHECK_LIST} > li {
+            position: relative;
+            padding-left: ${CHECK_WIDTH}px;
+        }
+        ul.${CHECK_LIST} > li::before {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            box-sizing: border-box;
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--darkest-gray);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        ul.${CHECK_LIST} > li.${CHECK_DONE}::before {
+            border-color: var(--primary-color);
+            background: var(--primary-color) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+        }
+        ul.${CHECK_LIST} > li.${CHECK_DONE} {
+            color: var(--font-lighter);
+        }
+        a:not([contenteditable="false"]) {
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: var(--border-radius-small);
+            transition: color 0.2s, background-color 0.2s;
+        }
+        a:not([contenteditable="false"]):hover {
+            color: color-mix(in srgb, var(--primary-color) 80%, var(--black-color));
             text-decoration: underline;
+            background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
         }
         table {
-            margin: 0 0 12px;
             border-collapse: collapse;
         }
         th, td {
@@ -172,6 +231,28 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
             outline: 2px solid var(--primary-color);
             outline-offset: -2px;
         }
+        pre, code {
+            font-family: monospace;
+            font-size: 12px;
+            background-color: var(--lighter-gray);
+            border-radius: var(--border-radius-small);
+        }
+        pre {
+            padding: 8px 10px;
+            white-space: pre-wrap;
+        }
+        code {
+            padding: 1px 4px;
+        }
+        blockquote {
+            padding-left: 12px;
+            border-left: 3px solid var(--border-color-medium);
+        }
+        hr {
+            margin: calc((1.5em - 1px) / 2 + var(--editor-spacing, 12px)) 0;
+            border: none;
+            border-top: 1px solid var(--border-color-medium);
+        }
         > :first-child {
             margin-top: 0;
         }
@@ -179,9 +260,21 @@ const Content = Styled.div.attrs(({ minHeight, maxHeight }) => ({ minHeight, max
             margin-bottom: 0;
         }
     }
+
+    ${(props) => props.centerImages && `
+        .mce-content-body img {
+            display: block;
+            margin: 8px auto;
+        }
+        .mce-content-body img[data-mce-selected] {
+            outline: none;
+        }
+    `}
 `;
 
 const Toolbar = Styled.div`
+    position: sticky;
+    top: 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -189,6 +282,9 @@ const Toolbar = Styled.div`
     gap: 2px;
     min-height: var(--editor-toolbar-height);
     padding: 0 6px;
+    background-color: var(--content-color);
+    border-radius: var(--border-radius);
+    z-index: 1;
 `;
 
 const Line = Styled.div`
@@ -202,9 +298,9 @@ const Line = Styled.div`
 const Block = Styled.button`
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
     height: 24px;
-    padding: 0 2px 0 8px;
+    padding: 0 2px 0 6px;
     font-family: inherit;
     font-size: 12px;
     color: var(--black-color);
@@ -242,6 +338,45 @@ const Action = Styled(IconLink).attrs(({ isActive }) => ({ isActive }))`
     }
 `;
 
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+    }
+`;
+
+const Resize = Styled.div`
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+`;
+
+const ResizeHandle = Styled.div.attrs(({ isLeft }) => ({ isLeft }))`
+    position: absolute;
+    top: 50%;
+    ${(props) => props.isLeft ? "left: 3px;" : "right: 3px;"}
+    box-sizing: border-box;
+    width: 8px;
+    height: min(56px, 40%);
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 2px solid var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    cursor: ew-resize;
+    pointer-events: auto;
+    animation: ${fadeIn} 0.15s ease-in;
+    transition: background-color 0.15s, transform 0.15s;
+
+    &:hover {
+        background-color: var(--primary-color);
+        transform: translateY(-50%) scaleY(1.1);
+    }
+`;
+
+const FileInput = Styled.input`
+    display: none;
+`;
+
 
 
 /**
@@ -251,26 +386,33 @@ const Action = Styled(IconLink).attrs(({ isActive }) => ({ isActive }))`
  */
 function EditorInput(props) {
     const {
-        inputRef, className, isFocused, isDisabled, withLabel,
-        name, value, placeholder, rows, maxRows, titles, filesUrl, variables,
-        withColors, withSizes, withAlign, withLinks, withFiles, withTables, outsideLabel,
-        onChange, onFocus, onBlur, onMedia,
+        inputRef, className, isFocused, isDisabled, centerImages, withLabel,
+        name, value, placeholder, rows, maxRows, titles, filesUrl, variables, init,
+        toolbar, outsideLabel,
+        onChange, onFocus, onBlur, onMedia, onUpload, onInit, onKeyUp, onKeyDown, onMouseDown,
     } = props;
+
+
+    // The buttons of the Toolbar that are shown
+    const has = (key) => toolbar.includes(key);
 
 
     // The References
     const editorRef = React.useRef(null);
+    const boxRef    = React.useRef(null);
     const blockRef  = React.useRef(null);
     const listRef   = React.useRef(null);
     const numberRef = React.useRef(null);
     const tableRef  = React.useRef(null);
     const alignRef  = React.useRef(null);
     const sizeRef   = React.useRef(null);
+    const fileRef   = React.useRef(null);
+    const uploadRef = React.useRef(null);
     const barRef    = React.useRef(null);
     const varRef    = React.useRef(null);
     const markRef   = React.useRef(null);
     const colorRefs = { color : React.useRef(null), highlight : React.useRef(null) };
-    const resizeRef = React.useRef(null);
+    const resizeRef = React.useRef({ image : null, isDragging : false });
     const touchRef  = React.useRef(false);
     const sentRef   = React.useRef(null);
 
@@ -278,15 +420,31 @@ function EditorInput(props) {
     const [ active, setActive ] = React.useState({});
     const [ menu,   setMenu   ] = React.useState("");
     const [ lift,   setLift   ] = React.useState(0);
+    const [ resize, setResize ] = React.useState(null);
     const [ link,   setLink   ] = React.useState({ url : "", text : "", target : "_blank", isEdit : false });
 
 
-    // The Blocks are the paragraph and the titles that are allowed, which are numbered in their
-    // order, as a title is called the same whatever its level is
+    // The Blocks are the paragraph, the titles that are allowed, which are numbered in their
+    // order, as a title is called the same whatever its level is, and the quote and the code
     const blocks = [
-        { key : "p", message : NLS.get("GENERAL_FORMAT_PARAGRAPH") },
-        ...titles.map((key, index) => ({ key, message : NLS.format("GENERAL_FORMAT_TITLE", index + 1) })),
+        { key : "p", icon : "format-paragraph", message : NLS.get("GENERAL_FORMAT_PARAGRAPH") },
+        ...titles.map((key, index) => ({
+            key,
+            icon    : index < 3 ? `format-h${index + 1}` : "",
+            message : NLS.format("GENERAL_FORMAT_TITLE", index + 1),
+        })),
     ];
+    if (has("quote")) {
+        blocks.push({ key : "blockquote", icon : "blockquote", message : NLS.get("GENERAL_FORMAT_QUOTE") });
+    }
+    if (has("code")) {
+        blocks.push({ key : "pre", icon : "code-block", message : NLS.get("GENERAL_FORMAT_CODE") });
+    }
+
+    const formats = has("format") ? [ ...FORMATS ] : [];
+    if (has("code")) {
+        formats.push({ key : "code", icon : "code", tooltip : "GENERAL_FORMAT_CODE", command : "mceToggleFormat", value : "code" });
+    }
 
 
     // Handles the Init, which gives the body to the Input, so the label can focus it
@@ -295,8 +453,6 @@ function EditorInput(props) {
         if (inputRef) {
             inputRef.current = editor.getBody();
         }
-        editor.on("ObjectResizeStart", handleResizeStart);
-        editor.on("ObjectResized", handleResized);
 
         // The editor rewrites the html that it is given, and reports it as a change when it loads
         // it, so the changes are only sent once the user edits the text. Focusing it runs a
@@ -310,31 +466,14 @@ function EditorInput(props) {
 
         // The shortcut of the links opens the dialog of the Link instead of the one of the editor
         editor.addShortcut("meta+k", "", () => openLink());
-    };
 
-    // Handles the Start of the Resize of an image, keeping the width that it is shown with, as
-    // the editor measures the image with its own width, which can be wider than the text
-    const handleResizeStart = ({ target, width }) => {
-        resizeRef.current = { shown : target.getBoundingClientRect().width, width };
-    };
-
-    // Handles the Resize of an image, which keeps its width as a part of the text instead of
-    // the pixels that it has here, so it takes the same part where the text is shown wider
-    const handleResized = ({ target, width }) => {
-        const editor = editorRef.current;
-        const start  = resizeRef.current;
-        if (!editor || !start || !start.width || target.nodeName !== "IMG") {
-            return;
+        // The item that the Enter adds after one that is done starts as not done
+        if (has("check")) {
+            editor.on("NewBlock", ({ newBlock }) => editor.dom.removeClass(newBlock, CHECK_DONE));
         }
-        const body    = editor.getBody();
-        const style   = window.getComputedStyle(body);
-        const space   = body.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-        const shown   = start.shown * width / start.width;
-        const percent = Utils.clamp(Math.round(shown * 100 / space), 5, 100);
-
-        editor.dom.setStyles(target, { width : `${percent}%`, height : "auto" });
-        editor.dom.setAttribs(target, { width : null, height : null });
-        editor.undoManager.add();
+        if (onInit) {
+            onInit(editor);
+        }
     };
 
     // The images are saved without the url of the Files, which is added to show them
@@ -368,31 +507,259 @@ function EditorInput(props) {
         }
     }, [ value ]);
 
-    // Handles the Media, which picks an image or a file and inserts it where the cursor was. The
-    // image is shown and the file is a link with its name
-    const handleMedia = (e, mediaType) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const editor   = editorRef.current;
-        const bookmark = editor ? editor.selection.getBookmark(2, true) : null;
-        onMedia(mediaType, (file) => {
-            if (!editor || !file) {
-                return;
-            }
-            const isFull = /^(https?:)?\/\//i.test(file);
-            const url    = isFull ? file : `${filesUrl}${String(file).replace(/^\/+/, "")}`;
-            editor.focus();
-            if (bookmark) {
-                editor.selection.moveToBookmark(bookmark);
-            }
-            if (mediaType === MediaType.IMAGE) {
-                editor.insertContent(`<img src="${url}" alt="" />`);
-            } else {
-                const fileName = editor.dom.encode(String(file).split("/").pop());
-                editor.insertContent(`<a href="${url}" target="_blank" rel="noopener">${fileName}</a>&nbsp;`);
-            }
+
+    // Returns the width of the text, which is the widest an image can be
+    const getTextWidth = () => {
+        const body  = editorRef.current.getBody();
+        const style = window.getComputedStyle(body);
+        return body.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    };
+
+    // Places the handles that resize the given image over it, or takes them away
+    const showResize = (image) => {
+        resizeRef.current.image = image;
+        if (!image || !boxRef.current) {
+            setResize(null);
+            return;
+        }
+        const box    = boxRef.current.getBoundingClientRect();
+        const bounds = image.getBoundingClientRect();
+        setResize({
+            top    : bounds.top - box.top,
+            left   : bounds.left - box.left,
+            width  : bounds.width,
+            height : bounds.height,
         });
     };
+
+    // Handles the Mouse Move, which shows the handles over the image that is under the mouse
+    const handleResizeHover = (e) => {
+        if (isDisabled || resizeRef.current.isDragging || e.target.closest(".editor-resize")) {
+            return;
+        }
+        const image = e.target.nodeName === "IMG" && e.target.closest(".mce-content-body") ? e.target : null;
+        if (image !== resizeRef.current.image) {
+            showResize(image);
+        }
+    };
+
+    // Handles the Leave of the mouse, or the scroll, which takes the handles away
+    const handleResizeLeave = () => {
+        if (!resizeRef.current.isDragging) {
+            showResize(null);
+        }
+    };
+
+    // Handles the Mouse Down on a handle, which resizes the image while it is dragged keeping
+    // its proportions. A centered image grows on both sides, so the change is doubled to follow
+    // the mouse. Once dropped, its width is kept as a part of the text instead of the pixels
+    // that it has here, so it takes the same part where the text is shown wider
+    const handleResizeStart = (e, isLeft) => {
+        const editor = editorRef.current;
+        const image  = resizeRef.current.image;
+        if (!editor || !image) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+
+        const bounds = image.getBoundingClientRect();
+        const body   = editor.getBody().getBoundingClientRect();
+        const space  = getTextWidth();
+        const startX = e.clientX;
+        const factor = Math.abs((bounds.left - body.left) - (body.right - bounds.right)) < 2 ? 2 : 1;
+        let   width  = bounds.width;
+        resizeRef.current.isDragging = true;
+
+        const handleMove = (event) => {
+            const change = (isLeft ? startX - event.clientX : event.clientX - startX) * factor;
+            width = Math.round(Utils.clamp(bounds.width + change, 40, space));
+            editor.dom.setStyles(image, { width : `${width}px`, height : "auto" });
+            editor.dom.setAttribs(image, { width : null, height : null });
+            showResize(image);
+        };
+        const handleUp = () => {
+            window.removeEventListener("mousemove", handleMove);
+            window.removeEventListener("mouseup", handleUp);
+            resizeRef.current.isDragging = false;
+
+            const percent = Utils.clamp(Math.round(width * 100 / space), 5, 100);
+            editor.dom.setStyles(image, { width : `${percent}%`, height : "auto" });
+            touchRef.current = true;
+            editor.undoManager.add();
+            handleChange(editor.getContent());
+            showResize(image);
+        };
+        window.addEventListener("mousemove", handleMove);
+        window.addEventListener("mouseup", handleUp);
+    };
+
+
+    // Inserts a File where the cursor was: an image is shown and any other one is a link with
+    // its name
+    const insertFile = (url, fileName, isImage, bookmark) => {
+        const editor = editorRef.current;
+        if (!editor || !url) {
+            return;
+        }
+        editor.focus();
+        if (bookmark) {
+            editor.selection.moveToBookmark(bookmark);
+        }
+        touchRef.current = true;
+        if (isImage) {
+            editor.insertContent(`<img src="${url}" alt="" />`);
+        } else {
+            const text = editor.dom.encode(fileName);
+            editor.insertContent(`<a href="${url}" target="_blank" rel="noopener">${text}</a>&nbsp;`);
+        }
+    };
+
+    // Handles the Media, which picks an image or a file that already exists. A file that is
+    // an image is shown too
+    const handleMedia = (mediaType) => {
+        const editor   = editorRef.current;
+        const bookmark = markRef.current || (editor ? editor.selection.getBookmark(2, true) : null);
+        markRef.current = null;
+        setMenu("");
+        onMedia(mediaType, (file) => {
+            if (!file) {
+                return;
+            }
+            const isFull  = /^(https?:)?\/\//i.test(file);
+            const url     = isFull ? file : `${filesUrl}${String(file).replace(/^\/+/, "")}`;
+            const isImage = mediaType === MediaType.IMAGE || IMAGE_FILE.test(String(file));
+            insertFile(url, String(file).split("/").pop(), isImage, bookmark);
+        });
+    };
+
+    // Handles the Upload Open, which picks the files to upload keeping where the cursor was
+    const handleUploadOpen = () => {
+        setMenu("");
+        uploadRef.current.click();
+    };
+
+    // Handles the Upload of the picked files, which are inserted as each one is uploaded
+    const handleUpload = (e) => {
+        const files = Array.from(e.target.files);
+        let bookmark = markRef.current;
+        markRef.current = null;
+        e.target.value = "";
+        if (!files.length) {
+            return;
+        }
+        onUpload(files, (url, fileName, isImage) => {
+            insertFile(url, fileName, isImage, bookmark);
+            bookmark = null;
+        });
+    };
+
+
+    // Makes the list where the cursor is a list of tasks, creating it when there is none
+    const setCheckList = (isDone = false) => {
+        const editor = editorRef.current;
+        if (!editor.dom.getParent(editor.selection.getNode(), "ul")) {
+            editor.execCommand("InsertUnorderedList");
+        }
+        const list = editor.dom.getParent(editor.selection.getNode(), "ul");
+        if (!list) {
+            return;
+        }
+        editor.dom.setStyle(list, "list-style-type", null);
+        editor.dom.addClass(list, CHECK_LIST);
+        if (isDone) {
+            editor.dom.addClass(editor.dom.getParent(editor.selection.getNode(), "li"), CHECK_DONE);
+        }
+    };
+
+    // Handles the Check List, which makes the list one of tasks or a normal one again
+    const handleCheckList = (e) => {
+        e.preventDefault();
+        const editor = editorRef.current;
+        if (!editor) {
+            return;
+        }
+        editor.undoManager.transact(() => {
+            if (active.check) {
+                const list = editor.dom.getParent(editor.selection.getNode(), "ul");
+                editor.dom.removeClass(list, CHECK_LIST);
+                editor.dom.removeClass(editor.dom.select("li", list), CHECK_DONE);
+            } else {
+                setCheckList();
+            }
+        });
+        editor.focus();
+        handleNodeChange();
+    };
+
+    // Starts a list of tasks when a [ ] or a [x] is written at the start of a line, as in
+    // GitHub, taking away what was written. Returns true when it did
+    const startCheckList = () => {
+        const editor = editorRef.current;
+        const range  = editor ? editor.selection.getRng() : null;
+        const node   = range ? range.startContainer : null;
+        if (!range || !range.collapsed || node.nodeType !== Node.TEXT_NODE) {
+            return false;
+        }
+        const before = node.data.substring(0, range.startOffset);
+        const match  = before.replace(/\u00a0/g, " ").match(CHECK_REGEX);
+        const block  = editor.dom.getParent(node, "p,li");
+        if (!match || !block || block.firstChild !== node) {
+            return false;
+        }
+
+        // The list is made first, as it keeps the text and the cursor that is in it,
+        // and what was written is then taken away from the start of that text
+        editor.undoManager.transact(() => {
+            setCheckList((match[1] || "").toLowerCase() === "x");
+            node.deleteData(0, match[0].length);
+
+            const item = editor.dom.getParent(node, "li");
+            if (!node.data.length && item) {
+                editor.dom.setHTML(item, "<br data-mce-bogus=\"1\">");
+                editor.selection.setCursorLocation(item, 0);
+            } else {
+                editor.selection.setCursorLocation(node, 0);
+            }
+        });
+        handleNodeChange();
+        return true;
+    };
+
+    // Handles the Key Up, which starts a list of tasks after its marks are written
+    const handleKeyUp = (e) => {
+        if (has("check") && e.key === " " && startCheckList()) {
+            return;
+        }
+        if (onKeyUp) {
+            onKeyUp(e);
+        }
+    };
+
+    // Handles the Mouse Down, which marks the task of a list as done or not when its box is
+    // clicked, without giving the focus to the text, as checking a task is not writing in it
+    const handleMouseDown = (e) => {
+        if (onMouseDown) {
+            onMouseDown(e);
+        }
+        const editor = editorRef.current;
+        const item   = e.target.nodeName === "LI" ? e.target : null;
+        if (e.defaultPrevented || !has("check") || isDisabled || !editor || !item) {
+            return;
+        }
+        if (!editor.dom.hasClass(item.parentNode, CHECK_LIST)) {
+            return;
+        }
+        if (e.clientX - item.getBoundingClientRect().left > CHECK_WIDTH) {
+            return;
+        }
+
+        e.preventDefault();
+        touchRef.current = true;
+        editor.undoManager.transact(() => editor.dom.toggleClass(item, CHECK_DONE));
+        handleChange(editor.getContent());
+    };
+
 
     // Handles the Node Change, to mark the actions that apply where the cursor is
     const handleNodeChange = () => {
@@ -400,13 +767,16 @@ function EditorInput(props) {
         if (!editor) {
             return;
         }
-        const list = editor.dom.getParent(editor.selection.getNode(), "ul,ol");
+        const list    = editor.dom.getParent(editor.selection.getNode(), "ul,ol");
+        const isCheck = Boolean(list && editor.dom.hasClass(list, CHECK_LIST));
         setActive({
-            block     : blocks.find((block) => editor.formatter.match(block.key))?.key || "p",
+            block     : getBlock(editor),
             bold      : editor.queryCommandState("Bold"),
             italic    : editor.queryCommandState("Italic"),
             underline : editor.queryCommandState("Underline"),
-            list      : editor.queryCommandState("InsertUnorderedList"),
+            code      : editor.formatter.match("code"),
+            list      : editor.queryCommandState("InsertUnorderedList") && !isCheck,
+            check     : isCheck,
             number    : editor.queryCommandState("InsertOrderedList"),
             listStyle : list ? (list.style.listStyleType || (list.nodeName === "UL" ? "disc" : "decimal")) : "",
             align     : ALIGNS.find((align) => editor.formatter.match(align.key))?.key || "alignleft",
@@ -414,6 +784,15 @@ function EditorInput(props) {
             highlight : getColor(editor, COLORS[1].style),
             size      : getSize(editor),
         });
+    };
+
+    // Returns the Block where the cursor is. A Quote wraps the paragraphs it has, so it is
+    // looked for before them
+    const getBlock = (editor) => {
+        if (has("quote") && editor.formatter.match("blockquote")) {
+            return "blockquote";
+        }
+        return blocks.find((block) => editor.formatter.match(block.key))?.key || "p";
     };
 
     // Returns the font size in pixels that was set where the cursor is, or 0 for the normal one,
@@ -484,6 +863,22 @@ function EditorInput(props) {
         e.preventDefault();
         e.stopPropagation();
         runCommand(command, commandValue);
+    };
+
+    // Handles the Block. A Quote is a wrapper and not a block, so it is added or taken away
+    // with its own command, and the Block is then set inside of it
+    const handleBlock = (key) => {
+        const inQuote = active.block === "blockquote";
+        if (key === "blockquote") {
+            if (!inQuote) {
+                runCommand("mceBlockQuote");
+            }
+            return;
+        }
+        if (inQuote) {
+            runCommand("mceBlockQuote");
+        }
+        runCommand("FormatBlock", key);
     };
 
     // Handles the Menu, which keeps where the cursor is to give it back when it closes
@@ -603,8 +998,11 @@ function EditorInput(props) {
     // the dark mode when it is created
     const isDark    = document.body.classList.contains("dark-mode");
 
-    const minHeight = (Number(rows) || 3) * LINE_HEIGHT + 16;
+    const minHeight = (Number(rows) || 3) * LINE_HEIGHT;
     const maxHeight = maxRows ? Number(maxRows) * LINE_HEIGHT + 16 : 0;
+
+    const hasImages = has("image") && Boolean(onMedia);
+    const hasFiles  = has("file") && Boolean(onMedia || onUpload);
 
     // The Input grows up while the text is written, showing the Toolbar over what is above it,
     // so the text does not move when it shows
@@ -626,6 +1024,7 @@ function EditorInput(props) {
     // Do the Render
     return <>
         <Container
+            passedRef={boxRef}
             className={className}
             isFocused={isFocused || Boolean(menu)}
             isOpen={showToolbar}
@@ -636,8 +1035,9 @@ function EditorInput(props) {
         >
             <EditorStyles />
             {showToolbar && <Toolbar ref={barRef} onMouseDown={(e) => e.preventDefault()}>
-                {titles.length > 0 && <>
+                {has("block") && blocks.length > 1 && <>
                     <Block ref={blockRef} onClick={(e) => handleMenu(e, "block")}>
+                        <Icon icon={Utils.getValue(blocks, "key", active.block || "p", "icon")} />
                         <BlockNames>
                             {blocks.map((block) => <BlockName
                                 key={block.key}
@@ -650,7 +1050,7 @@ function EditorInput(props) {
                     </Block>
                     <Line />
                 </>}
-                {withSizes && <>
+                {has("size") && <>
                     <Block ref={sizeRef} onClick={(e) => handleMenu(e, "size")}>
                         <BlockNames>
                             <BlockName isHidden={Boolean(active.size)}>
@@ -664,17 +1064,17 @@ function EditorInput(props) {
                     </Block>
                     <Line />
                 </>}
-                {FORMATS.map((action) => <Action
+                {formats.map((action) => <Action
                     key={action.key}
                     variant="black"
                     icon={action.icon}
                     tooltip={action.tooltip}
                     tooltipVariant="bottom"
                     isActive={Boolean(active[action.key])}
-                    onClick={(e) => handleCommand(e, action.command)}
+                    onClick={(e) => handleCommand(e, action.command, action.value)}
                     isSmall
                 />)}
-                {withColors && COLORS.map((color) => <Action
+                {has("color") && COLORS.map((color) => <Action
                     key={color.key}
                     passedRef={colorRefs[color.key]}
                     variant="black"
@@ -685,8 +1085,8 @@ function EditorInput(props) {
                     onClick={(e) => handleMenu(e, color.key)}
                     isSmall
                 />)}
-                <Line />
-                {withAlign && <>
+                {(formats.length > 0 || has("color")) && <Line />}
+                {has("align") && <>
                     <Action
                         passedRef={alignRef}
                         variant="black"
@@ -707,7 +1107,7 @@ function EditorInput(props) {
                     />)}
                     <Line />
                 </>}
-                {LISTS.map((list) => <Action
+                {has("list") && LISTS.map((list) => <Action
                     key={list.key}
                     passedRef={list.key === "list" ? listRef : numberRef}
                     variant="black"
@@ -718,32 +1118,58 @@ function EditorInput(props) {
                     onClick={(e) => handleMenu(e, list.key)}
                     isSmall
                 />)}
-                <Line />
-                {!!onMedia && <>
-                    <Action
-                        variant="black"
-                        icon="image"
-                        tooltip="GENERAL_FORMAT_IMAGE"
-                        tooltipVariant="bottom"
-                        onClick={(e) => handleMedia(e, MediaType.IMAGE)}
-                        isSmall
-                    />
-                    {withFiles && <Action
-                        variant="black"
-                        icon="attachment"
-                        tooltip="GENERAL_FORMAT_FILE"
-                        tooltipVariant="bottom"
-                        onClick={(e) => handleMedia(e, MediaType.ANY)}
-                        isSmall
-                    />}
-                </>}
-                {withTables && <Action
+                {has("check") && <Action
+                    variant="black"
+                    icon="list-check"
+                    tooltip="GENERAL_FORMAT_LIST_CHECK"
+                    tooltipVariant="bottom"
+                    isActive={Boolean(active.check)}
+                    onClick={handleCheckList}
+                    isSmall
+                />}
+                {(has("list") || has("check")) && <Line />}
+                {hasImages && <Action
+                    variant="black"
+                    icon="image"
+                    tooltip="GENERAL_FORMAT_IMAGE"
+                    tooltipVariant="bottom"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleMedia(MediaType.IMAGE);
+                    }}
+                    isSmall
+                />}
+                {hasFiles && <Action
+                    passedRef={fileRef}
+                    variant="black"
+                    icon="attachment"
+                    tooltip="GENERAL_FORMAT_FILE"
+                    tooltipVariant="bottom"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        if (onUpload) {
+                            handleMenu(e, "file");
+                        } else {
+                            handleMedia(MediaType.ANY);
+                        }
+                    }}
+                    isSmall
+                />}
+                {has("table") && <Action
                     passedRef={tableRef}
                     variant="black"
                     icon="table"
                     tooltip="GENERAL_FORMAT_TABLE"
                     tooltipVariant="bottom"
                     onClick={(e) => handleMenu(e, "table")}
+                    isSmall
+                />}
+                {has("line") && <Action
+                    variant="black"
+                    icon="divider"
+                    tooltip="GENERAL_FORMAT_LINE"
+                    tooltipVariant="bottom"
+                    onClick={(e) => handleCommand(e, "InsertHorizontalRule")}
                     isSmall
                 />}
                 {variables.length > 0 && <Action
@@ -755,7 +1181,7 @@ function EditorInput(props) {
                     onClick={(e) => handleMenu(e, "variable")}
                     isSmall
                 />}
-                {withLinks && <Action
+                {has("link") && <Action
                     variant="black"
                     icon="insert-link"
                     tooltip="GENERAL_FORMAT_LINK"
@@ -763,14 +1189,14 @@ function EditorInput(props) {
                     onClick={handleLink}
                     isSmall
                 />}
-                <Action
+                {has("clear") && <Action
                     variant="black"
                     icon="format-clear"
                     tooltip="GENERAL_FORMAT_CLEAR"
                     tooltipVariant="bottom"
                     onClick={(e) => handleCommand(e, "RemoveFormat")}
                     isSmall
-                />
+                />}
 
                 <Menu
                     open={menu === "block"}
@@ -781,9 +1207,10 @@ function EditorInput(props) {
                 >
                     {blocks.map((block) => <MenuItem
                         key={block.key}
+                        icon={block.icon}
                         message={block.message}
                         isSelected={(active.block || "p") === block.key}
-                        onClick={() => runCommand("FormatBlock", block.key)}
+                        onClick={() => handleBlock(block.key)}
                     />)}
                 </Menu>
                 <Menu
@@ -849,6 +1276,23 @@ function EditorInput(props) {
                         onClick={() => runCommand(align.command)}
                     />)}
                 </Menu>
+                <Menu
+                    open={menu === "file"}
+                    targetRef={fileRef}
+                    direction="bottom right"
+                    onClose={handleMenuClose}
+                    gap={4}
+                >
+                    <MenuItem
+                        message="GENERAL_FILE_NEW"
+                        onClick={handleUploadOpen}
+                    />
+                    <MenuItem
+                        isHidden={!onMedia}
+                        message="GENERAL_FILE_EXISTING"
+                        onClick={() => handleMedia(MediaType.ANY)}
+                    />
+                </Menu>
                 <EditorVariables
                     open={menu === "variable"}
                     targetRef={varRef}
@@ -866,7 +1310,14 @@ function EditorInput(props) {
                     <EditorTable onSelect={handleTable} />
                 </Menu>
             </Toolbar>}
-            <Content minHeight={minHeight} maxHeight={maxHeight}>
+            <Content
+                centerImages={centerImages}
+                minHeight={minHeight}
+                maxHeight={maxHeight}
+                onMouseMove={handleResizeHover}
+                onMouseLeave={handleResizeLeave}
+                onWheel={handleResizeLeave}
+            >
                 <Editor
                     tinymceScriptSrc={`${Navigate.getAppUrl()}/tinymce/tinymce.min.js`}
                     value={shownValue}
@@ -876,6 +1327,9 @@ function EditorInput(props) {
                     onFocus={onFocus}
                     onBlur={onBlur}
                     onNodeChange={handleNodeChange}
+                    onKeyUp={handleKeyUp}
+                    onKeyDown={onKeyDown}
+                    onMouseDown={handleMouseDown}
                     init={{
                         inline              : true,
                         menubar             : false,
@@ -887,13 +1341,26 @@ function EditorInput(props) {
                         plugins             : [ "autolink", "lists", "link", "table" ],
                         link_default_target : "_blank",
                         contextmenu         : "table",
+                        object_resizing     : false,
+                        ...(has("line") ? { text_patterns : TEXT_PATTERNS } : {}),
 
                         // The actions are the ones of the toolbar below, as the ones of the editor
                         // float over the text and move by their own when the content is scrolled
                         toolbar             : false,
+                        ...init,
                     }}
                 />
             </Content>
+            {Boolean(resize) && <Resize className="editor-resize" style={resize}>
+                <ResizeHandle isLeft onMouseDown={(e) => handleResizeStart(e, true)} />
+                <ResizeHandle onMouseDown={(e) => handleResizeStart(e, false)} />
+            </Resize>}
+            {Boolean(onUpload) && <FileInput
+                ref={uploadRef}
+                type="file"
+                onChange={handleUpload}
+                multiple
+            />}
         </Container>
 
         <EditorLink
@@ -917,6 +1384,7 @@ EditorInput.propTypes = {
     className    : PropTypes.string,
     isFocused    : PropTypes.bool,
     isDisabled   : PropTypes.bool,
+    centerImages : PropTypes.bool,
     withLabel    : PropTypes.bool,
     name         : PropTypes.string,
     value        : PropTypes.string,
@@ -924,19 +1392,20 @@ EditorInput.propTypes = {
     rows         : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     maxRows      : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     titles       : PropTypes.array,
-    withLinks    : PropTypes.bool,
-    withFiles    : PropTypes.bool,
-    withTables   : PropTypes.bool,
-    withColors   : PropTypes.bool,
-    withSizes    : PropTypes.bool,
-    withAlign    : PropTypes.bool,
+    toolbar      : PropTypes.array,
     filesUrl     : PropTypes.string,
     outsideLabel : PropTypes.bool,
     variables    : PropTypes.array,
+    init         : PropTypes.object,
     onChange     : PropTypes.func.isRequired,
     onMedia      : PropTypes.func,
+    onUpload     : PropTypes.func,
+    onInit       : PropTypes.func,
     onFocus      : PropTypes.func,
     onBlur       : PropTypes.func,
+    onKeyUp      : PropTypes.func,
+    onKeyDown    : PropTypes.func,
+    onMouseDown  : PropTypes.func,
 };
 
 /**
@@ -947,19 +1416,16 @@ EditorInput.defaultProps = {
     className    : "",
     isFocused    : false,
     isDisabled   : false,
+    centerImages : false,
     withLabel    : false,
     value        : "",
     placeholder  : "",
     titles       : [ "h1", "h2", "h3" ],
-    withLinks    : true,
-    withFiles    : true,
-    withTables   : true,
-    withColors   : true,
-    withSizes    : false,
-    withAlign    : true,
+    toolbar      : [ "block", "format", "color", "align", "list", "image", "file", "table", "link", "clear" ],
     filesUrl     : "",
     outsideLabel : false,
     variables    : [],
+    init         : {},
 };
 
 export default EditorInput;
