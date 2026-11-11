@@ -335,7 +335,13 @@ function SelectInput(props) {
     };
 
     // Handles the Focus
+    // Pressing the arrow of a focused input blurs it before the click focuses it again, so
+    // the Blur that is still waiting is canceled, or it would close the options it opened
     const handleFocus = () => {
+        if (timer) {
+            window.clearTimeout(timer);
+            setTimer(null);
+        }
         setStyle({ ...initStyle });
         setSelectedIndex(valueKey);
         setInitialVal(selectedValRef.current);
