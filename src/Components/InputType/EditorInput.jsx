@@ -767,7 +767,15 @@ function EditorInput(props) {
         if (!editor) {
             return;
         }
-        const list    = editor.dom.getParent(editor.selection.getNode(), "ul,ol");
+
+        // A selection outside of the text, like the one a click on a tab leaves, marks nothing,
+        // as the lists and the formats of the page would be found as the ones of the text
+        const node = editor.selection.getNode();
+        if (!editor.getBody().contains(node)) {
+            setActive({});
+            return;
+        }
+        const list    = editor.dom.getParent(node, "ul,ol");
         const isCheck = Boolean(list && editor.dom.hasClass(list, CHECK_LIST));
         setActive({
             block     : getBlock(editor),
