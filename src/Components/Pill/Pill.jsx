@@ -22,7 +22,7 @@ const STATE_VARIANTS = {
 };
 
 // Styles
-const Container = Styled.span.attrs(({ variant, isOutlined, isSmall, withDot, smallRadius }) => ({ variant, isOutlined, isSmall, withDot, smallRadius }))`
+const Container = Styled.span.attrs(({ variant, pillColor, isOutlined, isSmall, withDot, smallRadius }) => ({ variant, pillColor, isOutlined, isSmall, withDot, smallRadius }))`
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -41,7 +41,7 @@ const Container = Styled.span.attrs(({ variant, isOutlined, isSmall, withDot, sm
         color: var(--font-lighter);
         background-color: var(--lighter-gray);
     ` : `
-        color: var(--${props.variant}-color);
+        color: ${props.pillColor};
         background-color: color-mix(in srgb, currentColor 12%, transparent);
     `}
 
@@ -92,6 +92,12 @@ function Pill(props) {
     const { showTooltip, hideTooltip } = Store.useAction("core");
 
 
+    // Returns the Color of a Variant, which can also be a hex color
+    const getColor = (pillVariant) => {
+        return pillVariant.startsWith("#") ? pillVariant : `var(--${pillVariant}-color)`;
+    };
+
+
     // Handles the Tooltip
     const handleTooltip = () => {
         if (tooltip) {
@@ -101,6 +107,7 @@ function Pill(props) {
 
 
     // Do the Render
+    const pillVariant = STATE_VARIANTS[variant] || variant || "gray";
     if (isHidden) {
         return <React.Fragment />;
     }
@@ -109,7 +116,8 @@ function Pill(props) {
         onMouseEnter={tooltip ? handleTooltip : undefined}
         onMouseLeave={tooltip ? hideTooltip : undefined}
         className={`pill ${className}`}
-        variant={STATE_VARIANTS[variant] || variant || "gray"}
+        variant={pillVariant}
+        pillColor={getColor(pillVariant)}
         isOutlined={isOutlined}
         isSmall={isSmall}
         withDot={withDot}
