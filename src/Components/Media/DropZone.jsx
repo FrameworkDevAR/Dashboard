@@ -171,9 +171,9 @@ function DropZone(props) {
             return;
         }
 
-        const ownDialog = containerRef.current?.closest(".dialog");
+        const ownDialog = /** @type {HTMLElement} */ (containerRef.current?.closest(".dialog"));
         const ownLevel  = ownDialog ? Number(ownDialog.dataset.level) : 0;
-        const levels    = Array.from(document.querySelectorAll(".dialog"), (node) => Number(node.dataset.level));
+        const levels    = Array.from(document.querySelectorAll(".dialog"), (node) => Number(/** @type {HTMLElement} */ (node).dataset.level));
         if (ownLevel !== Math.max(0, ...levels)) {
             return;
         }
@@ -210,7 +210,7 @@ function DropZone(props) {
         try {
             await onUrl(fileUrl, fileName);
             setShowUpload(false);
-        } catch (/** @type {object} */ errors) {
+        } catch (errors) {
             setError(errors.form || errors.fileUrl);
         } finally {
             setUploading(false);

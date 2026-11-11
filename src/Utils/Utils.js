@@ -1237,6 +1237,7 @@ function getVisibleChildren(children) {
  * @returns {Array<[ number, React.ReactElement ]>}
  */
 function getVisibleEntries(children) {
+    /** @type {Array<[ number, React.ReactElement ]>} */
     const result = [];
     for (const [ index, child ] of getChildren(children).entries()) {
         const has = hasProp(child.props, "isHidden");
@@ -1916,7 +1917,8 @@ function openFile(source, signal = null) {
  * @returns {boolean}
  */
 function isMacOS() {
-    const platform = window.navigator.userAgentData?.platform || window.navigator.platform || "";
+    const navigator = /** @type {Navigator & { userAgentData?: { platform: string } }} */ (window.navigator);
+    const platform  = navigator.userAgentData?.platform || navigator.platform || "";
     return platform.toLowerCase().includes("mac");
 }
 

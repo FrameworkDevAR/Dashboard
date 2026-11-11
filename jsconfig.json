@@ -1,17 +1,19 @@
 {
     "compilerOptions": {
-        "checkJs"          : true,
-        "jsx"              : "react",
-        "module"           : "esNext",
-        "target"           : "esNext",
-        "moduleResolution" : "bundler",
-        "noImplicitThis"   : false,
-        "noImplicitAny"    : false,
-        "strictNullChecks" : false,
-        "paths"            : {
+        "checkJs"                    : true,
+        "skipLibCheck"               : true,
+        "maxNodeModuleJsDepth"       : 0,
+        "jsx"                        : "react",
+        "module"                     : "esNext",
+        "target"                     : "esNext",
+        "moduleResolution"           : "bundler",
+        "noImplicitThis"             : false,
+        "noImplicitAny"              : false,
+        "strictNullChecks"           : false,
+        "useUnknownInCatchVariables" : false,
+        "paths"                      : {
             "*" : [
-                "./src/*",
-                "./node_modules/*"
+                "./src/*"
             ]
         }
     },

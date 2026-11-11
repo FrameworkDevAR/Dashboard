@@ -25,7 +25,7 @@ const dataStyles = css`
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 
-    ${(props) => props.maxHeight > 0 && `
+    ${(/** @type {{ maxHeight: number }} */ props) => props.maxHeight > 0 && `
         max-height: ${props.maxHeight}px;
         overflow: auto;
     `}

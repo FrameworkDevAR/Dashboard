@@ -189,7 +189,7 @@ function useForm(slice, initialData, edit = undefined, onSubmit = undefined, sta
             if (onSubmit) {
                 onSubmit(response);
             }
-        } catch (/** @type {object} */ errors) {
+        } catch (errors) {
             endLoading();
             setErrorsInt(errors);
         }

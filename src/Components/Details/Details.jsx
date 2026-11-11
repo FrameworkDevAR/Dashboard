@@ -186,7 +186,9 @@ function Details(props) {
             return undefined;
         }
         setWidth(widthRef.current);
-        return () => document.body.style.removeProperty(widthVar);
+        return () => {
+            document.body.style.removeProperty(widthVar);
+        };
     }, [ resizable, isShown, widthVar ]);
 
 

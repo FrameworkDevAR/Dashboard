@@ -33,7 +33,9 @@ function RouterRedirect(props) {
     // left out, as the login lands on them for an instant before it navigates
     React.useEffect(() => {
         const isAuth = AUTH_URLS.some((key) => rest.startsWith(NLS.url(key)));
-        if (rest && !isQuiet && !isAuth && import.meta.env.DEV) {
+        // The Dashboard has no types of Vite, which gives the env to the app
+        const isDev  = /** @type {any} */ (import.meta).env.DEV;
+        if (rest && !isQuiet && !isAuth && isDev) {
             // eslint-disable-next-line no-console
             console.warn(`No Route matches "${rest}", so it went to "${to}"`);
         }

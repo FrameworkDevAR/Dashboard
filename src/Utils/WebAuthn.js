@@ -3,6 +3,11 @@ const OFFER_KEY  = "passkey-offer";
 const OFFER_DAYS = 30;
 const QUIET_TIME = 5000;
 
+/**
+ * @typedef {PublicKeyCredential & { response: AuthenticatorAttestationResponse }} CreatedCredential
+ * @typedef {PublicKeyCredential & { response: AuthenticatorAssertionResponse }}   FoundCredential
+ */
+
 
 
 /**
@@ -123,11 +128,12 @@ async function create(options, isQuiet = false, onlyDevice = false) {
 
     try {
         // The browser may never answer a quiet one it chose not to save, so it gets a limit
-        const credential = await navigator.credentials.create({
+        const credential = /** @type {CreatedCredential} */ (await navigator.credentials.create({
             publicKey,
+            // @ts-expect-error The types of the browser do not have the mediation of a create yet
             mediation : isQuiet ? "conditional" : undefined,
             signal    : isQuiet ? AbortSignal.timeout(QUIET_TIME) : undefined,
-        });
+        }));
         return {
             origin            : getOrigin(),
             clientDataJSON    : toBase64(credential.response.clientDataJSON),
@@ -157,11 +163,11 @@ async function get(options, isAutofill = false, signal = undefined) {
     };
 
     try {
-        const credential = await navigator.credentials.get({
+        const credential = /** @type {FoundCredential} */ (await navigator.credentials.get({
             publicKey,
             signal,
             mediation : isAutofill ? "conditional" : undefined,
-        });
+        }));
         return {
             origin            : getOrigin(),
             credentialKey     : toBase64(credential.rawId),

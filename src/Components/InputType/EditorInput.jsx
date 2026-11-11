@@ -417,7 +417,7 @@ function EditorInput(props) {
     const sentRef   = React.useRef(null);
 
     // The Current State
-    const [ active, setActive ] = React.useState({});
+    const [ active, setActive ] = React.useState(/** @type {{ [key: string]: any }} */ ({}));
     const [ menu,   setMenu   ] = React.useState("");
     const [ lift,   setLift   ] = React.useState(0);
     const [ resize, setResize ] = React.useState(null);
