@@ -486,8 +486,16 @@ function EditorInput(props) {
         ));
     }, [ value, filesUrl ]);
 
+    // The editor keeps the html it rewrote until the user edits it, as the editor sets the given
+    // one again on each render when they differ, which replaces the node that is being clicked
+    const [ rewritten, setRewritten ] = React.useState({ source : "", content : "" });
+    const editorValue = rewritten.source === shownValue ? rewritten.content : shownValue;
+
     // Handles the Change
     const handleChange = (content) => {
+        if (!touchRef.current) {
+            setRewritten({ source : shownValue, content });
+        }
         let newValue = content;
         if (filesUrl) {
             newValue = content.replace(IMAGE_SRC, (match, start, src) => (
@@ -1329,7 +1337,7 @@ function EditorInput(props) {
             >
                 <Editor
                     tinymceScriptSrc={`${Navigate.getAppUrl()}/tinymce/tinymce.min.js`}
-                    value={shownValue}
+                    value={editorValue}
                     disabled={isDisabled}
                     onInit={handleInit}
                     onEditorChange={handleChange}
