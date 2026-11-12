@@ -126,14 +126,15 @@ function MediaList(props) {
     } = useMediaDrag(sortedItems, isGrid, canDrag, handleDrop);
 
 
-    // Handles the Action, keeping the Directory that is being opened
+    // Handles the Action, keeping the Directory that is being opened. The Items go with it in
+    // the order that they are shown
     const handleAction = (action, elem, e) => {
         if ((action.isSelect || action.isView) && (elem.isDir || elem.isBack)) {
             setOpenElem(elem);
             setOpening(true);
         }
         if (onAction) {
-            onAction(action, elem, e);
+            onAction(action, elem, e, sortedItems);
         }
     };
 
