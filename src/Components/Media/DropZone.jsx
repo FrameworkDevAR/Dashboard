@@ -15,6 +15,9 @@ import PromptDialog         from "../Dialogs/PromptDialog";
 
 
 
+// Constants
+const MIN_UPLOAD = 1000;
+
 // Styles
 const Container = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
     box-sizing: border-box;
@@ -117,11 +120,15 @@ function DropZone(props) {
     // The References
     const containerRef = React.useRef(null);
     const inputRef     = React.useRef(null);
+    const heightRef    = React.useRef(0);
+    const startRef     = React.useRef(0);
+    const timerRef     = React.useRef(null);
 
     // The Current State
     const [ uploading,  setUploading  ] = React.useState(false);
     const [ showUpload, setShowUpload ] = React.useState(false);
     const [ error,      setError      ] = React.useState("");
+    const [ lastUpload, setLastUpload ] = React.useState(null);
 
 
     // Handles the Click
@@ -199,6 +206,39 @@ function DropZone(props) {
         return () => window.removeEventListener("paste", handlePaste, true);
     });
 
+    // The upload stays for a minimum time, as one that ends right away would show the bar and
+    // the buttons again in a blink
+    React.useEffect(() => {
+        if (upload) {
+            if (!lastUpload) {
+                startRef.current = Date.now();
+            }
+            Utils.clearTimeout(timerRef);
+            setLastUpload(upload);
+            return;
+        }
+        if (!lastUpload) {
+            return;
+        }
+        const elapsed = Date.now() - startRef.current;
+        if (elapsed >= MIN_UPLOAD) {
+            setLastUpload(null);
+        } else {
+            Utils.setTimeout(timerRef, () => setLastUpload(null), MIN_UPLOAD - elapsed);
+        }
+    }, [ upload ]);
+
+    React.useEffect(() => {
+        return () => Utils.clearTimeout(timerRef);
+    }, []);
+
+    // Keeps the height without the upload, so the bar takes the same space as the buttons
+    React.useLayoutEffect(() => {
+        if (!upload && !lastUpload && containerRef.current) {
+            heightRef.current = containerRef.current.offsetHeight;
+        }
+    });
+
     // Handles the Upload Url
     const handleUploadUrl = async (fileUrl, fileName) => {
         if (!onUrl) {
@@ -225,15 +265,16 @@ function DropZone(props) {
 
 
     // Do the Render
+    const current  = upload || lastUpload;
     let   prefix   = onlyImages ? "DROPZONE_IMAGES_" : "DROPZONE_FILES_";
-    const percent  = upload ? Math.round((upload.index + upload.progress) / upload.total * 100) : 0;
+    const percent  = current ? Math.round((current.index + current.progress) / current.total * 100) : 0;
     let   sizeText = NLS.format("DROPZONE_MAX_SIZE", String(maxSize));
     let   amount   = `${percent}%`;
 
     // The browser only knows of the bytes it sends, so there is nothing to show before the
     // first ones leave and once they arrived, while the server stores the file
-    const isProcessing = Boolean(upload && upload.progress >= 1);
-    const isWaiting    = Boolean(upload && (upload.progress <= 0 || isProcessing));
+    const isProcessing = Boolean(current && current.progress >= 1);
+    const isWaiting    = Boolean(current && (current.progress <= 0 || isProcessing));
     if (isWaiting) {
         amount = "";
     }
@@ -241,8 +282,8 @@ function DropZone(props) {
     if (Number(maxVideoSize) && !onlyImages) {
         sizeText = NLS.format("DROPZONE_MAX_SIZE_VIDEO", String(maxSize), String(maxVideoSize));
     }
-    if (upload && upload.total > 1) {
-        amount = `${NLS.format("DROPZONE_UPLOADING_AMOUNT", String(upload.index + 1), String(upload.total))} · ${percent}%`;
+    if (current && current.total > 1) {
+        amount = `${NLS.format("DROPZONE_UPLOADING_AMOUNT", String(current.index + 1), String(current.total))} · ${percent}%`;
     }
     if (isSingle) {
         prefix = "DROPZONE_FILE_";
@@ -252,7 +293,7 @@ function DropZone(props) {
     }
     return <>
         <DragDrop
-            isHidden={isHidden || withoutDrop || Boolean(upload)}
+            isHidden={isHidden || withoutDrop || Boolean(current)}
             onlyImages={onlyImages}
             withSVG={withSVG}
             maxSize={maxSize}
@@ -261,12 +302,17 @@ function DropZone(props) {
             onError={onError}
         />
 
-        <Container ref={containerRef} className="dropzone-upload" isStacked={isStacked}>
-            {!!upload && <>
+        <Container
+            ref={containerRef}
+            className="dropzone-upload"
+            isStacked={isStacked}
+            style={current ? { minHeight : heightRef.current } : null}
+        >
+            {!!current && <>
                 <Content isStacked={isStacked}>
                     <UploadIcon icon="upload" />
                     <Info>
-                        <FileName>{NLS.format(isProcessing ? "DROPZONE_PROCESSING" : "DROPZONE_UPLOADING", upload.name)}</FileName>
+                        <FileName>{NLS.format(isProcessing ? "DROPZONE_PROCESSING" : "DROPZONE_UPLOADING", current.name)}</FileName>
                         <Text>{amount}</Text>
                     </Info>
                 </Content>
@@ -277,14 +323,14 @@ function DropZone(props) {
                 />
             </>}
 
-            {!upload && <Content isStacked={isStacked}>
+            {!current && <Content isStacked={isStacked}>
                 <UploadIcon icon="upload" />
                 <div>
                     <Title>{NLS.get(`${prefix}TITLE`)}</Title>
                     {!!Number(maxSize) && <Text>{sizeText}</Text>}
                 </div>
             </Content>}
-            {!upload && <Buttons>
+            {!current && <Buttons>
                 <Button
                     variant="outlined"
                     icon="upload"
