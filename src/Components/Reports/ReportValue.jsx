@@ -6,6 +6,7 @@ import Responsive           from "../../Core/Responsive";
 // Components
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
+import IconLink             from "../Link/IconLink";
 
 
 
@@ -69,7 +70,16 @@ const Help = Styled(Icon)`
     cursor: pointer;
 `;
 
+const Action = Styled(IconLink)`
+    position: absolute;
+    top: 12px;
+    right: 12px;
+`;
+
 const Amount = Styled.div.attrs(({ color, isSmall }) => ({ color, isSmall }))`
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     flex-grow: 2;
     font-size: ${(props) => props.isSmall ? "22px" : "28px"};
     font-weight: 600;
@@ -77,6 +87,14 @@ const Amount = Styled.div.attrs(({ color, isSmall }) => ({ color, isSmall }))`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+`;
+
+const Detail = Styled.span`
+    margin-left: 8px;
+    font-family: var(--google-font);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--font-lighter);
 `;
 
 const Iconography = Styled(Icon).attrs(({ color, background, isSmall }) => ({ color, background, isSmall }))`
@@ -111,8 +129,9 @@ const Unread = Styled.div`
  */
 function ReportValue(props) {
     const {
-        index, label, icon, value, unread, tooltip,
+        index, label, icon, value, detail, unread, tooltip,
         withLinks, isSmall, url, onClick,
+        action, actionTooltip, onAction,
     } = props;
 
     const { color, background } = COLORS[index % COLORS.length];
@@ -152,9 +171,18 @@ function ReportValue(props) {
                 />}
             </Header>
 
-            <Amount color={color} isSmall={isSmall} title={String(value)}>{value}</Amount>
+            <Amount color={color} isSmall={isSmall} title={String(value)}>
+                {value}
+                {!!detail && <Detail>{detail}</Detail>}
+            </Amount>
         </Content>
         {!!unread && <Unread>{unread}</Unread>}
+        {!!action && <Action
+            variant="black"
+            icon={action}
+            tooltip={actionTooltip}
+            onClick={onAction}
+        />}
     </Container>;
 }
 
@@ -163,16 +191,20 @@ function ReportValue(props) {
  * @type {object} propTypes
  */
 ReportValue.propTypes = {
-    index     : PropTypes.number.isRequired,
-    label     : PropTypes.string.isRequired,
-    icon      : PropTypes.string.isRequired,
-    value     : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]).isRequired,
-    unread    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
-    tooltip   : PropTypes.string,
-    withLinks : PropTypes.bool,
-    isSmall   : PropTypes.bool,
-    url       : PropTypes.string,
-    onClick   : PropTypes.func,
+    index         : PropTypes.number.isRequired,
+    label         : PropTypes.string.isRequired,
+    icon          : PropTypes.string.isRequired,
+    value         : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]).isRequired,
+    detail        : PropTypes.string,
+    unread        : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
+    tooltip       : PropTypes.string,
+    withLinks     : PropTypes.bool,
+    isSmall       : PropTypes.bool,
+    url           : PropTypes.string,
+    onClick       : PropTypes.func,
+    action        : PropTypes.string,
+    actionTooltip : PropTypes.string,
+    onAction      : PropTypes.func,
 };
 
 export default ReportValue;
