@@ -71,6 +71,7 @@ function MediaList(props) {
         className, isLoading, onAction, onDrop,
         canEdit, canSelect, canDrag, inDialog, withSpace, withTip,
         selectedPath, selectedPaths, items, path, none,
+        sort, onSort, total, hasMore, isLoadingMore, onMore,
     } = props;
 
 
@@ -85,9 +86,13 @@ function MediaList(props) {
     const [ isOpening,  setOpening    ] = React.useState(false);
     const [ addedPaths, setAddedPaths ] = React.useState([]);
     const [ view,     setView     ] = React.useState(localStorage.getItem("dashboard-media-view") || "grid");
-    const [ sort,     setSort     ] = React.useState(localStorage.getItem("dashboard-media-sort") || "name");
+    const [ ownSort,  setOwnSort  ] = React.useState(localStorage.getItem("dashboard-media-sort") || "name");
 
-    // The Back and the Directories are always first, no matter the sort
+    // The sort is given when the Items come in pages, as the server sorts them
+    const currentSort = onSort ? sort : ownSort;
+
+    // The Back and the Directories are always first, no matter the sort. The names are
+    // compared like the server does, so the Items that it sorted keep their order
     const sortedItems = React.useMemo(() => [ ...items ].sort((a, b) => {
         if (a.isBack !== b.isBack) {
             return a.isBack ? -1 : 1;
@@ -95,18 +100,18 @@ function MediaList(props) {
         if (a.isDir !== b.isDir) {
             return a.isDir ? -1 : 1;
         }
-        if (sort === "time") {
+        if (currentSort === "time" && a.modifiedTime !== b.modifiedTime) {
             return b.modifiedTime - a.modifiedTime;
         }
-        return a.name.localeCompare(b.name);
-    }), [ items, sort ]);
+        return a.name.localeCompare(b.name, undefined, { numeric : true, sensitivity : "base" });
+    }), [ items, currentSort ]);
 
     // Variables
     // A Directory that is being opened shows the loader instead of the one it leaves
     const showLoader = Boolean(isLoading && (!items.length || isOpening));
     const showNone   = Boolean(!isLoading && !items.length);
     const showItems  = Boolean(items.length && !showLoader);
-    const amount     = items.filter((elem) => !elem.isBack).length;
+    const amount     = total ?? items.filter((elem) => !elem.isBack).length;
     const isGrid     = view === "grid";
 
     // The items leave the space of the Breadcrumb, the Drop Zone and the Tip
@@ -144,10 +149,18 @@ function MediaList(props) {
         localStorage.setItem("dashboard-media-view", newView);
     };
 
-    // Handles the Sort, which is remembered
+    // Handles the Sort, which is remembered. When there are more Items to load they load
+    // again sorted, which shows the loader as when opening a Directory
     const handleSort = (newSort) => {
-        setSort(newSort);
+        setOwnSort(newSort);
         localStorage.setItem("dashboard-media-sort", newSort);
+        if (!onSort || newSort === currentSort) {
+            return;
+        }
+        if (hasMore) {
+            setOpening(true);
+        }
+        onSort(newSort);
     };
 
     // Returns true if the elem was just added
@@ -229,6 +242,26 @@ function MediaList(props) {
         });
     }, [ isLoading, sortedItems ]);
 
+    // Asks for more Items once the last one is seen, which also happens when the ones that
+    // came do not fill the list
+    React.useEffect(() => {
+        if (!hasMore || !onMore || isLoading || isLoadingMore || !containerRef.current) {
+            return undefined;
+        }
+        const last = containerRef.current.querySelector(`.media-item-${sortedItems.length - 1}`);
+        if (!last) {
+            return undefined;
+        }
+        const observer = new IntersectionObserver(([ entry ]) => {
+            if (entry.isIntersecting) {
+                observer.disconnect();
+                onMore();
+            }
+        });
+        observer.observe(last);
+        return () => observer.disconnect();
+    }, [ hasMore, isLoading, isLoadingMore, sortedItems, isGrid ]);
+
 
     // Do the Render
     return <Container
@@ -246,7 +279,8 @@ function MediaList(props) {
                     amount={NLS.pluralize("MEDIA_AMOUNT", amount)}
                     onClick={handleBreadcrumb}
                 />
-                <TabList selected={sort} onClick={handleSort}>
+                {isLoadingMore && <CircularLoader variant="primary" isTiny />}
+                <TabList selected={currentSort} onClick={handleSort}>
                     <TabItem
                         icon="sort-alpha"
                         value="name"
@@ -318,6 +352,12 @@ MediaList.propTypes = {
     items         : PropTypes.array,
     path          : PropTypes.string,
     none          : PropTypes.any,
+    sort          : PropTypes.string,
+    onSort        : PropTypes.func,
+    total         : PropTypes.number,
+    hasMore       : PropTypes.bool,
+    isLoadingMore : PropTypes.bool,
+    onMore        : PropTypes.func,
 };
 
 /**
