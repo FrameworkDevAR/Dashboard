@@ -13,7 +13,7 @@ import Html                 from "../Common/Html";
 
 
 // Styles
-const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace, noBorder, inlineChildren, isTight }) => ({ variant, iconColor, topSpace, bottomSpace, noBorder, inlineChildren, isTight }))`
+const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace, maxWidth, noBorder, inlineChildren, isTight }) => ({ variant, iconColor, topSpace, bottomSpace, maxWidth, noBorder, inlineChildren, isTight }))`
     position: relative;
     gap: 8px;
     padding: 12px 16px;
@@ -108,6 +108,10 @@ const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace,
 
     ${(props) => props.topSpace && `margin-top: ${props.topSpace}px;`}
     ${(props) => props.bottomSpace && `margin-bottom: ${props.bottomSpace}px;`}
+    ${(props) => props.maxWidth && `
+        box-sizing: border-box;
+        max-width: ${props.maxWidth}px;
+    `}
 `;
 
 const Content = Styled.div`
@@ -154,7 +158,7 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
 function Banner(props) {
     const {
         isHidden, className, variant, icon, iconColor, title, message,
-        topSpace, bottomSpace, noBorder, inlineChildren, isTight, children,
+        topSpace, bottomSpace, maxWidth, noBorder, inlineChildren, isTight, children,
     } = props;
 
 
@@ -186,6 +190,7 @@ function Banner(props) {
         iconColor={iconColor}
         topSpace={topSpace}
         bottomSpace={bottomSpace}
+        maxWidth={maxWidth}
         noBorder={noBorder}
         inlineChildren={inlineChildren}
         isTight={isTight}
@@ -221,6 +226,7 @@ Banner.propTypes = {
     message        : PropTypes.string,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    maxWidth       : PropTypes.number,
     noBorder       : PropTypes.bool,
     inlineChildren : PropTypes.bool,
     isTight        : PropTypes.bool,

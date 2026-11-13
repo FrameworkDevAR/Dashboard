@@ -40,29 +40,6 @@ const Sticky = Styled.div`
     }
 `;
 
-const Search = Styled(InputField)`
-    --input-border: var(--border-color-light);
-    --input-border-radius: var(--border-radius);
-
-    padding: 1px;
-
-    .input-content {
-        height: var(--filter-input-height);
-        min-height: 0;
-        background-color: var(--filter-input-background);
-        transition: all 0.2s;
-    }
-    .input-content:hover {
-        --input-border: var(--input-border-hover);
-    }
-    input {
-        background-color: transparent;
-    }
-    input::placeholder {
-        color: var(--font-lighter);
-    }
-`;
-
 const Results = Styled.span`
     margin-right: 4px;
     color: var(--darkest-gray);
@@ -212,7 +189,7 @@ function SortableList(props) {
 
     return <Container className={className}>
         {withSearch && <Sticky>
-            <Search
+            <InputField
                 name="sortableSearch"
                 icon="search"
                 placeholder="GENERAL_SEARCH"
@@ -221,6 +198,7 @@ function SortableList(props) {
                 onKeyDown={handleKeyDown}
                 onClear={() => setSearch("")}
                 hasClear={search.length > 0}
+                isFilter
             >
                 <Results>{search.length > 1 ? resultText : ""}</Results>
                 <IconLink
@@ -237,7 +215,7 @@ function SortableList(props) {
                     onClick={() => goToResult(1)}
                     isSmall
                 />
-            </Search>
+            </InputField>
         </Sticky>}
 
         <List ref={listRef}>

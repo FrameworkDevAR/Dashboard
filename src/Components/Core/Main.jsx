@@ -13,7 +13,7 @@ import Utils                from "../../Utils/Utils";
 const ANIMATION_TIME = 200;
 
 // Styles
-const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isAnimated }) => ({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isAnimated }))`
+const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isTransparent, withScroll, isAnimated }) => ({ withNavigation, isCollapsed, withDetails, wideDetails, largeDetails, isTransparent, withScroll, isAnimated }))`
     --main-navigation: ${(props) => props.withNavigation ? (props.isCollapsed ? "calc(var(--navigation-small-width) + 16px)" : "var(--navigation-width)") : "0px"};
     --main-details: ${(props) => props.withDetails ? `calc(${props.wideDetails ? "var(--details-width-wide)" : (props.largeDetails ? "var(--details-width-large)" : "var(--details-width)")} + var(--main-margin))` : "0px"};
 
@@ -26,7 +26,8 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
     margin-right: var(--main-margin);
     margin-bottom: var(--main-margin);
     border-radius: var(--main-radius);
-    background-color: var(--content-color);
+    background-color: ${(props) => props.isTransparent ? "transparent" : "var(--content-color)"};
+    ${(props) => props.withScroll && "overflow: auto;"}
 
     @media (max-width: ${Responsive.WIDTH_FOR_DETAILS}px) {
         width: calc(100vw - var(--sidebar-width) - var(--main-navigation) - var(--main-margin));
@@ -61,7 +62,10 @@ const Content = Styled.main.attrs(({ withNavigation, isCollapsed, withDetails, w
  * @returns {React.ReactElement}
  */
 function Main(props) {
-    const { className, withNavigation, withDetails, wideDetails, largeDetails, children } = props;
+    const {
+        className, withNavigation, withDetails, wideDetails, largeDetails,
+        isTransparent, withScroll, children,
+    } = props;
 
     const isForMenu   = Responsive.useIsForMenu();
     const showDetails = Responsive.useShowDetails(withDetails);
@@ -116,6 +120,8 @@ function Main(props) {
         withDetails={showDetails}
         largeDetails={largeDetails}
         wideDetails={wideDetails}
+        isTransparent={isTransparent}
+        withScroll={withScroll}
         isAnimated={isAnimated}
     >
         {children}
@@ -132,6 +138,8 @@ Main.propTypes = {
     withDetails    : PropTypes.bool,
     wideDetails    : PropTypes.bool,
     largeDetails   : PropTypes.bool,
+    isTransparent  : PropTypes.bool,
+    withScroll     : PropTypes.bool,
     children       : PropTypes.any,
 };
 
@@ -145,6 +153,8 @@ Main.defaultProps = {
     withDetails    : false,
     wideDetails    : false,
     largeDetails   : false,
+    isTransparent  : false,
+    withScroll     : false,
 };
 
 export default Main;

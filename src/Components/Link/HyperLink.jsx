@@ -29,12 +29,13 @@ const Variant = {
 
 
 // Styles
-const Link = Styled.a.attrs(({ variant }) => ({ variant }))`
+const Link = Styled.a.attrs(({ variant, isSmall }) => ({ variant, isSmall }))`
     position: relative;
     color: var(--link-color);
     text-decoration: none;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+    ${(props) => props.isSmall && "font-size: 12px;"}
 
     &:hover, &:focus {
         outline: none;
@@ -140,7 +141,7 @@ const Components = {
 function HyperLink(props) {
     const {
         passedRef, isHidden, variant, className,
-        target, message, html, children,
+        target, message, html, isSmall, children,
     } = props;
 
     const Component = Components[variant] || Link;
@@ -156,6 +157,7 @@ function HyperLink(props) {
         ref={passedRef}
         className={`link ${className}`}
         variant={variant}
+        isSmall={isSmall}
         href={Navigate.getHref(props)}
         target={target}
         onClick={onClick}
@@ -186,6 +188,7 @@ HyperLink.propTypes = {
     isWhatsApp : PropTypes.bool,
     onClick    : PropTypes.func,
     dontStop   : PropTypes.bool,
+    isSmall    : PropTypes.bool,
     children   : PropTypes.any,
 };
 

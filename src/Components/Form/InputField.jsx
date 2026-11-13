@@ -69,7 +69,7 @@ function InputField(props) {
     const {
         passedRef, isHidden, className, type, name,
         label, labelTooltip, icon, postIcon, prefixText, suffixText, value,
-        error, helperText, helperSteps, width, fullWidth, isRequired,
+        error, helperText, helperSteps, width, fullWidth, isFilter, isRequired,
         onChange, onInput, onFocus, onBlur,
         autoFocus, withLabel, shrinkLabel, bigLabel, outsideLabel, sideLabel,
         rightToggle, rightInput, atBottom, errorBackground, disabledBackground, isDisabled,
@@ -201,6 +201,7 @@ function InputField(props) {
         dataName={name}
         width={width}
         fullWidth={fullWidth}
+        isFilter={isFilter}
         hasError={hasError}
         bigLabel={bigLabel}
         outsideLabel={withOutside}
@@ -355,6 +356,7 @@ InputField.propTypes = {
     width             : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     minWidth          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     fullWidth         : PropTypes.bool,
+    isFilter          : PropTypes.bool,
     shrinkLabel       : PropTypes.bool,
     bigLabel          : PropTypes.bool,
     outsideLabel      : PropTypes.bool,
@@ -424,6 +426,7 @@ InputField.defaultProps = {
     extraOptions    : [],
     suggestParams   : {},
     fullWidth       : false,
+    isFilter        : false,
     shrinkLabel     : false,
     outsideLabel    : false,
     sideLabel       : false,

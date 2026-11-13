@@ -5,7 +5,7 @@ import Styled               from "styled-components";
 
 
 // Styles
-const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }) => ({ width, fullWidth, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }))`
+const Container = Styled.div.attrs(({ width, fullWidth, isFilter, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }) => ({ width, fullWidth, isFilter, hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground }))`
     --input-border: var(--input-border-color);
     position: relative;
     display: block;
@@ -15,6 +15,28 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
     `}
     ${(props) => (Boolean(props.width) && !props.rightInput) && `
         width: ${props.width}px;
+    `}
+
+    ${(props) => props.isFilter && `
+        --input-border: var(--border-color-light);
+        --input-border-radius: var(--border-radius);
+        padding: 1px;
+
+        .input-content {
+            height: var(--filter-input-height);
+            min-height: 0;
+            background-color: var(--filter-input-background);
+            transition: all 0.2s;
+        }
+        .input-content:hover {
+            --input-border: var(--input-border-hover);
+        }
+        input {
+            background-color: transparent;
+        }
+        input::placeholder {
+            color: var(--font-lighter);
+        }
     `}
 
     ${(props) => props.hasError && `
@@ -129,7 +151,7 @@ const Container = Styled.div.attrs(({ width, fullWidth, hasError, bigLabel, outs
  */
 function InputContainer(props) {
     const {
-        className, dataName, width, fullWidth,
+        className, dataName, width, fullWidth, isFilter,
         hasError, bigLabel, outsideLabel, sideLabel, bottomSpace, rightInput, atBottom, disabledBackground, children,
     } = props;
 
@@ -138,6 +160,7 @@ function InputContainer(props) {
         data-name={dataName}
         width={width}
         fullWidth={fullWidth}
+        isFilter={isFilter}
         hasError={hasError}
         bigLabel={bigLabel}
         outsideLabel={outsideLabel}
@@ -160,6 +183,7 @@ InputContainer.propTypes = {
     dataName           : PropTypes.string,
     width              : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     fullWidth          : PropTypes.bool,
+    isFilter           : PropTypes.bool,
     hasError           : PropTypes.bool,
     bigLabel           : PropTypes.bool,
     outsideLabel       : PropTypes.bool,
@@ -179,6 +203,7 @@ InputContainer.defaultProps = {
     className          : "",
     dataName           : "",
     fullWidth          : false,
+    isFilter           : false,
     hasError           : false,
     outsideLabel       : false,
     sideLabel          : false,

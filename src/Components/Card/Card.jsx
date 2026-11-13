@@ -8,10 +8,12 @@ import NLS                  from "../../Core/NLS";
 
 
 // Styles
-const Container = Styled.section`
+const Container = Styled.section.attrs(({ labelWidth }) => ({ labelWidth }))`
     padding: 16px 18px;
     border: 1px solid var(--border-color-light);
     border-radius: var(--border-radius-medium);
+
+    ${(props) => props.labelWidth && `--card-label-width: ${props.labelWidth}px;`}
 
     &:has(> .card-item) {
         padding-bottom: 10px;
@@ -35,14 +37,14 @@ const Title = Styled.h3`
  * @returns {React.ReactElement}
  */
 function Card(props) {
-    const { isHidden, className, message, children } = props;
+    const { isHidden, className, message, labelWidth, children } = props;
 
 
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={className}>
+    return <Container className={className} labelWidth={labelWidth}>
         {!!message && <Title>{NLS.get(message)}</Title>}
         {children}
     </Container>;
@@ -53,10 +55,11 @@ function Card(props) {
  * @type {object} propTypes
  */
 Card.propTypes = {
-    isHidden  : PropTypes.bool,
-    className : PropTypes.string,
-    message   : PropTypes.string,
-    children  : PropTypes.any,
+    isHidden   : PropTypes.bool,
+    className  : PropTypes.string,
+    message    : PropTypes.string,
+    labelWidth : PropTypes.number,
+    children   : PropTypes.any,
 };
 
 /**
