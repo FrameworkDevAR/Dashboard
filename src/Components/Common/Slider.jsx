@@ -6,6 +6,7 @@ import Styled               from "styled-components";
 import Utils                from "../../Utils/Utils";
 
 // Components
+import Icon                 from "../Common/Icon";
 import Video                from "../Common/Video";
 
 // Variants
@@ -17,143 +18,88 @@ const Variant = {
 
 
 // Styles
-const Container = Styled.section`
-    --slider-gap: 18px;
-    --slider-dot-bottom: 16px;
-    --slider-dot-size: 16px;
-    --slider-dot-gap: 8px;
-    --slider-arrow-width: 16px;
-    --slider-arrow-gap: 16px;
-    --slider-border-radius: var(--border-radius);
-
+const Container = Styled.section.attrs(({ ratio, radius }) => ({ ratio, radius }))`
     position: relative;
-    border-radius: var(--slider-border-radius);
-    touch-action: none;
     overflow: hidden;
+    border-radius: ${(props) => props.radius ? `${props.radius}px` : "var(--border-radius)"};
+    background-color: var(--lighter-gray);
+    touch-action: none;
+    ${(props) => props.ratio && `aspect-ratio: ${props.ratio};`}
 
-    &:hover .slider-arrows button,
+    &:hover .slider-arrow,
     &:hover .slider-dots {
         opacity: 1;
     }
 `;
 
 const Content = Styled.div`
-    position: relative;
-    width: 400%;
     display: flex;
-    transition: transform ease-in-out 0.5s;
+    height: 100%;
+
+    & > div {
+        flex-shrink: 0;
+        height: 100%;
+    }
 `;
 
 const Image = Styled.img`
     display: block;
-    max-width: 100%;
-    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
 `;
 
-const Arrows = Styled.nav`
+const Arrow = Styled.button`
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    transition: all 0.2s ease-in-out;
-`;
-
-const Button = Styled.button`
-    appearance: none;
-    position: absolute;
-    top: calc(50% - var(--slider-arrow-width) * 2);
-    width: calc(var(--slider-arrow-width) * 2 + var(--slider-arrow-gap));
-    height: calc(var(--slider-arrow-width) * 4);
-    padding: 0;
-    border: none;
-    background-color: transparent;
-    pointer-events: all;
-    outline: none;
-    opacity: 0;
     z-index: 1;
-    cursor: pointer;
-
-    &::before,
-    &::after {
-        content: "";
-        display: block;
-        position: absolute;
-        top: 50%;
-        width: var(--slider-arrow-width);
-        height: 2px;
-        background-color: var(--white-color);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        transition: all 0.2s;
-    }
-    &::before {
-        transform: rotate(45deg);
-    }
-    &::after {
-        transform: rotate(-45deg);
-    }
-    &:active::before {
-        transform: rotate(35deg);
-    }
-    &:active::after {
-        transform: rotate(-35deg);
-    }
-`;
-
-const Prev = Styled(Button)`
-    left: 0;
-    &::before,
-    &::after {
-        left: var(--slider-arrow-gap);
-        transform-origin: left center;
-    }
-`;
-
-const Next = Styled(Button)`
-    right: 0;
-    &::before,
-    &::after {
-        right: var(--slider-arrow-gap);
-        transform-origin: right center;
-    }
-`;
-
-const Dots = Styled.ul.attrs(({ showAlways }) => ({ showAlways }))`
-    position: absolute;
-    bottom: var(--slider-dot-bottom);
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
     align-items: center;
-    gap: var(--slider-dot-gap);
-    opacity: ${(props) => props.showAlways ? 1 : 0};
-    margin: 0;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     padding: 0;
-    list-style: none;
-    z-index: 2;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--font-color);
+    font-size: 18px;
+    cursor: pointer;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    &.slider-prev {
+        left: 8px;
+    }
+    &.slider-next {
+        right: 8px;
+    }
 `;
 
-const Dot = Styled.button.attrs(({ isActive }) => ({ isActive }))`
-    background-color: ${(props) => props.isActive ? "white" : "rgba(0, 0, 0, 0.7)"};
-    appearance: none;
-    display: block;
-    height: var(--slider-dot-size);
-    width: var(--slider-dot-size);
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 100%;
-    overflow: hidden;
-    text-indent: 100%;
-    outline: none;
-    transition: all 0.5s;
-    cursor: pointer;
+const Dots = Styled.div.attrs(({ showAlways }) => ({ showAlways }))`
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    opacity: ${(props) => props.showAlways ? 1 : 0};
+    transition: opacity 0.2s;
 
-    &:hover {
-        background-color: rgb(0, 0, 0);
+    span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.55);
+        cursor: pointer;
+        transition: background-color 0.35s, transform 0.35s;
+    }
+    span.slider-current {
+        background-color: white;
+        transform: scale(1.3);
     }
 `;
 
@@ -166,18 +112,23 @@ const Dot = Styled.button.attrs(({ isActive }) => ({ isActive }))`
  */
 function Slider(props) {
     const {
-        variant, data, className, height, withArrows, withDots, alwaysDots,
-        autoSlide, time, onClick, onSlide,
+        variant, data, className, height, ratio, radius, withArrows, withDots,
+        alwaysDots, autoSlide, time, onClick, onSlide,
     } = props;
 
 
     // The Current State
     const [ update,     setUpdate     ] = React.useState(0);
     const [ timer,      setTimer      ] = React.useState(null);
-    const [ index,      setIndex      ] = React.useState(0);
+    const [ index,      setIndex      ] = React.useState(props.index);
     const [ touchStart, setTouchStart ] = React.useState(0);
     const [ touchDiff,  setTouchDiff  ] = React.useState(0);
 
+
+    // Goes back to the given Index when it or the list changes
+    React.useEffect(() => {
+        setIndex(props.index < data.length ? props.index : 0);
+    }, [ props.index, data.length ]);
 
     // Start the Slider
     React.useEffect(() => {
@@ -246,7 +197,7 @@ function Slider(props) {
         setTouchDiff(0);
         if (Math.abs(touchDiff) < 50) {
             if (onClick && data[index]) {
-                onClick(data[index]);
+                onClick(data[index], index);
             }
         } else if (touchDiff < 0 && index < data.length - 1) {
             gotoDir(1);
@@ -259,53 +210,54 @@ function Slider(props) {
     // Variables
     const dots       = Utils.createArrayOf(data.length, 0);
     const showArrows = Boolean(withArrows && data.length > 1);
-    const showDots   = Boolean(withDots && data.length > 1);
+    const showDots   = Boolean((withDots || alwaysDots) && data.length > 1);
     const slStyle    = { width : `calc(100% / ${data.length})` };
     const cntStyle   = {
         height     : height ? `${height}px` : "inherit",
         width      : `calc(100% * ${data.length})`,
         transform  : `translateX(calc(-100% / ${data.length} * ${index} + ${touchDiff}px))`,
-        transition : touchDiff ? "none" : "transform ease-in-out 0.5s",
+        transition : touchDiff ? "none" : "transform 0.35s ease",
     };
 
 
     // Do the Render
     return <Container
         className={`slider ${className}`}
+        ratio={ratio}
+        radius={radius}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
     >
         <Content className="slider-content" style={cntStyle}>
-            {Object.entries(data).map(([ type, elem ]) => (
-                <div key={type} style={slStyle}>
-                    {variant === Variant.IMAGE && <Image
-                        alt={elem.name}
-                        src={elem.source}
-                        onClick={() => onClick(elem)}
-                    />}
-                    {variant === Variant.VIDEO && <Video
-                        title={elem.name}
-                        source={elem.source}
-                    />}
-                </div>
-            ))}
+            {data.map((elem, position) => <div key={elem.source || position} style={slStyle}>
+                {variant === Variant.IMAGE && <Image
+                    alt={elem.name}
+                    src={elem.source}
+                    onClick={() => onClick(elem, position)}
+                />}
+                {variant === Variant.VIDEO && <Video
+                    title={elem.name}
+                    source={elem.source}
+                />}
+            </div>)}
         </Content>
 
-        {showArrows && <Arrows className="slider-arrows">
-            <Prev onClick={() => gotoDir(-1)} />
-            <Next onClick={() => gotoDir(1)}  />
-        </Arrows>}
+        {showArrows && <>
+            <Arrow type="button" className="slider-arrow slider-prev" onClick={() => gotoDir(-1)}>
+                <Icon icon="prev" />
+            </Arrow>
+            <Arrow type="button" className="slider-arrow slider-next" onClick={() => gotoDir(1)}>
+                <Icon icon="next" />
+            </Arrow>
+        </>}
 
         {showDots && <Dots className="slider-dots" showAlways={alwaysDots}>
-            {dots.map((elem) => <li key={elem}>
-                <Dot
-                    isActive={Number(index) === Number(elem)}
-                    onClick={() => gotoIndex(elem)}
-                >
-                    {elem + 1}
-                </Dot>
-            </li>)}
+            {dots.map((elem) => <span
+                key={elem}
+                className={Number(index) === Number(elem) ? "slider-current" : ""}
+                onClick={() => gotoIndex(elem)}
+            />)}
         </Dots>}
     </Container>;
 }
@@ -321,6 +273,8 @@ Slider.propTypes = {
     onClick    : PropTypes.func,
     onSlide    : PropTypes.func,
     height     : PropTypes.number,
+    ratio      : PropTypes.string,
+    radius     : PropTypes.number,
     index      : PropTypes.number,
     withArrows : PropTypes.bool,
     withDots   : PropTypes.bool,
@@ -338,6 +292,8 @@ Slider.defaultProps = {
     variant    : Variant.IMAGE,
     className  : "",
     height     : 0,
+    ratio      : "",
+    radius     : 0,
     index      : 0,
     withArrows : false,
     withDots   : false,
