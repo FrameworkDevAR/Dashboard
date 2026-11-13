@@ -57,6 +57,17 @@ const H2 = Styled.h2`
     letter-spacing: var(--title-letter-spacing);
 `;
 
+const Title = Styled(H2)`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const Detail = Styled.span.attrs(({ isSmall }) => ({ isSmall }))`
+    flex: 1;
+    ${(props) => props.isSmall && "font-size: 15px;"}
+`;
+
 
 
 /**
@@ -66,7 +77,7 @@ const H2 = Styled.h2`
  */
 function DialogHeader(props) {
     const {
-        className, message, icon, isError,
+        className, message, detail, smallDetail, icon, isError,
         dontClose, onClose, childrenOnEnd, children,
     } = props;
 
@@ -75,7 +86,11 @@ function DialogHeader(props) {
     return <Header className={className} isError={isError}>
         <Start>
             {!!icon && <Icon icon={icon} size="24" />}
-            <H2>{NLS.get(message)}</H2>
+            {detail ? <Title>
+                <span>{NLS.get(message)}</span>
+                <span>·</span>
+                <Detail isSmall={smallDetail}>{detail}</Detail>
+            </Title> : <H2>{NLS.get(message)}</H2>}
             {!childrenOnEnd && children}
         </Start>
         <End>
@@ -98,6 +113,8 @@ function DialogHeader(props) {
 DialogHeader.propTypes = {
     className     : PropTypes.string,
     message       : PropTypes.string,
+    detail        : PropTypes.string,
+    smallDetail   : PropTypes.bool,
     icon          : PropTypes.string,
     isError       : PropTypes.bool,
     dontClose     : PropTypes.bool,
@@ -113,6 +130,8 @@ DialogHeader.propTypes = {
 DialogHeader.defaultProps = {
     className     : "",
     message       : "",
+    detail        : "",
+    smallDetail   : false,
     dontClose     : false,
     childrenOnEnd : false,
 };
