@@ -23,6 +23,17 @@ const FieldContent = Styled.div`
     align-items: center;
 `;
 
+const FieldTitle = Styled.div`
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+
+    .input-copy {
+        margin: -10px -2px -6px 0;
+    }
+`;
+
 const FieldHelper = Styled.p.attrs(({ isOutside }) => ({ isOutside }))`
     font-size: var(--font-size-small);
     margin: 4px 0 0 4px;
@@ -192,6 +203,22 @@ function InputField(props) {
     };
 
 
+    // The Copy of an Input with the Label outside goes next to it, as it would cover the text
+    const copyInLabel = Boolean(hasCopy && hasOutside && hasLabel);
+    const labelElem   = hasLabel && <InputLabel
+        className="inputfield-label"
+        isRequired={isRequired}
+        withTransform={!hasOutside && withTransform}
+        withValue={hasOutside || withValue}
+        isFocused={!hasOutside && isFocused}
+        isBigger={bigLabel}
+        isOutside={hasOutside}
+        message={label}
+        tooltip={labelTooltip}
+        onClick={(hasOutside && canFocus) ? handleLabel : undefined}
+    />;
+
+
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
@@ -211,18 +238,15 @@ function InputField(props) {
         atBottom={atBottom}
         disabledBackground={Boolean(disabledBackground && isDisabled)}
     >
-        {hasLabel && <InputLabel
-            className="inputfield-label"
-            isRequired={isRequired}
-            withTransform={!hasOutside && withTransform}
-            withValue={hasOutside || withValue}
-            isFocused={!hasOutside && isFocused}
-            isBigger={bigLabel}
-            isOutside={hasOutside}
-            message={label}
-            tooltip={labelTooltip}
-            onClick={(hasOutside && canFocus) ? handleLabel : undefined}
-        />}
+        {(hasLabel && copyInLabel) ? <FieldTitle className="inputfield-title">
+            {labelElem}
+            <InputCopy
+                className="input-copy"
+                copyValue={copyValue}
+                inputValue={String(value)}
+                onCopy={onCopy}
+            />
+        </FieldTitle> : labelElem}
         {(hasHelperText && hasOutside) && <FieldHelper className="inputfield-helper" isOutside>
             {NLS.get(helperText)}
         </FieldHelper>}
@@ -251,7 +275,7 @@ function InputField(props) {
                 withInsideCnt={withInsideCnt}
             />
             <InputCopy
-                isHidden={!hasCopy}
+                isHidden={!hasCopy || copyInLabel}
                 copyValue={copyValue}
                 inputValue={String(value)}
                 onCopy={onCopy}

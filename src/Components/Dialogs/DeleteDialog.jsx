@@ -1,27 +1,9 @@
 import React                from "react";
 import PropTypes            from "prop-types";
-import Styled               from "styled-components";
 
 // Components
 import ConfirmDialog        from "./ConfirmDialog";
-import ViewField            from "../Form/ViewField";
-
-
-
-// Styles
-const Names = Styled(ViewField)`
-    --input-padding: 12px 16px;
-
-    margin-top: 8px;
-    text-align: left;
-    overflow-wrap: anywhere;
-`;
-
-const List = Styled.ul`
-    margin: 0;
-    padding-left: 16px;
-    font-weight: 500;
-`;
+import DataCard             from "../Card/DataCard";
 
 
 
@@ -85,11 +67,11 @@ function DeleteDialog(props) {
         onSubmit={onSubmit}
         onClose={onClose}
     >
-        {hasNames && <Names maxHeight={180}>
-            <List>
-                {names.map((name, index) => <li key={index}>{name}</li>)}
-            </List>
-        </Names>}
+        <DataCard
+            isHidden={!hasNames}
+            message="GENERAL_WHERE_USED"
+            items={names}
+        />
     </ConfirmDialog>;
 }
 

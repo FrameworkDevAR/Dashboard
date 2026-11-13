@@ -70,6 +70,10 @@ const Content = Styled.div`
     gap: 8px;
 `;
 
+const Children = Styled.div`
+    margin-top: 12px;
+`;
+
 const Symbol = Styled.span`
     display: flex;
     animation: ${draw} 0.45s 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
@@ -133,7 +137,7 @@ function DialogResult(props) {
                 isHidden={!description}
                 message={description}
             />
-            {children}
+            {!!children && <Children>{children}</Children>}
         </Content>
     </Container>;
 }

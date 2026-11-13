@@ -39,6 +39,7 @@ const Copy = Styled.div`
     flex: none;
     align-self: center;
     margin-block: -6px;
+    margin-right: -8px;
 
     .link {
         margin-top: 0;

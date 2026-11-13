@@ -9,6 +9,7 @@ import NLS                  from "../../Core/NLS";
 // Dashboard
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
+import InputCopy            from "../Input/InputCopy";
 
 
 
@@ -134,6 +135,17 @@ const Title = Styled.h4`
     font-weight: 600;
 `;
 
+const Value = Styled.div.attrs(({ isTight }) => ({ isTight }))`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 0 0 ${(props) => props.isTight ? 38 : 48}px;
+    margin-right: -4px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+`;
+
 const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
     ${(props) => !props.inlineChildren && "padding: 12px 0 0 28px;"}
     ${(props) => props.inlineChildren && `
@@ -157,7 +169,7 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
  */
 function Banner(props) {
     const {
-        isHidden, className, variant, icon, iconColor, title, message,
+        isHidden, className, variant, icon, iconColor, title, message, value, hasCopy,
         topSpace, bottomSpace, maxWidth, noBorder, inlineChildren, isTight, children,
     } = props;
 
@@ -206,6 +218,10 @@ function Banner(props) {
                 <Html>{NLS.get(message)}</Html>
             </Text> : <Html>{NLS.get(message)}</Html>}
         </Content>
+        {!!value && <Value className="banner-value" isTight={isTight}>
+            {value}
+            <InputCopy isHidden={!hasCopy} copyValue={value} />
+        </Value>}
         <Children className="banner-children" inlineChildren={inlineChildren}>
             {children}
         </Children>
@@ -224,6 +240,8 @@ Banner.propTypes = {
     iconColor      : PropTypes.string,
     title          : PropTypes.string,
     message        : PropTypes.string,
+    value          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    hasCopy        : PropTypes.bool,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     maxWidth       : PropTypes.number,

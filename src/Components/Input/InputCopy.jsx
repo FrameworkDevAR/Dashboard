@@ -2,11 +2,17 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Utils
+import Utils                from "../../Utils/Utils";
+
 // Components
 import IconLink             from "../Link/IconLink";
 import Icon                 from "../Common/Icon";
 
 
+
+// Constants
+const COPIED_TIME = 1500;
 
 // Styles
 const Container = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
@@ -19,17 +25,31 @@ const Container = Styled.div.attrs(({ isFloating }) => ({ isFloating }))`
     `}
 `;
 
-const CopyLink = Styled(IconLink)`
+const Content = Styled.div`
+    position: relative;
     margin-top: 4px;
     margin-right: 2px;
 `;
 
-const IconCheck = Styled(Icon)`
+const Swap = Styled.div.attrs(({ isShown, turn }) => ({ isShown, turn }))`
+    transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+
+    ${(props) => !props.isShown && `
+        opacity: 0;
+        transform: rotate(${props.turn}deg) scale(0.6);
+        filter: blur(2px);
+    `}
+`;
+
+const CheckSwap = Styled(Swap)`
     position: absolute;
-    top: -4px;
-    left: -4px;
-    color: green;
-    font-size: 16px;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success-text-color);
+    pointer-events: none;
 `;
 
 
@@ -40,11 +60,19 @@ const IconCheck = Styled(Icon)`
  * @returns {React.ReactElement}
  */
 function InputCopy(props) {
-    const { isHidden, isFloating, copyValue, inputValue, onCopy } = props;
+    const { isHidden, className, isFloating, copyValue, inputValue, onCopy } = props;
 
+
+    // The References
+    const timerRef = React.useRef(null);
 
     // The Current State
     const [ showCopied, setCopied ] = React.useState(false);
+
+    // Clears the timer when it is removed
+    React.useEffect(() => {
+        return () => Utils.clearTimeout(timerRef);
+    }, []);
 
 
     // Handles the Text Copy
@@ -54,9 +82,10 @@ function InputCopy(props) {
             value = onCopy(value);
         }
 
+        // Another copy while the check is shown starts its time again
         navigator.clipboard.writeText(value);
         setCopied(true);
-        window.setTimeout(() => setCopied(false), 2000);
+        Utils.setTimeout(timerRef, () => setCopied(false), COPIED_TIME);
     };
 
 
@@ -64,14 +93,20 @@ function InputCopy(props) {
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container isFloating={isFloating}>
-        <CopyLink
-            variant="black"
-            icon="copy"
-            onClick={handleCopy}
-            isSmall
-        />
-        {showCopied && <IconCheck icon="check" />}
+    return <Container className={className} isFloating={isFloating}>
+        <Content>
+            <Swap isShown={!showCopied} turn={-30}>
+                <IconLink
+                    variant="black"
+                    icon="copy"
+                    onClick={handleCopy}
+                    isSmall
+                />
+            </Swap>
+            <CheckSwap isShown={showCopied} turn={30}>
+                <Icon icon="check" size="22" />
+            </CheckSwap>
+        </Content>
     </Container>;
 }
 
@@ -81,6 +116,7 @@ function InputCopy(props) {
  */
 InputCopy.propTypes = {
     isHidden   : PropTypes.bool,
+    className  : PropTypes.string,
     isFloating : PropTypes.bool,
     copyValue  : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     inputValue : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
@@ -93,6 +129,7 @@ InputCopy.propTypes = {
  */
 InputCopy.defaultProps = {
     isHidden   : false,
+    className  : "",
     isFloating : false,
 };
 
