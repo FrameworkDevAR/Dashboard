@@ -2,8 +2,8 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Core
-import NLS                  from "../../Core/NLS";
+// Components
+import Html                 from "./Html";
 
 // Variants
 const Variant = {
@@ -15,7 +15,7 @@ const Variant = {
 
 
 // Styles
-const Container = Styled.h3.attrs(({ variant, centered }) => ({ variant, centered }))`
+const Container = Styled.h3.attrs(({ variant, centered, isDashed }) => ({ variant, centered, isDashed }))`
     margin: 0;
     padding: 16px;
     font-size: 15px;
@@ -34,6 +34,19 @@ const Container = Styled.h3.attrs(({ variant, centered }) => ({ variant, centere
         color: var(--title-color);
     `}
 
+    ${(props) => props.isDashed && `
+        box-sizing: border-box;
+        min-height: 44px;
+        padding: 11px 16px;
+        font-size: var(--font-size);
+        font-weight: normal;
+        line-height: 20px;
+        color: var(--font-lighter);
+        background-color: var(--lightest-gray);
+        border: 1px dashed var(--input-border-color);
+        border-radius: var(--input-border-radius);
+    `}
+
     ${(props) => props.centered && "text-align: center;"}
 `;
 
@@ -45,7 +58,7 @@ const Container = Styled.h3.attrs(({ variant, centered }) => ({ variant, centere
  * @returns {React.ReactElement}
  */
 function NoneAvailable(props) {
-    const { isHidden, className, variant, centered, message } = props;
+    const { isHidden, className, variant, centered, isDashed, message } = props;
 
 
     // Do the Render
@@ -56,8 +69,9 @@ function NoneAvailable(props) {
         className={className}
         variant={variant}
         centered={centered}
+        isDashed={isDashed}
     >
-        {NLS.get(message)}
+        <Html variant="span" message={message} />
     </Container>;
 }
 
@@ -69,6 +83,7 @@ NoneAvailable.propTypes = {
     isHidden  : PropTypes.bool,
     className : PropTypes.string,
     centered  : PropTypes.bool,
+    isDashed  : PropTypes.bool,
     message   : PropTypes.string.isRequired,
     variant   : PropTypes.string,
 };
