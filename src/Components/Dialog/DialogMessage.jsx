@@ -14,6 +14,7 @@ import Html                 from "../Common/Html";
 const Container = Styled.div.attrs(({ centered, topSpace, bottomSpace }) => ({ centered, topSpace, bottomSpace }))`
     color: var(--black-color);
     font-weight: 400;
+    line-height: 1.5;
 
     ${(props) => props.centered ? "text-align: center;" : ""}
     ${(props) => props.topSpace && `margin-top: ${props.topSpace}px;`}
@@ -23,6 +24,7 @@ const Container = Styled.div.attrs(({ centered, topSpace, bottomSpace }) => ({ c
 const Content = Styled(Html).attrs(({ centered, noSpace, topSpace, bottomSpace }) => ({ centered, noSpace, topSpace, bottomSpace }))`
     color: var(--black-color);
     font-weight: 400;
+    line-height: 1.5;
 
     ${(props) => props.centered && "text-align: center;"}
     ${(props) => props.noSpace && "margin: 0;"}
