@@ -9,7 +9,7 @@ import ScrollFade           from "../Common/ScrollFade";
 
 
 // Styles
-const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, isNarrow, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }))`
+const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpacing, bigSpacing, gap, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }) => ({ isLoading, isCentered, withSpacing, bigSpacing, gap, isNarrow, minHeight, maxHeight, keptHeight, fullHeight, hideFooter, noOverflow }))`
     --dialog-content: var(--dialog-body);
 
     box-sizing: border-box;
@@ -17,6 +17,11 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
     max-height: var(--dialog-body);
     overscroll-behavior-y: none;
 
+    ${(props) => props.gap && `
+        display: flex;
+        flex-direction: column;
+        gap: ${props.gap}px;
+    `}
     ${(props) => (props.isLoading || props.isCentered) && `
         display: flex;
         justify-content: center;
@@ -72,7 +77,7 @@ const Container = Styled.main.attrs(({ isLoading, isCentered, isNarrow, withSpac
 function DialogBody(props) {
     const {
         className, isLoading, loadingMessage,
-        isCentered, isNarrow, bigSpacing, withSpacing,
+        isCentered, isNarrow, bigSpacing, withSpacing, gap,
         noOverflow, minHeight, maxHeight, keepHeight, fullHeight, hideFooter,
         withFade, passedRef, onScroll, children,
     } = props;
@@ -115,6 +120,7 @@ function DialogBody(props) {
         isNarrow={isNarrow}
         withSpacing={withSpacing}
         bigSpacing={bigSpacing}
+        gap={gap}
         minHeight={minHeight}
         maxHeight={maxHeight}
         keptHeight={keepHeight ? contentHeight : 0}
@@ -148,6 +154,7 @@ DialogBody.propTypes = {
     isCentered     : PropTypes.bool,
     isNarrow       : PropTypes.bool,
     withSpacing    : PropTypes.bool,
+    gap            : PropTypes.number,
     bigSpacing     : PropTypes.bool,
     minHeight      : PropTypes.number,
     maxHeight      : PropTypes.number,
