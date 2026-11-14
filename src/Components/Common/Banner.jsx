@@ -18,6 +18,7 @@ const Container = Styled.div.attrs(({ variant, iconColor, topSpace, bottomSpace,
     position: relative;
     gap: 8px;
     padding: 12px 16px;
+    color: var(--font-color);
     line-height: 1.4;
     overflow-wrap: anywhere;
     border: 1px solid;

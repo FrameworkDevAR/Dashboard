@@ -2,11 +2,12 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
-// Utils
+// Core & Utils
+import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
 
 // Components
-import Alert                from "../Form/Alert";
+import Banner               from "../Common/Banner";
 import Columns              from "../Form/Columns";
 
 
@@ -48,10 +49,11 @@ function Form(props) {
 
     // Do the Render
     return <Content ref={passedRef} className={className} bigGap={bigGap}>
-        <Alert
+        <Banner
             className="form-error"
+            isTight
             variant="error"
-            message={error}
+            message={Array.isArray(error) ? NLS.format(...error) : error}
         />
         {items}
     </Content>;

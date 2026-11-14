@@ -3,7 +3,7 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Components
-import Alert                from "../Form/Alert";
+import Banner               from "../Common/Banner";
 
 
 
@@ -24,10 +24,6 @@ const Container = Styled.section.attrs(({ hasTabs, hasPills, withBorder }) => ({
     `}
 `;
 
-const AlertText = Styled(Alert)`
-    margin-bottom: 12px;
-`;
-
 
 
 /**
@@ -46,7 +42,12 @@ function PageContainer(props) {
         hasPills={hasPills}
         withBorder={withBorder}
     >
-        <AlertText variant="error" message={error} />
+        <Banner
+            variant="error"
+            message={error}
+            bottomSpace={12}
+            isTight
+        />
 
         {children}
     </Container>;
