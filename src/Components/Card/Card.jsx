@@ -10,7 +10,7 @@ import NLS                  from "../../Core/NLS";
 // Styles
 const Container = Styled.section.attrs(({ labelWidth }) => ({ labelWidth }))`
     padding: 16px 18px;
-    border: 1px solid var(--border-color-light);
+    border: 1px solid var(--card-border-color, var(--border-color-light));
     border-radius: var(--border-radius-medium);
 
     ${(props) => props.labelWidth && `--card-label-width: ${props.labelWidth}px;`}
