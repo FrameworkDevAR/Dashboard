@@ -136,12 +136,29 @@ const Title = Styled.h4`
     font-weight: 600;
 `;
 
+const Body = Styled.div`
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+`;
+
 const Value = Styled.div.attrs(({ isTight }) => ({ isTight }))`
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 8px 0 0 ${(props) => props.isTight ? 38 : 48}px;
+    padding: ${(props) => props.isTight ? 0 : "8px 0 0 48px"};
+
+    ${(props) => props.isTight && `
+        .banner-copy {
+            margin: -8px 0;
+        }
+        .banner-copy > div {
+            margin-top: 0;
+        }
+    `}
     margin-right: -4px;
     font-weight: 600;
     overflow-wrap: anywhere;
@@ -197,6 +214,21 @@ function Banner(props) {
     if (isHidden || (!message && !title)) {
         return <React.Fragment />;
     }
+
+    // A tight Banner keeps the value next to the text, so the icon is centered on both
+    const valueInside = Boolean(isTight && value);
+    const textElem    = title ? <Text>
+        <Title>{NLS.get(title)}</Title>
+        <Html>{NLS.get(message)}</Html>
+    </Text> : <Html>{NLS.get(message)}</Html>;
+    const valueElem   = !!value && <Value className="banner-value" isTight={isTight}>
+        {value}
+        <InputCopy
+            className="banner-copy"
+            isHidden={!hasCopy}
+            copyValue={value}
+        />
+    </Value>;
     return <Container
         className={className}
         variant={variant}
@@ -214,15 +246,12 @@ function Banner(props) {
                 icon={bannerIcon}
                 size="20"
             />
-            {title ? <Text>
-                <Title>{NLS.get(title)}</Title>
-                <Html>{NLS.get(message)}</Html>
-            </Text> : <Html>{NLS.get(message)}</Html>}
+            {valueInside ? <Body>
+                {textElem}
+                {valueElem}
+            </Body> : textElem}
         </Content>
-        {!!value && <Value className="banner-value" isTight={isTight}>
-            {value}
-            <InputCopy isHidden={!hasCopy} copyValue={value} />
-        </Value>}
+        {!valueInside && valueElem}
         <Children className="banner-children" inlineChildren={inlineChildren}>
             {children}
         </Children>
