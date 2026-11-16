@@ -38,7 +38,7 @@ const Title = Styled.li`
  * @returns {React.ReactElement}
  */
 function NavigationList(props) {
-    const { isHidden, className, message, listID, onGrab, useExact, onAction, onClose, children } = props;
+    const { isHidden, className, message, listID, onGrab, useExact, onAction, children } = props;
 
     const { smallNav } = Store.useState("core");
 
@@ -47,7 +47,7 @@ function NavigationList(props) {
     // and the List says its ID, so they can be dropped in it
     const canDrag = Boolean(onGrab) && listID !== undefined && !smallNav;
     const items   = Utils.cloneChildren(children, (child) => ({
-        useExact, onAction, onClose,
+        useExact, onAction,
         ...(canDrag && child.props.elemID !== undefined && { onGrab }),
     }));
 
@@ -77,7 +77,6 @@ NavigationList.propTypes = {
     variant   : PropTypes.string,
     useExact  : PropTypes.bool,
     onAction  : PropTypes.func,
-    onClose   : PropTypes.func,
     children  : PropTypes.any,
 };
 

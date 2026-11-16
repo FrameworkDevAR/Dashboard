@@ -105,9 +105,9 @@ function NavigationItem(props) {
         className, message, html, url, href, emoji,
         icon, iconColor, afterIcon, amount, badge,
         elemID, isSelected, useExact, isDisabled, smallNav,
-        onAction, onClick, onClose, noClose,
+        onAction, onClick, noClose,
         hideActions, canEdit, canDelete, actions, onGrab,
-        canCollapse, isCollapsed, collapseOnSelect, markExpanded, children,
+        canCollapse, isCollapsed, markExpanded, children,
     } = props;
 
     const isSelect   = Navigate.useSelect();
@@ -135,9 +135,6 @@ function NavigationItem(props) {
     const handleClick = (e) => {
         if (isDisabled) {
             return;
-        }
-        if (onClose) {
-            onClose(e);
         }
         if (onClick) {
             onClick(e);
@@ -178,10 +175,10 @@ function NavigationItem(props) {
 
 
     // Variables
-    const hasActions   = canEdit || canDelete || canCollapse || collapseOnSelect || (Boolean(actions) && !isSmallNav);
+    const hasActions   = canEdit || canDelete || canCollapse || (Boolean(actions) && !isSmallNav);
     const canDrag      = !isSmallNav && Boolean(onGrab);
     const selected     = shouldSelect();
-    const showChildren = collapseOnSelect ? selected : (canCollapse ? !isCollapsed : true);
+    const showChildren = !canCollapse || !isCollapsed;
     const menuUrl      = Navigate.useMenuUrl(url || "");
 
 
@@ -231,13 +228,6 @@ function NavigationItem(props) {
                     onClick={(e) => handleAction(e, "COLLAPSE")}
                     isSmall
                 />}
-                {collapseOnSelect && <NavIcon
-                    variant="black"
-                    isSelected={selected}
-                    icon={selected ? "closed" : "open"}
-                    onClick={handleClick}
-                    isSmall
-                />}
                 {canEdit && <NavIcon
                     variant="black"
                     isSelected={selected}
@@ -285,7 +275,6 @@ NavigationItem.propTypes = {
     elemID           : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     onClick          : PropTypes.func,
     onAction         : PropTypes.func,
-    onClose          : PropTypes.func,
     noClose          : PropTypes.bool,
     hideActions      : PropTypes.bool,
     canEdit          : PropTypes.bool,
@@ -294,7 +283,6 @@ NavigationItem.propTypes = {
     onGrab           : PropTypes.func,
     canCollapse      : PropTypes.bool,
     isCollapsed      : PropTypes.bool,
-    collapseOnSelect : PropTypes.bool,
     markExpanded     : PropTypes.bool,
     isSelected       : PropTypes.bool,
     useExact         : PropTypes.bool,
@@ -315,7 +303,6 @@ NavigationItem.defaultProps = {
     canDelete        : false,
     canCollapse      : false,
     isCollapsed      : false,
-    collapseOnSelect : false,
     markExpanded     : false,
     isSelected       : false,
     isDisabled       : false,

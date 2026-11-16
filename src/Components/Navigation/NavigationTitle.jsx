@@ -25,7 +25,7 @@ const VARIANTS = {
 };
 
 // Styles
-const Container = Styled.header.attrs(({ smallNav, onlyIcon }) => ({ smallNav, onlyIcon }))`
+const Container = Styled.header`
     flex-shrink: 0;
     box-sizing: border-box;
     display: flex;
@@ -35,14 +35,6 @@ const Container = Styled.header.attrs(({ smallNav, onlyIcon }) => ({ smallNav, o
     height: var(--navigation-height, auto);
     padding: var(--navigation-title-padding, 12px 12px 10px 8px);
     z-index: 1;
-
-    ${(props) => props.onlyIcon && `
-        --navigation-title-icon: 24px;
-        justify-content: center;
-        padding-left: 0;
-        padding-right: 4px;
-        gap: 0;
-    `}
 
     @media (max-width: ${Responsive.WIDTH_FOR_MENU}px) {
         flex-wrap: wrap;
@@ -162,8 +154,7 @@ const Span2 = Styled.span`
 function NavigationTitle(props) {
     const {
         className, icon, href, message, fallback, subTitle, subCircle,
-        smallNav, onlyIcon, canAdd, canEdit, canManage,
-        noBack, onClick, onAction,
+        smallNav, canEdit, noBack, onAction,
     } = props;
 
     const parent = Navigate.useParent();
@@ -180,11 +171,8 @@ function NavigationTitle(props) {
 
 
     // Variables
-    const showLink   = (!icon || smallNav) && !noBack;
-    const showTitle  = !onlyIcon;
-    const showAdd    = canAdd && !smallNav;
-    const showEdit   = canEdit && !smallNav;
-    const showManage = canManage && !smallNav;
+    const showLink = (!icon || smallNav) && !noBack;
+    const showEdit = canEdit && !smallNav;
 
     // The border of the Pill separates it from the title
     const showBorder = !subCircle;
@@ -193,27 +181,24 @@ function NavigationTitle(props) {
     // Do the Render
     return <Container
         className={`navigation-title ${className}`}
-        smallNav={smallNav}
-        onlyIcon={onlyIcon}
     >
         <BackLink
             isHidden={noBack}
             className={showLink ? "" : "navigation-back"}
             icon="back"
-            href={onClick ? null : (href || parent)}
-            onClick={onClick}
+            href={href || parent}
             isSmall
         />
         {!!icon && <HeaderIcon icon={icon} withBack={!noBack} />}
 
-        {showTitle && <Title hasSubTitle={Boolean(subTitle)}>
+        <Title hasSubTitle={Boolean(subTitle)}>
             {!message ? NLS.get(fallback) : <>
                 {!!fallback && <Span1>{NLS.get(fallback)}</Span1>}
                 <Span2>{NLS.get(message)}</Span2>
             </>}
-        </Title>}
+        </Title>
 
-        {showTitle && !!subTitle && <SubTitle
+        {!!subTitle && <SubTitle
             className="navigation-subtitle"
             withBorder={showBorder}
         >
@@ -225,19 +210,9 @@ function NavigationTitle(props) {
             />}
         </SubTitle>}
 
-        {showAdd && <IconLink
-            icon="add"
-            onClick={(e) => handleAction(e, "ADD")}
-            isSmall
-        />}
         {showEdit && <IconLink
             icon="edit"
             onClick={(e) => handleAction(e, "EDIT")}
-            isSmall
-        />}
-        {showManage && <IconLink
-            icon="settings"
-            onClick={(e) => handleAction(e, "MANAGE")}
             isSmall
         />}
     </Container>;
@@ -256,13 +231,9 @@ NavigationTitle.propTypes = {
     subTitle  : PropTypes.string,
     subCircle : PropTypes.string,
     smallNav  : PropTypes.bool,
-    onlyIcon  : PropTypes.bool,
-    canAdd    : PropTypes.bool,
     canEdit   : PropTypes.bool,
-    canManage : PropTypes.bool,
     noBack    : PropTypes.bool,
     onAction  : PropTypes.func,
-    onClick   : PropTypes.func,
 };
 
 /**
@@ -274,10 +245,7 @@ NavigationTitle.defaultProps = {
     icon      : "",
     href      : "",
     smallNav  : false,
-    onlyIcon  : false,
-    canAdd    : false,
     canEdit   : false,
-    canManage : false,
     noBack    : false,
 };
 

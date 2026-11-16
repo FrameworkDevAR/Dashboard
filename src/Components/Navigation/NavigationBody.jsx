@@ -3,36 +3,26 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
-import Action               from "../../Core/Action";
 import Utils                from "../../Utils/Utils";
 
 // Components
-import NoneAvailable        from "../Common/NoneAvailable";
 import CircularLoader       from "../Loader/CircularLoader";
 import NavigationList       from "../Navigation/NavigationList";
-import Button               from "../Form/Button";
 
 
 
 // Styles
-const Container = Styled.nav.attrs(({ withSpacing }) => ({ withSpacing }))`
+const Container = Styled.nav`
     display: flex;
     flex-grow: 2;
     flex-direction: column;
     justify-content: flex-start;
     --navigation-body-offset: 6px;
 
-    padding: ${(props) => props.withSpacing && "var(--navigation-body-padding, 0px 16px 16px 6px)"};
+    padding: var(--navigation-body-padding, 0px 16px 16px 6px);
     margin-top: calc(var(--navigation-body-offset) * -1);
     padding-top: var(--navigation-body-offset);
     overflow: auto;
-`;
-
-const None = Styled(NoneAvailable)`
-    padding: 4px 0 24px 0;
-    font-size: 14px;
-    text-align: center;
-    background-color: transparent;
 `;
 
 const Ul = Styled.ul`
@@ -49,24 +39,7 @@ const Ul = Styled.ul`
  * @returns {React.ReactElement}
  */
 function NavigationBody(props) {
-    const {
-        className, passedRef, onAction, onClose, smallNav,
-        isLoading, none, canAdd, add, withSpacing, children,
-    } = props;
-
-    // The References
-    const navigationRef = React.useRef(null);
-    const elementRef    = passedRef || navigationRef;
-
-
-    // Handles the Action
-    const handleAdd = (e) => {
-        if (onAction) {
-            onAction(Action.get("ADD"));
-        }
-        e.stopPropagation();
-        e.preventDefault();
-    };
+    const { passedRef, onAction, smallNav, isLoading, children } = props;
 
 
     // Parse the Items
@@ -81,9 +54,6 @@ function NavigationBody(props) {
             if (onAction) {
                 childProps.onAction = onAction;
             }
-            if (onClose) {
-                childProps.onClose = onClose;
-            }
             if (smallNav && child.type === CircularLoader) {
                 childProps.isTiny = true;
             }
@@ -92,34 +62,16 @@ function NavigationBody(props) {
     }
 
 
-    // Variables
-    const showLoader = isLoading;
-    const showNone   = Boolean(!isLoading && !items.length && none);
-    const showAdd    = Boolean(showNone && canAdd && add);
-    const showItems  = Boolean(!isLoading && items.length);
-
-
     // Do the Render
     return <Container
-        ref={elementRef}
-        className={`navigation-body ${className}`}
-        withSpacing={withSpacing}
+        ref={passedRef}
+        className="navigation-body"
     >
-        {showLoader && <CircularLoader
+        {isLoading && <CircularLoader
             isTiny={smallNav}
             topSpace={20}
         />}
-        {showNone   && <div>
-            <None message={none} />
-            {showAdd && <Button
-                variant="outlined-accent"
-                icon="add"
-                message={add}
-                onClick={(e) => handleAdd(e)}
-                fullWidth
-            />}
-        </div>}
-        {showItems  && (addList ? <Ul>{items}</Ul> : items)}
+        {!isLoading && items.length > 0 && (addList ? <Ul>{items}</Ul> : items)}
     </Container>;
 }
 
@@ -128,18 +80,11 @@ function NavigationBody(props) {
  * @type {object} propTypes
  */
 NavigationBody.propTypes = {
-    className   : PropTypes.string,
-    passedRef   : PropTypes.any,
-    variant     : PropTypes.string,
-    isLoading   : PropTypes.bool,
-    none        : PropTypes.string,
-    canAdd      : PropTypes.bool,
-    add         : PropTypes.string,
-    withSpacing : PropTypes.bool,
-    smallNav    : PropTypes.bool,
-    onAction    : PropTypes.func,
-    onClose     : PropTypes.func,
-    children    : PropTypes.any,
+    passedRef : PropTypes.any,
+    isLoading : PropTypes.bool,
+    smallNav  : PropTypes.bool,
+    onAction  : PropTypes.func,
+    children  : PropTypes.any,
 };
 
 /**
@@ -147,10 +92,7 @@ NavigationBody.propTypes = {
  * @type {object} defaultProps
  */
 NavigationBody.defaultProps = {
-    className   : "",
-    none        : "",
-    isLoading   : false,
-    withSpacing : true,
+    isLoading : false,
 };
 
 export default NavigationBody;

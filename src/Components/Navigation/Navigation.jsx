@@ -13,19 +13,16 @@ import NavigationBody       from "./NavigationBody";
 import TopTitle             from "../Core/TopTitle";
 import MenuLink             from "../Link/MenuLink";
 import ScrollFade           from "../Common/ScrollFade";
-import IconLink             from "../Link/IconLink";
 
 
 
 // Styles
-const Container = Styled.main.attrs(({ isCollapsed, bottomCollapse }) => ({ isCollapsed, bottomCollapse }))`
+const Container = Styled.main.attrs(({ isCollapsed }) => ({ isCollapsed }))`
     position: relative;
     display: flex;
 
     ${(props) => props.isCollapsed && `
         --navigation-width: var(--navigation-small-width);
-    `}
-    ${(props) => (props.isCollapsed && props.bottomCollapse) && `
         --navigation-body-padding: 0 0 16px 0;
 
         .navigation {
@@ -73,19 +70,7 @@ const Footer = Styled.div`
     padding-top: 8px;
 `;
 
-const FloatCollapse = Styled(IconLink)`
-    --link-background: var(--lighter-gray);
-    --link-size: 18px;
-
-    position: absolute;
-    top: 22px;
-    left: calc(var(--navigation-width) - var(--link-size) / 2);
-    z-index: 4;
-    border: 1px solid var(--border-color-light);
-    background-color: var(--content-color);
-`;
-
-const BottomCollapse = Styled(MenuLink)`
+const Collapse = Styled(MenuLink)`
     --link-color: var(--navigation-color, var(--title-color));
     --link-hover: var(--navigation-hover-color, var(--title-color));
     --link-background: var(--navigation-hover, rgba(0, 0, 0, 0.1));
@@ -108,8 +93,7 @@ const BottomCollapse = Styled(MenuLink)`
 function Navigation(props) {
     const {
         className, message, fallback, subTitle, subCircle, icon, href, noBack,
-        none, add, canAdd, canEdit, canManage, onAction, withTopTitle,
-        isLoading, canCollapse, isCollapsed, onCollapse, children,
+        canEdit, onAction, withTopTitle, isLoading, canCollapse, children,
     } = props;
 
     const { smallNav } = Store.useState("core");
@@ -121,22 +105,16 @@ function Navigation(props) {
     const bodyRef    = React.useRef(null);
 
 
-    // Restore the Small Nav on load, unless the collapse is controlled
+    // Restore the Small Nav on load
     React.useEffect(() => {
-        if (bottomCollapse) {
-            const smallNav = Utils.restoreItem("small-nav", "0");
-            setSmallNav(Boolean(Number(smallNav)));
-        }
+        const smallNav = Utils.restoreItem("small-nav", "0");
+        setSmallNav(Boolean(Number(smallNav)));
     }, []);
 
     // Handles the Small Nav toggle
     const handleCollapse = () => {
-        if (bottomCollapse) {
-            Utils.storeItem("small-nav", smallNav ? "0" : "1");
-            setSmallNav(!smallNav);
-        } else {
-            onCollapse();
-        }
+        Utils.storeItem("small-nav", smallNav ? "0" : "1");
+        setSmallNav(!smallNav);
         hideTooltip();
     };
 
@@ -149,13 +127,9 @@ function Navigation(props) {
 
 
     // Variables
-    const isForMenu          = Responsive.useIsForMenu();
-    const bottomCollapse     = !onCollapse;
-
-    const showCollapse       = canCollapse && !isForMenu;
-    const showBottomCollapse = showCollapse && bottomCollapse;
-    const showFloatCollapse  = showCollapse && !bottomCollapse;
-    const collapsed          = showCollapse && (bottomCollapse ? smallNav : isCollapsed);
+    const isForMenu    = Responsive.useIsForMenu();
+    const showCollapse = canCollapse && !isForMenu;
+    const collapsed    = showCollapse && smallNav;
 
 
     // Do the Render
@@ -169,7 +143,6 @@ function Navigation(props) {
         <Container
             className="navigation-wrapper"
             isCollapsed={collapsed}
-            bottomCollapse={bottomCollapse}
         >
             <Content className={`navigation ${className}`}>
                 <NavigationTitle
@@ -181,10 +154,7 @@ function Navigation(props) {
                     href={href}
                     noBack={noBack}
                     smallNav={collapsed}
-                    onlyIcon={!bottomCollapse && collapsed}
-                    canAdd={canAdd}
                     canEdit={canEdit}
-                    canManage={canManage}
                     onAction={onAction}
                 />
                 <Body
@@ -194,9 +164,6 @@ function Navigation(props) {
                     <NavigationBody
                         passedRef={bodyRef}
                         isLoading={isLoading}
-                        canAdd={canAdd}
-                        add={add}
-                        none={none}
                         onAction={onAction}
                         smallNav={collapsed}
                     >
@@ -204,8 +171,8 @@ function Navigation(props) {
                     </NavigationBody>
                 </Body>
 
-                {showBottomCollapse && <Footer>
-                    <BottomCollapse
+                {showCollapse && <Footer>
+                    <Collapse
                         passedRef={elementRef}
                         variant="light"
                         message="GENERAL_COLLAPSE_MENU"
@@ -218,12 +185,6 @@ function Navigation(props) {
                     />
                 </Footer>}
             </Content>
-
-            {showFloatCollapse && <FloatCollapse
-                icon={collapsed ? "next" : "prev"}
-                onClick={handleCollapse}
-                isTiny
-            />}
         </Container>
     </>;
 }
@@ -241,17 +202,11 @@ Navigation.propTypes = {
     subCircle    : PropTypes.string,
     icon         : PropTypes.string,
     href         : PropTypes.string,
-    none         : PropTypes.string,
-    add          : PropTypes.string,
     isLoading    : PropTypes.bool,
     noBack       : PropTypes.bool,
-    canAdd       : PropTypes.bool,
     canEdit      : PropTypes.bool,
-    canManage    : PropTypes.bool,
     onAction     : PropTypes.func,
     canCollapse  : PropTypes.bool,
-    isCollapsed  : PropTypes.bool,
-    onCollapse   : PropTypes.func,
     children     : PropTypes.any,
 };
 
@@ -262,15 +217,10 @@ Navigation.propTypes = {
 Navigation.defaultProps = {
     className   : "",
     href        : "/",
-    none        : "",
-    add         : "",
     isLoading   : false,
     noBack      : false,
-    canAdd      : false,
     canEdit     : false,
-    canManage   : false,
     canCollapse : false,
-    isCollapsed : false,
 };
 
 export default Navigation;

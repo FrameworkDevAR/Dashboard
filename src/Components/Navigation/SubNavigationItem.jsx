@@ -111,7 +111,7 @@ const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
 function SubNavigationItem(props) {
     const {
         action, isSelected, message, url, href, emoji, icon, iconColor, afterIcon,
-        amount, badge, onAction, onClick, onClose, noClose,
+        amount, badge, onAction, onClick, noClose,
         hideActions, canEdit, canDelete, canCollapse, isCollapsed, elemID, onGrab, withAccent, children,
     } = props;
 
@@ -136,9 +136,6 @@ function SubNavigationItem(props) {
             onClick(e);
         } else if (onAction) {
             onAction(act);
-        }
-        if (onClose) {
-            onClose(e);
         }
         if (!noClose) {
             closeMenu();
@@ -265,7 +262,6 @@ SubNavigationItem.propTypes = {
     badge       : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
     onAction    : PropTypes.func,
     onClick     : PropTypes.func,
-    onClose     : PropTypes.func,
     noClose     : PropTypes.bool,
     isSelected  : PropTypes.bool,
     hideActions : PropTypes.bool,
