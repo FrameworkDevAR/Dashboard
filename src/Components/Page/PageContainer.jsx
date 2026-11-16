@@ -8,7 +8,7 @@ import Banner               from "../Common/Banner";
 
 
 // Styles
-const Container = Styled.section.attrs(({ hasTabs, hasPills, withBorder }) => ({ hasTabs, hasPills, withBorder }))`
+const Container = Styled.section.attrs(({ withMaxWidth, hasTabs, hasPills, withBorder }) => ({ withMaxWidth, hasTabs, hasPills, withBorder }))`
     box-sizing: border-box;
     flex-grow: 2;
     display: flex;
@@ -17,6 +17,7 @@ const Container = Styled.section.attrs(({ hasTabs, hasPills, withBorder }) => ({
 
     ${(props) => props.hasTabs && "height: var(--page-height-tabs);"}
     ${(props) => props.hasPills && "height: var(--page-height-pills);"}
+    ${(props) => props.withMaxWidth && "max-width: var(--page-max-width);"}
 
     ${(props) => props.withBorder && `
         border: var(--border-width) solid var(--border-color-light);
@@ -27,17 +28,19 @@ const Container = Styled.section.attrs(({ hasTabs, hasPills, withBorder }) => ({
 
 
 /**
- * The Page Container
+ * The Page Container. With the max width it is as wide as the --page-max-width, so its content,
+ * like an Accordion, and the buttons of the Page end at the same place
  * @param {object} props
  * @returns {React.ReactElement}
  */
 function PageContainer(props) {
-    const { className, hasTabs, hasPills, withBorder, error, children } = props;
+    const { className, withMaxWidth, hasTabs, hasPills, withBorder, error, children } = props;
 
 
     // Do the Render
     return <Container
         className={className}
+        withMaxWidth={withMaxWidth}
         hasTabs={hasTabs}
         hasPills={hasPills}
         withBorder={withBorder}
@@ -58,12 +61,13 @@ function PageContainer(props) {
  * @type {object} propTypes
  */
 PageContainer.propTypes = {
-    className  : PropTypes.string,
-    hasTabs    : PropTypes.bool,
-    hasPills   : PropTypes.bool,
-    withBorder : PropTypes.bool,
-    error      : PropTypes.string,
-    children   : PropTypes.any,
+    className    : PropTypes.string,
+    withMaxWidth : PropTypes.bool,
+    hasTabs      : PropTypes.bool,
+    hasPills     : PropTypes.bool,
+    withBorder   : PropTypes.bool,
+    error        : PropTypes.string,
+    children     : PropTypes.any,
 };
 
 /**
@@ -71,11 +75,12 @@ PageContainer.propTypes = {
  * @type {object} defaultProps
  */
 PageContainer.defaultProps = {
-    className  : "",
-    hasTabs    : false,
-    hasPills   : false,
-    withBorder : false,
-    error      : "",
+    className    : "",
+    withMaxWidth : false,
+    hasTabs      : false,
+    hasPills     : false,
+    withBorder   : false,
+    error        : "",
 };
 
 export default PageContainer;
