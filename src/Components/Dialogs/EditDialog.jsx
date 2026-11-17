@@ -15,10 +15,12 @@ import Form                 from "../Form/Form";
 // Styles
 const Message = Styled(DialogMessage)`
     margin-top: 0;
+    margin-bottom: 8px;
     font-size: var(--font-size);
 `;
 
 const Content = Styled(Form)`
+    --form-gap: var(--dialog-gap, var(--main-gap));
     flex-grow: 1;
     min-height: 0;
 `;
@@ -35,7 +37,7 @@ function EditDialog(props) {
         open, title, icon, header, message, className, isLoading, loadingMessage,
         width, isNarrow, isWide, minHeight, maxHeight, keepHeight, fullHeight,
         noOverflow, withSpacing, bigSpacing, withFade,
-        error, isDisabled, dontClose, noAutoFocus, bigGap,
+        error, isDisabled, dontClose, noAutoFocus,
         hideFooter, hidePrimary, primary, primaryVariant, primaryIcon, onSubmit,
         cancel, cancelVariant, onClose, onCancel,
         secondary, secondaryVariant, secondaryIcon, secondaryLoading, onSecondary,
@@ -79,7 +81,6 @@ function EditDialog(props) {
                 error={error}
                 onSubmit={onSubmit}
                 noAutoFocus={noAutoFocus}
-                bigGap={bigGap}
             >
                 {children}
             </Content>
@@ -126,7 +127,6 @@ EditDialog.propTypes = {
     isDisabled       : PropTypes.bool,
     hideFooter       : PropTypes.bool,
     noAutoFocus      : PropTypes.bool,
-    bigGap           : PropTypes.bool,
     width            : PropTypes.number,
     isNarrow         : PropTypes.bool,
     isWide           : PropTypes.bool,
@@ -174,7 +174,6 @@ EditDialog.defaultProps = {
     isLoading   : false,
     isDisabled  : false,
     noAutoFocus : false,
-    bigGap      : false,
     isNarrow    : false,
     isWide      : false,
     keepHeight  : false,
