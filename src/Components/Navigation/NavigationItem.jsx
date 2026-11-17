@@ -32,8 +32,10 @@ const Content = Styled.div.attrs(({ hideActions, isSelected, canDrag }) => ({ hi
 
     ${(props) => props.hideActions && `
         &:hover > .nav-actions {
-            display: flex;
             background-color: ${props.isSelected ? "var(--navigation-selected-icon, rgba(0, 0, 0, 0.1))" : "var(--navigation-hover, rgba(0, 0, 0, 0.1))"};
+        }
+        &:hover > .nav-actions > .nav-hover {
+            display: flex;
         }
     `}
 `;
@@ -79,8 +81,8 @@ const DragHandle = Styled(Icon)`
     transform: translateY(-50%);
 `;
 
-const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
-    display: ${(props) => props.hideActions ? "none" : "flex"};
+const NavActions = Styled.div`
+    display: flex;
     justify-content: center;
     position: absolute;
     top: 50%;
@@ -91,6 +93,10 @@ const NavActions = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
     .icon {
         padding: 2px;
     }
+`;
+
+const NavHover = Styled.div.attrs(({ hideActions }) => ({ hideActions }))`
+    display: ${(props) => props.hideActions ? "none" : "flex"};
 `;
 
 
@@ -216,29 +222,29 @@ function NavigationItem(props) {
                 onMouseLeave={hideTooltip}
             />
 
-            {hasActions && <NavActions
-                className="nav-actions"
-                hideActions={hideActions}
-            >
-                {!isSmallNav && actions}
+            {/* The actions can show only on hover, but the arrow to collapse always shows, last */}
+            {hasActions && <NavActions className="nav-actions">
+                <NavHover className="nav-hover" hideActions={hideActions}>
+                    {!isSmallNav && actions}
+                    {canEdit && <NavIcon
+                        variant="black"
+                        isSelected={selected}
+                        icon="edit"
+                        onClick={(e) => handleAction(e, "EDIT")}
+                        isSmall
+                    />}
+                    {canDelete && <IconLink
+                        variant="error"
+                        icon="delete"
+                        onClick={(e) => handleAction(e, "DELETE")}
+                        isSmall
+                    />}
+                </NavHover>
                 {(canCollapse && !isSmallNav) && <NavIcon
                     variant="black"
                     isSelected={selected}
                     icon={isCollapsed ? "closed" : "open"}
                     onClick={(e) => handleAction(e, "COLLAPSE")}
-                    isSmall
-                />}
-                {canEdit && <NavIcon
-                    variant="black"
-                    isSelected={selected}
-                    icon="edit"
-                    onClick={(e) => handleAction(e, "EDIT")}
-                    isSmall
-                />}
-                {canDelete && <IconLink
-                    variant="error"
-                    icon="delete"
-                    onClick={(e) => handleAction(e, "DELETE")}
                     isSmall
                 />}
             </NavActions>}
