@@ -85,7 +85,7 @@ const Item = Styled.div.attrs(({ withSort, withRemove, withTitle, withError, wit
             font-size: 12px;
             font-weight: 500;
         }
-        .inputfield-helper {
+        .inputfield-outside + .inputfield-helper {
             margin: -4px 0 5px 0;
             font-size: var(--font-size-small);
         }
