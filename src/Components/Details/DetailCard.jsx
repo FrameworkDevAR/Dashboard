@@ -40,6 +40,11 @@ const Container = Styled.div.attrs(({ isSelected, isDimmed, withError, canDrag, 
     ${(props) => props.isDimmed && `
         opacity: 0.4;
         scale: 0.97;
+
+        &:hover {
+            opacity: 1;
+            scale: 1;
+        }
     `}
 
     ${(props) => props.isSelected && `
