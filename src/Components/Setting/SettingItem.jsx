@@ -26,7 +26,7 @@ const Content = Styled.div`
 function SettingItem(props) {
     const {
         isHidden, isDimmed, className, elemID, index,
-        onGrab, onEdit, onDelete, children,
+        onGrab, onClick, onEdit, onDelete, actions, children,
     } = props;
 
 
@@ -37,9 +37,10 @@ function SettingItem(props) {
     return <DetailCard
         className={className}
         isDimmed={isDimmed}
-        onSort={(e) => onGrab(e, elemID, index)}
-        onClick={onEdit}
+        onSort={onGrab ? (e) => onGrab(e, elemID, index) : undefined}
+        onClick={onClick || onEdit}
         actions={<>
+            {actions}
             <IconLink
                 isHidden={!onEdit}
                 variant="black"
@@ -48,6 +49,7 @@ function SettingItem(props) {
                 isSmall
             />
             <IconLink
+                isHidden={!onDelete}
                 variant="error"
                 icon="delete"
                 onClick={onDelete}
@@ -70,8 +72,10 @@ SettingItem.propTypes = {
     elemID    : PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]).isRequired,
     index     : PropTypes.number,
     onGrab    : PropTypes.func,
+    onClick   : PropTypes.func,
     onEdit    : PropTypes.func,
-    onDelete  : PropTypes.func.isRequired,
+    onDelete  : PropTypes.func,
+    actions   : PropTypes.any,
     children  : PropTypes.any,
 };
 

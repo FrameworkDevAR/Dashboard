@@ -16,6 +16,10 @@ import Button               from "../Form/Button";
 // Styles
 const Container = Styled.div`
     max-width: var(--setting-width);
+
+    &:first-child > header {
+        margin-top: 0;
+    }
 `;
 
 const Header = Styled.header`
@@ -88,7 +92,7 @@ function SettingList(props) {
         order.indexOf(a.props.elemID) - order.indexOf(b.props.elemID)
     ));
     const list = Utils.cloneChildren(sorted, (child, index) => {
-        return { index, onGrab : handleGrab };
+        return { index, onGrab : onSort ? handleGrab : undefined };
     });
 
 
@@ -129,7 +133,7 @@ SettingList.propTypes = {
     noneMessage : PropTypes.string.isRequired,
     items       : PropTypes.array.isRequired,
     onAdd       : PropTypes.func,
-    onSort      : PropTypes.func.isRequired,
+    onSort      : PropTypes.func,
     children    : PropTypes.any,
 };
 
