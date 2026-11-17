@@ -60,6 +60,8 @@ const Container = Styled.div.attrs(({ variant, width, maxWidth, toLeft, arrow, s
         li + li {
             margin-top: 4px;
         }
+    `}
+    ${(props) => props.hasBreaks && !props.isDark && `
         b {
             color: var(--title-color);
         }
