@@ -11,6 +11,8 @@ import DialogHeader         from "../Dialog/DialogHeader";
 import DialogBody           from "../Dialog/DialogBody";
 import DialogFooter         from "../Dialog/DialogFooter";
 import Icon                 from "../Common/Icon";
+import Banner               from "../Common/Banner";
+import LinearLoader         from "../Loader/LinearLoader";
 
 
 
@@ -146,23 +148,42 @@ const Text = Styled.p`
     line-height: 1.4;
 `;
 
+const Progress = Styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+const ProgressText = Styled.p`
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    color: var(--font-lighter);
+    font-size: 13px;
+`;
+
 
 
 /**
- * The Export Dialog, with the amount of elements to export and the format of the file
+ * The Export Dialog
  * @param {object} props
  * @returns {React.ReactElement}
  */
 function ExportDialog(props) {
     const {
         open, icon, iconColor, title, message, total, error, format, isLoading,
-        onFormat, onSubmit, onClose,
+        isLong, running, onFormat, onSubmit, onCancel, onClose,
     } = props;
+
+    // A long Export is written in the background as a CSV, as an Excel file can not get
+    // more rows once it is written
+    const isRunning = Boolean(running);
+    const isBlocked = isLoading || isRunning;
 
 
     // Handles the Format Select
     const handleSelect = (key) => {
-        if (!isLoading) {
+        if (!isBlocked && !(isLong && key !== "csv")) {
             onFormat(key);
         }
     };
@@ -174,6 +195,17 @@ function ExportDialog(props) {
             handleSelect(key);
         }
     };
+
+
+    // The text under the Total says what happens with the file
+    let description = "GENERAL_EXPORT_DOWNLOAD";
+    if (error) {
+        description = error;
+    } else if (isRunning) {
+        description = "GENERAL_EXPORT_RUNNING";
+    } else if (isLong) {
+        description = "GENERAL_EXPORT_EMAIL";
+    }
 
 
     // Do the Render
@@ -189,45 +221,66 @@ function ExportDialog(props) {
             <Summary>
                 <SummaryIcon icon={icon} iconColor={iconColor} />
                 <SummaryText>
-                    <Total>{NLS.pluralize(message, total || 0)}</Total>
+                    <Total>{NLS.pluralize(message, (isRunning ? running.totalRows : total) || 0)}</Total>
                     <Description isError={!!error}>
-                        {NLS.get(error || "GENERAL_EXPORT_DOWNLOAD")}
+                        {NLS.get(description)}
                     </Description>
                 </SummaryText>
             </Summary>
 
-            <Options role="radiogroup" aria-label={NLS.get("GENERAL_FILE_FORMAT")}>
-                {NLS.select("SELECT_EXPORT_FORMATS").map(({ key, value : name }) => <Option
-                    key={key}
-                    role="radio"
-                    aria-checked={format === key}
-                    aria-disabled={isLoading}
-                    tabIndex={isLoading ? -1 : 0}
-                    formatColor={FORMATS[key].color}
-                    isSelected={format === key}
-                    isDisabled={isLoading}
-                    onClick={() => handleSelect(key)}
-                    onKeyDown={(e) => handleKeyDown(e, key)}
-                >
-                    <OptionIcon
-                        icon={FORMATS[key].icon}
-                        formatColor={FORMATS[key].color}
-                    />
-                    <Name>
-                        {name}
-                        <Extension>.{key}</Extension>
-                    </Name>
-                    <Text>{NLS.get(FORMATS[key].text)}</Text>
-                    <Radio
-                        formatColor={FORMATS[key].color}
-                        isSelected={format === key}
-                    />
-                </Option>)}
-            </Options>
+            {isRunning ? <Progress>
+                <LinearLoader percent={running.percent} />
+                <ProgressText>
+                    <span>{NLS.format("GENERAL_EXPORT_PROGRESS", running.doneRows, running.totalRows)}</span>
+                    <b>{running.percent}%</b>
+                </ProgressText>
+            </Progress> : <>
+                <Options role="radiogroup" aria-label={NLS.get("GENERAL_FILE_FORMAT")}>
+                    {NLS.select("SELECT_EXPORT_FORMATS").map(({ key, value : name }) => {
+                        const isDisabled = isBlocked || (isLong && key !== "csv");
+                        return <Option
+                            key={key}
+                            role="radio"
+                            aria-checked={format === key}
+                            aria-disabled={isDisabled}
+                            tabIndex={isDisabled ? -1 : 0}
+                            formatColor={FORMATS[key].color}
+                            isSelected={format === key}
+                            isDisabled={isDisabled}
+                            onClick={() => handleSelect(key)}
+                            onKeyDown={(e) => handleKeyDown(e, key)}
+                        >
+                            <OptionIcon
+                                icon={FORMATS[key].icon}
+                                formatColor={FORMATS[key].color}
+                            />
+                            <Name>
+                                {name}
+                                <Extension>.{key}</Extension>
+                            </Name>
+                            <Text>{NLS.get(FORMATS[key].text)}</Text>
+                            <Radio
+                                formatColor={FORMATS[key].color}
+                                isSelected={format === key}
+                            />
+                        </Option>;
+                    })}
+                </Options>
+                <Banner
+                    isHidden={!isLong}
+                    variant="info"
+                    icon="email"
+                    message="GENERAL_EXPORT_LONG"
+                    topSpace={16}
+                />
+            </>}
         </DialogBody>
         <DialogFooter
-            primary="GENERAL_EXPORT"
-            onSubmit={onSubmit}
+            primary={isRunning ? "GENERAL_EXPORT_CANCEL" : "GENERAL_EXPORT"}
+            primaryVariant={isRunning ? "error" : undefined}
+            primaryIcon={isRunning ? "close" : undefined}
+            onSubmit={isRunning ? onCancel : onSubmit}
+            cancel={isRunning ? "GENERAL_CLOSE" : undefined}
             isDisabled={isLoading}
         />
     </Dialog>;
@@ -247,8 +300,11 @@ ExportDialog.propTypes = {
     error     : PropTypes.string,
     format    : PropTypes.string.isRequired,
     isLoading : PropTypes.bool,
+    isLong    : PropTypes.bool,
+    running   : PropTypes.object,
     onFormat  : PropTypes.func.isRequired,
     onSubmit  : PropTypes.func.isRequired,
+    onCancel  : PropTypes.func,
     onClose   : PropTypes.func.isRequired,
 };
 
@@ -260,6 +316,8 @@ ExportDialog.defaultProps = {
     total     : 0,
     error     : "",
     isLoading : false,
+    isLong    : false,
+    running   : null,
 };
 
 export default ExportDialog;
