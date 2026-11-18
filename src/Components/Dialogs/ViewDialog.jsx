@@ -16,12 +16,12 @@ const Body = Styled(DialogBody)`
     flex-direction: column;
 `;
 
-const Content = Styled.div.attrs(({ bigGap }) => ({ bigGap }))`
+const Content = Styled.div`
     flex-grow: 2;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: ${(props) => props.bigGap ? "24px" : "var(--main-gap)"};
+    gap: var(--main-gap);
 `;
 
 
@@ -35,7 +35,7 @@ function ViewDialog(props) {
     const {
         contentRef, open, title, icon, className, isLoading, headerActions,
         width, isWide, isNarrow, minHeight, fullHeight,
-        withSpacing, bigSpacing, bigGap, withFade, zIndex,
+        withSpacing, bigSpacing, withFade, zIndex,
         hideFooter, primary, primaryVariant, primaryIcon, onSubmit,
         secondary, secondaryVariant, secondaryIcon, onSecondary, secondaryLoading,
         tertiary, tertiaryVariant, tertiaryIcon, onTertiary, tertiaryLoading,
@@ -66,7 +66,7 @@ function ViewDialog(props) {
             bigSpacing={bigSpacing}
             hideFooter={hideFooter}
         >
-            <Content bigGap={bigGap}>{children}</Content>
+            <Content>{children}</Content>
         </Body>
         <DialogFooter
             isHidden={hideFooter}
@@ -109,7 +109,6 @@ ViewDialog.propTypes = {
     lightHeader      : PropTypes.bool,
     withSpacing      : PropTypes.bool,
     bigSpacing       : PropTypes.bool,
-    bigGap           : PropTypes.bool,
     withFade         : PropTypes.bool,
     zIndex           : PropTypes.number,
     hideFooter       : PropTypes.bool,
@@ -147,7 +146,6 @@ ViewDialog.defaultProps = {
     withSpacing : false,
     withFade    : false,
     bigSpacing  : false,
-    bigGap      : false,
     hideFooter  : false,
 };
 
