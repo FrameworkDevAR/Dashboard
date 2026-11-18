@@ -54,7 +54,6 @@ function PageButtons(props) {
                 onClick={() => onSubmit()}
                 isDisabled={isDisabled || hasChanges === false}
                 withMark={hasChanges === true}
-                inLowerCase
             />
         </Save>
         <Button
@@ -63,7 +62,6 @@ function PageButtons(props) {
             icon="delete"
             message="GENERAL_DELETE"
             onClick={() => onDelete()}
-            inLowerCase
         />
     </PageFooter>;
 }

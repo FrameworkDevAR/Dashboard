@@ -440,7 +440,6 @@ function SearchDialog(props) {
                 icon="close"
                 message="GENERAL_CLOSE"
                 onClick={onClose}
-                inLowerCase
             />
         </Footer>
     </Container>;

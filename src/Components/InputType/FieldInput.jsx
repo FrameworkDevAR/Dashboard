@@ -628,7 +628,6 @@ function FieldInput(props) {
                 icon="add"
                 message={addButton}
                 onClick={() => handleAdd()}
-                inLowerCase
                 isSmall
             />
         </Footer>}

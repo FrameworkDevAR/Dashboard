@@ -47,7 +47,6 @@ function EmptyFilter(props) {
             icon="filter-clear"
             message="GENERAL_CLEAR_FILTERS"
             onClick={onClear}
-            inLowerCase
         />
     </Container>;
 }

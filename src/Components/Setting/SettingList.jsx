@@ -109,7 +109,6 @@ function SettingList(props) {
                 message={addMessage}
                 icon="add"
                 onClick={onAdd}
-                inLowerCase
             />
         </Header>}
 

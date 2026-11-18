@@ -336,7 +336,6 @@ function DropZone(props) {
                     icon="upload"
                     message={`${prefix}BUTTON`}
                     onClick={handleClick}
-                    inLowerCase
                 />
                 <Button
                     isHidden={!onUrl}
@@ -344,7 +343,6 @@ function DropZone(props) {
                     icon="link"
                     message="MEDIA_UPLOAD_URL_TITLE"
                     onClick={() => setShowUpload(true)}
-                    inLowerCase
                 />
             </Buttons>}
             <Input

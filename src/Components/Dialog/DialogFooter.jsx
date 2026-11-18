@@ -117,7 +117,6 @@ function DialogFooter(props) {
                     variant={secondaryVariant}
                     icon={secondaryIcon}
                     message={secondary}
-                    inLowerCase
                     isLoading={secondaryLoading}
                     isDisabled={secondaryLoading}
                     onClick={onSecondary}
@@ -127,7 +126,6 @@ function DialogFooter(props) {
                     variant={tertiaryVariant}
                     icon={tertiaryIcon}
                     message={tertiary}
-                    inLowerCase
                     isLoading={tertiaryLoading}
                     isDisabled={isDisabled || tertiaryLoading}
                     onClick={onTertiary}
@@ -140,7 +138,6 @@ function DialogFooter(props) {
                 variant={primaryVariant}
                 icon={mainIcon}
                 message={primary}
-                inLowerCase
                 isDisabled={isDisabled}
                 onClick={handleSubmit}
             />
@@ -149,7 +146,6 @@ function DialogFooter(props) {
                 variant={cancelVariant}
                 icon={cancelIcon}
                 message={cancel}
-                inLowerCase
                 onClick={onCancel || onClose}
             />
         </Primary>

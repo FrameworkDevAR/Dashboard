@@ -35,7 +35,7 @@ const Variant = {
 
 
 // Styles
-const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }) => ({ variant, isSmall, fullWidth, inLowerCase, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }))`
+const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }) => ({ variant, isSmall, fullWidth, noWrap, isLoading, withMark, withIcon, onlyIcon, smallRadius }))`
     --button-color: var(--black-color);
     --button-border: black;
     --button-border-style: solid;
@@ -53,9 +53,8 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
     background: var(--button-background);
     border: 1px var(--button-border-style) var(--button-border);
     color: var(--button-color);
-    text-transform: uppercase;
     border-radius: ${(props) => props.smallRadius ? "var(--border-radius-small)" : "var(--border-radius)"};
-    font-size: ${(props) => props.isSmall ? "10px" : "12px"};
+    font-size: ${(props) => props.isSmall ? "12px" : "14px"};
     padding: ${(props) => props.isSmall ? "4px 8px" : "8px 16px"};
     width: ${(props) => props.fullWidth ? "100%" : "auto"};
     transition: box-shadow 0.5s, color 0.5s, background-color 0.5s, border-color 0.5s;
@@ -67,11 +66,6 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         justify-content: center;
         padding: 5px 12px 5px 8px;
         gap: 4px;
-    `}
-
-    ${(props) => props.inLowerCase && `
-        text-transform: none;
-        font-size: ${props.isSmall ? "12px" : "14px"};
     `}
 
     ${(props) => props.noWrap && `
@@ -270,7 +264,6 @@ const Btn = Styled.button.attrs(({ variant, isSmall, fullWidth, inLowerCase, noW
         `;
 
         case Variant.MENU: return `
-            text-transform: none;
             --button-color: var(--darker-gray);
             --button-hover-color: white;
             --button-hover-background: rgba(255, 255, 255, 0.05);
@@ -325,7 +318,7 @@ const BtnBadge = Styled(Badge)`
 function Button(props) {
     const {
         passedRef, isHidden, className, variant,
-        isDisabled, isSmall, fullWidth, inLowerCase, noWrap, isLoading,
+        isDisabled, isSmall, fullWidth, noWrap, isLoading,
         icon, afterIcon, message, badge, withMark,
         tooltip, tooltipVariant, children,
     } = props;
@@ -371,7 +364,6 @@ function Button(props) {
         disabled={isDisabled}
         isSmall={isSmall}
         fullWidth={fullWidth}
-        inLowerCase={inLowerCase}
         noWrap={noWrap}
         isLoading={isLoading}
         withMark={withMark}
@@ -420,7 +412,6 @@ Button.propTypes = {
     isDisabled     : PropTypes.bool,
     isSmall        : PropTypes.bool,
     fullWidth      : PropTypes.bool,
-    inLowerCase    : PropTypes.bool,
     noWrap         : PropTypes.bool,
     isLoading      : PropTypes.bool,
     badge          : PropTypes.number,
@@ -450,7 +441,6 @@ Button.defaultProps = {
     isDisabled     : false,
     isSmall        : false,
     fullWidth      : false,
-    inLowerCase    : false,
     badge          : 0,
     withMark       : false,
     href           : "",

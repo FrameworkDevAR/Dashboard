@@ -161,7 +161,6 @@ function SnackBar(props) {
             variant="white"
             message={buttonText}
             onClick={handleAccept}
-            inLowerCase
             isSmall
         />
         <Close

@@ -119,7 +119,6 @@ function ActionItem(props) {
             isLoading={isLoading}
             badge={badge}
             withMark={withMark}
-            inLowerCase
             propagate
         />
 
