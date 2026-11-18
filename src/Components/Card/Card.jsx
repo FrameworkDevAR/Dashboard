@@ -8,12 +8,13 @@ import NLS                  from "../../Core/NLS";
 
 
 // Styles
-const Container = Styled.section.attrs(({ labelWidth }) => ({ labelWidth }))`
+const Container = Styled.section.attrs(({ labelWidth, withBackground }) => ({ labelWidth, withBackground }))`
     padding: 16px 18px;
     border: 1px solid var(--card-border-color, var(--border-color-light));
     border-radius: var(--border-radius-medium);
 
     ${(props) => props.labelWidth && `--card-label-width: ${props.labelWidth}px;`}
+    ${(props) => props.withBackground && "background-color: var(--lightest-gray);"}
 
     &:has(> .card-item) {
         padding-bottom: 10px;
@@ -37,14 +38,18 @@ const Title = Styled.h3`
  * @returns {React.ReactElement}
  */
 function Card(props) {
-    const { isHidden, className, message, labelWidth, children } = props;
+    const { isHidden, className, message, labelWidth, withBackground, children } = props;
 
 
     // Do the Render
     if (isHidden) {
         return <React.Fragment />;
     }
-    return <Container className={className} labelWidth={labelWidth}>
+    return <Container
+        className={className}
+        labelWidth={labelWidth}
+        withBackground={withBackground}
+    >
         {!!message && <Title>{NLS.get(message)}</Title>}
         {children}
     </Container>;
@@ -55,11 +60,12 @@ function Card(props) {
  * @type {object} propTypes
  */
 Card.propTypes = {
-    isHidden   : PropTypes.bool,
-    className  : PropTypes.string,
-    message    : PropTypes.string,
-    labelWidth : PropTypes.number,
-    children   : PropTypes.any,
+    isHidden       : PropTypes.bool,
+    className      : PropTypes.string,
+    message        : PropTypes.string,
+    labelWidth     : PropTypes.number,
+    withBackground : PropTypes.bool,
+    children       : PropTypes.any,
 };
 
 /**
@@ -67,8 +73,9 @@ Card.propTypes = {
  * @type {object} defaultProps
  */
 Card.defaultProps = {
-    isHidden  : false,
-    className : "",
+    isHidden       : false,
+    className      : "",
+    withBackground : false,
 };
 
 export default Card;
