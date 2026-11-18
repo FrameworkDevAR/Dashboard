@@ -819,7 +819,7 @@ function Filter(props) {
             }
         }
         return result;
-    }, [ JSON.stringify(data) ]);
+    }, [ JSON.stringify(data), JSON.stringify(itemList) ]);
 
     // Adding or removing a Chip does not resize the Filter, so it is measured again
     React.useLayoutEffect(measure, [ chipList ]);
