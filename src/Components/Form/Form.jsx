@@ -13,14 +13,10 @@ import Columns              from "../Form/Columns";
 
 
 // Styles
-const Content = Styled.div.attrs(({ bigGap }) => ({ bigGap }))`
+const Content = Styled.div`
     display: flex;
     flex-direction: column;
     gap: var(--form-gap, var(--main-gap));
-
-    ${(props) => props.bigGap && `
-        --form-gap: 24px;
-    `}
 `;
 
 
@@ -31,7 +27,7 @@ const Content = Styled.div.attrs(({ bigGap }) => ({ bigGap }))`
  * @returns {React.ReactElement}
  */
 function Form(props) {
-    const { passedRef, className, error, noAutoFocus, bigGap, onSubmit, children } = props;
+    const { passedRef, className, error, noAutoFocus, onSubmit, children } = props;
 
 
     // Clone the Children
@@ -48,7 +44,7 @@ function Form(props) {
 
 
     // Do the Render
-    return <Content ref={passedRef} className={className} bigGap={bigGap}>
+    return <Content ref={passedRef} className={className}>
         <Banner
             className="form-error"
             isTight
@@ -68,7 +64,6 @@ Form.propTypes = {
     className   : PropTypes.string,
     error       : PropTypes.oneOfType([ PropTypes.string, PropTypes.array ]),
     noAutoFocus : PropTypes.bool,
-    bigGap      : PropTypes.bool,
     onSubmit    : PropTypes.func,
     children    : PropTypes.any,
 };
@@ -80,7 +75,6 @@ Form.propTypes = {
 Form.defaultProps = {
     className   : "",
     noAutoFocus : false,
-    bigGap      : false,
 };
 
 export default Form;
