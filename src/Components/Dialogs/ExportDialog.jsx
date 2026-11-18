@@ -12,6 +12,7 @@ import Dialog               from "../Dialog/Dialog";
 import DialogHeader         from "../Dialog/DialogHeader";
 import DialogBody           from "../Dialog/DialogBody";
 import DialogFooter         from "../Dialog/DialogFooter";
+import Card                 from "../Card/Card";
 import Icon                 from "../Common/Icon";
 import Banner               from "../Common/Banner";
 import LinearLoader         from "../Loader/LinearLoader";
@@ -257,15 +258,17 @@ const Progress = Styled.div`
     gap: 8px;
 `;
 
+const NotesCard = Styled(Card)`
+    margin-top: 16px;
+`;
+
 const RunningNotes = Styled.ul`
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin: 16px 0 0;
-    padding: 12px 16px;
+    margin: 0;
+    padding: 0;
     list-style: none;
-    border-radius: var(--border-radius-medium);
-    background-color: var(--lightest-gray);
 `;
 
 const RunningNote = Styled.li`
@@ -293,6 +296,17 @@ const ProgressText = Styled.p`
 `;
 
 
+
+/**
+ * Returns the text of the given amount of rows, with the separator of the thousands
+ * @param {string} message
+ * @param {number} amount
+ * @returns {string}
+ */
+function pluralizeRows(message, amount) {
+    const suffix = Number(amount) === 1 ? "_SINGULAR" : "_PLURAL";
+    return NLS.format(message + suffix, Utils.formatNumber(amount));
+}
 
 /**
  * Returns the estimated time left of a running Export
@@ -419,7 +433,7 @@ function ExportDialog(props) {
             {!isReady && <Summary>
                 <SummaryIcon icon={icon} iconColor={iconColor} />
                 <SummaryText>
-                    <Total>{NLS.pluralize(message, rows || 0)}</Total>
+                    <Total>{pluralizeRows(message, rows || 0)}</Total>
                     <Description isError={!!error}>
                         {description}
                     </Description>
@@ -448,12 +462,12 @@ function ExportDialog(props) {
                             </dd>
                         </>}
                         <dt>{NLS.get("GENERAL_IMPORT_FILE_ROWS")}</dt>
-                        <dd>{NLS.pluralize(message, rows || 0)}</dd>
+                        <dd>{pluralizeRows(message, rows || 0)}</dd>
                         <dt>{NLS.get("GENERAL_IMPORT_IMPORTED_LABEL")}</dt>
-                        <dd>{NLS.pluralize(message, ready.importedRows || 0)}</dd>
+                        <dd>{pluralizeRows(message, ready.importedRows || 0)}</dd>
                         {hasWarnings && <>
                             <dt>{NLS.get("GENERAL_IMPORT_WARNINGS_LABEL")}</dt>
-                            <dd>{NLS.pluralize(message, ready.warnings)}</dd>
+                            <dd>{pluralizeRows(message, ready.warnings)}</dd>
                         </>}
                         <dt>{NLS.get("GENERAL_IMPORT_FINISHED")}</dt>
                         <dd>{DateTime.formatDate(ready.readyTime, "dashesHour")}</dd>
@@ -486,7 +500,7 @@ function ExportDialog(props) {
                             </dd>
                         </>}
                         <dt>{NLS.get("GENERAL_EXPORT_AMOUNT")}</dt>
-                        <dd>{NLS.pluralize(message, rows || 0)}</dd>
+                        <dd>{pluralizeRows(message, rows || 0)}</dd>
                         <dt>{NLS.get("GENERAL_EXPORT_FINISHED")}</dt>
                         <dd>{DateTime.formatDate(ready.readyTime, "dashesHour")}</dd>
                         <dt>{NLS.get("GENERAL_EXPORT_AVAILABLE")}</dt>
@@ -500,17 +514,19 @@ function ExportDialog(props) {
                 <LinearLoader percent={running.percent} />
                 <ProgressText>
                     <span>
-                        {NLS.format("GENERAL_EXPORT_PROGRESS", running.doneRows, running.totalRows)}
+                        {NLS.format("GENERAL_EXPORT_PROGRESS", Utils.formatNumber(running.doneRows), Utils.formatNumber(running.totalRows))}
                         {!!running.secondsLeft && ` · ${getTimeLeft(running.secondsLeft)}`}
                     </span>
                     <b>{running.percent}%</b>
                 </ProgressText>
-                <RunningNotes>
-                    {(isImport ? IMPORT_NOTES : RUNNING_NOTES).map((note) => <RunningNote key={note.message}>
-                        <Icon icon={note.icon} />
-                        {NLS.get(note.message)}
-                    </RunningNote>)}
-                </RunningNotes>
+                <NotesCard message="GENERAL_EXPORT_MEANTIME" withBackground>
+                    <RunningNotes>
+                        {(isImport ? IMPORT_NOTES : RUNNING_NOTES).map((note) => <RunningNote key={note.message}>
+                            <Icon icon={note.icon} />
+                            {NLS.get(note.message)}
+                        </RunningNote>)}
+                    </RunningNotes>
+                </NotesCard>
             </Progress>}
 
             {!isRunning && !isReady && <>
