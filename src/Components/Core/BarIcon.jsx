@@ -63,6 +63,37 @@ const Span = Styled.span`
     margin-left: 6px;
 `;
 
+const Ring = Styled.svg`
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+
+    rect {
+        x: 1px;
+        y: 1px;
+        width: calc(100% - 2px);
+        height: calc(100% - 2px);
+        rx: calc(var(--border-radius) - 1px);
+    }
+`;
+
+const RingTrack = Styled.rect`
+    fill: none;
+    stroke: var(--border-color-medium);
+    stroke-width: 2;
+`;
+
+const RingValue = Styled.rect`
+    fill: none;
+    stroke: var(--primary-color);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s;
+`;
+
 const BarBadge = Styled(Badge)`
     top: -5px;
     right: -5px;
@@ -79,7 +110,7 @@ function BarIcon(props) {
     const {
         passedRef, isHidden, hideMobile, className,
         isSelected, icon, withText, withTooltip, tooltipVariant, tooltipDelay,
-        message, url, startsWith, badge,
+        message, url, startsWith, badge, percent,
     } = props;
 
     const { showTooltip, hideTooltip } = Store.useAction("core");
@@ -93,6 +124,8 @@ function BarIcon(props) {
     const isSelect   = Navigate.useSelect();
     const hasContent = withText && !!message;
     const content    = NLS.get(message);
+    const hasRing    = percent >= 0;
+    const ringOffset = 100 - Math.min(percent, 100);
 
 
     // Returns true if the Menu should be selected
@@ -130,6 +163,14 @@ function BarIcon(props) {
         onMouseLeave={hideTooltip}
     >
         <Icon icon={icon} />
+        {hasRing && <Ring>
+            <RingTrack />
+            <RingValue
+                pathLength="100"
+                strokeDasharray="100"
+                strokeDashoffset={ringOffset}
+            />
+        </Ring>}
         {hasContent && <Span className="baricon-text">
             {content}
         </Span>}
@@ -159,6 +200,7 @@ BarIcon.propTypes = {
     onClick        : PropTypes.func,
     startsWith     : PropTypes.bool,
     badge          : PropTypes.number,
+    percent        : PropTypes.number,
 };
 
 /**
@@ -178,6 +220,7 @@ BarIcon.defaultProps = {
     url            : "",
     target         : "_self",
     startsWith     : false,
+    percent        : -1,
 };
 
 export default BarIcon;
