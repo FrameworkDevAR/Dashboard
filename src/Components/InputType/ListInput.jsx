@@ -79,15 +79,18 @@ const Item = Styled.div.attrs(({ withError, withStates, isDisabled, canSort, can
             margin-right: 0;
         }
     `}
-    ${(props) => props.canSort && "padding-left: 6px;"}
+    ${(props) => (props.canSort ? "padding-left: 6px;" : "padding-left: 0;")}
     ${(props) => props.canRemove && "padding-right: 6px;"}
 `;
 
-const Inside = Styled.div`
+const Inside = Styled.div.attrs(({ canSort, canRemove }) => ({ canSort, canRemove }))`
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    ${(props) => props.canSort && "margin-left: -8px;"}
+    ${(props) => props.canRemove && "margin-right: -8px;"}
 `;
 
 const RemoveIcon = Styled(IconLink)`
@@ -336,7 +339,7 @@ function ListInput(props) {
                         onMouseDown={(e) => handleGrab(e, elem, index)}
                     />
 
-                    <Inside>
+                    <Inside canSort={canSort} canRemove={canRemove}>
                         <InputField
                             passedRef={inputRefs[index]}
                             className={`inputfield-item-${name}-${index}`}
