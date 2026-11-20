@@ -10,6 +10,7 @@ import Utils                from "../../Utils/Utils";
 
 // Components
 import InputField           from "../Form/InputField";
+import MenuLine             from "./MenuLine";
 
 // Variants
 const Variant = {
@@ -264,14 +265,35 @@ function Menu(props) {
 
     // Parse the Items
     const items = React.useMemo(() => {
-        const items = [];
-        let   key   = 0;
-        let   index = 0;
-        for (const child of Utils.getChildren(children)) {
-            const { isHidden, act, title, message, isTitle } = child.props;
+        const items    = [];
+        const list     = Utils.getChildren(children);
+        const filtered = list.map((child) => {
+            const { act, title, message } = child.props;
             const titleMsg   = NLS.get(title || "");
             const contentMsg = NLS.get(message || act?.message || "");
-            const isFiltered = Boolean(filter && !titleMsg.toLocaleLowerCase().includes(filter) && !contentMsg.toLocaleLowerCase().includes(filter));
+            return Boolean(filter && !titleMsg.toLocaleLowerCase().includes(filter) && !contentMsg.toLocaleLowerCase().includes(filter));
+        });
+
+        // A Title stays while the filter leaves an item of its section
+        if (filter) {
+            for (const [ idx, child ] of list.entries()) {
+                if (!child.props.isTitle || !filtered[idx]) {
+                    continue;
+                }
+                for (let next = idx + 1; next < list.length && !list[next].props.isTitle; next += 1) {
+                    if (!list[next].props.isHidden && !filtered[next]) {
+                        filtered[idx] = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        let key   = 0;
+        let index = 0;
+        for (const [ idx, child ] of list.entries()) {
+            const { isHidden, isTitle } = child.props;
+            const isFiltered = filtered[idx];
 
             if (!isHidden && !isFiltered) {
                 const itemIndex = isTitle ? -1 : index;
@@ -310,6 +332,7 @@ function Menu(props) {
         const toLeft       = dir.includes("left");
         const toUp         = dir.includes("up");
         let   targetHeight = 0;
+        let   targetLeft   = 0;
 
         // Calculate the Bounds of the Menu without Styles
         const cntBounds   = contentRef.getBoundingClientRect();
@@ -323,6 +346,7 @@ function Menu(props) {
         if (!hasStyles && targetRef.current) {
             const bounds = Utils.getBounds(targetRef);
             targetHeight = bounds.height;
+            targetLeft   = bounds.left;
 
             if (toTop) {
                 bottom = winHeight - bounds.top + gap;
@@ -416,7 +440,12 @@ function Menu(props) {
                 if (left && left < 0) {
                     left = 10;
                 } else if (left && boundWidth && left + boundWidth > winWidth) {
-                    left -= (left + boundWidth) - winWidth;
+                    // A Menu to the side of its target opens on the other side, instead of over it
+                    if (targetHeight && !toTop && !toBottom && targetLeft - boundWidth > 0) {
+                        left = targetLeft - boundWidth;
+                    } else {
+                        left -= (left + boundWidth) - winWidth;
+                    }
                 }
 
                 if (right && boundWidth && right + boundWidth > winWidth) {
@@ -451,7 +480,8 @@ function Menu(props) {
 
 
     // Variables
-    const showSearch       = withSearch && (filter || items.length > 5) && winWidth > Responsive.WIDTH_FOR_MOBILE;
+    const totalItems       = items.filter((item) => !item.props.isTitle && item.type !== MenuLine).length;
+    const showSearch       = withSearch && (filter || totalItems > 5) && winWidth > Responsive.WIDTH_FOR_MOBILE;
     const showTopSearch    = showSearch && !toTop;
     const showBottomSearch = showSearch && toTop;
     const showEmpty        = Boolean((showSearch || filterText) && !items.length && emptyText);
