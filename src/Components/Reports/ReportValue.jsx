@@ -16,6 +16,7 @@ const COLORS = [
     { color : "rgb(234, 88, 12)",  background : "rgba(234, 88, 12, 0.12)"  },
     { color : "rgb(124, 58, 237)", background : "rgba(124, 58, 237, 0.12)" },
     { color : "rgb(37, 99, 235)",  background : "rgba(37, 99, 235, 0.12)"  },
+    { color : "rgb(24, 145, 170)", background : "rgba(24, 145, 170, 0.12)" },
 ];
 
 // Styles
