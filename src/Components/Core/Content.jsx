@@ -8,8 +8,7 @@ import Utils                from "../../Utils/Utils";
 
 // Components
 import PageLoader           from "../Loader/PageLoader";
-import FilterList           from "../Filter/FilterList";
-import FilterBar            from "../Filter/FilterBar";
+import Filter               from "../Filter/Filter";
 import TabList              from "../Tab/TabList";
 
 
@@ -82,7 +81,7 @@ function Content(props) {
     let   hasFilter   = withFilter;
 
     for (const child of Utils.getVisibleChildren(children)) {
-        if (child.type === FilterList || child.type === FilterBar) {
+        if (child.type === Filter) {
             hasFilter = true;
         } else if (child.type === TabList) {
             hasTabs = true;
