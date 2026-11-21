@@ -24,7 +24,7 @@ const Save = Styled.span`
  * @returns {React.ReactElement}
  */
 function PageButtons(props) {
-    const { canEdit, isEdit, isDisabled, hasChanges, onSubmit, onDelete } = props;
+    const { canEdit, isEdit, isDisabled, hasChanges, onSubmit, onDelete, onCancel } = props;
 
     const saveRef = React.useRef(null);
 
@@ -63,6 +63,13 @@ function PageButtons(props) {
             message="GENERAL_DELETE"
             onClick={() => onDelete()}
         />
+        <Button
+            isHidden={!onCancel}
+            variant="outlined-gray"
+            icon="close"
+            message="GENERAL_CANCEL"
+            onClick={() => onCancel()}
+        />
     </PageFooter>;
 }
 
@@ -77,6 +84,7 @@ PageButtons.propTypes = {
     hasChanges : PropTypes.bool,
     onSubmit   : PropTypes.func.isRequired,
     onDelete   : PropTypes.func,
+    onCancel   : PropTypes.func,
 };
 
 /**

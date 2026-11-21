@@ -57,7 +57,12 @@ const Sticky = Styled.div.attrs(({ isCentered, hasActions }) => ({ isCentered, h
     ${(props) => props.hasActions && `
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+
+        & > :not(.pills) {
+            flex-shrink: 0;
+        }
     `}
 `;
 

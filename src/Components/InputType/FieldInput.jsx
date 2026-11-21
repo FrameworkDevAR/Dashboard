@@ -220,7 +220,7 @@ const Sort = Styled.div`
 const Remove = Styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     grid-area: remove;
     gap: 4px;
 `;
@@ -456,7 +456,7 @@ function FieldInput(props) {
 
     // The icons of each row are 24px wide with a gap of 4px, and the column has a fixed
     // width so the Header lines up with the rows
-    const iconsWidth   = hasExtraIcon ? 52 : 24;
+    const iconsWidth   = (hasExtraIcon && canRemove) ? 52 : 24;
 
     // Returns the extra Icon of a row, which can change with its data, and its tooltip
     const getExtra = (elem) => {
@@ -500,7 +500,7 @@ function FieldInput(props) {
                 key={index}
                 className="inputfield-container"
                 withSort={canSort}
-                withRemove={canRemove}
+                withRemove={hasPostIcons}
                 withError={!!getError(index)}
                 withTitle={withTitle}
                 withLine={withLine && index < partsRef.current.length - 1}
@@ -533,6 +533,7 @@ function FieldInput(props) {
                             isSmall
                         />
                         <IconLink
+                            isHidden={!canRemove}
                             variant="error"
                             icon="delete"
                             onClick={() => handleRemove(index)}
@@ -573,6 +574,7 @@ function FieldInput(props) {
                                 value={value}
                                 options={item.getOptions?.(data) || item.options}
                                 icon={item.getIcon?.(data) || item.icon}
+                                placeholder={item.getPlaceholder?.(data) || item.placeholder}
                                 postIcon={item.getPostIcon?.(data) || item.postIcon}
                                 isDisabled={getDisabled(item, data)}
                                 error={getError(index, item.name)}
@@ -609,6 +611,7 @@ function FieldInput(props) {
                         isSmall
                     />
                     <IconLink
+                        isHidden={!canRemove}
                         variant="error"
                         icon="delete"
                         onClick={() => handleRemove(index)}

@@ -84,6 +84,7 @@ InputItem.propTypes = {
     getValue        : PropTypes.func,
     getColumns      : PropTypes.func,
     getIcon         : PropTypes.func,
+    getPlaceholder  : PropTypes.func,
     getPostIcon     : PropTypes.func,
     getDisabled     : PropTypes.func,
     component       : PropTypes.any,
