@@ -57,6 +57,9 @@ function NavigationBody(props) {
             if (smallNav && child.type === CircularLoader) {
                 childProps.isTiny = true;
             }
+            if (child.type === NavigationList) {
+                childProps.smallNav = smallNav;
+            }
             items.push(React.cloneElement(child, childProps));
         }
     }

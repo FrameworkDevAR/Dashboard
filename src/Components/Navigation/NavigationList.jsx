@@ -20,7 +20,7 @@ const Container = Styled.ul`
     }
 `;
 
-const Title = Styled.li`
+const Title = Styled.li.attrs(({ smallNav }) => ({ smallNav }))`
     padding: 0 8px;
     margin-bottom: 8px;
     font-size: 11px;
@@ -28,6 +28,14 @@ const Title = Styled.li`
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--font-lighter);
+
+    ${(props) => props.smallNav && `
+        position: relative;
+        padding: 0;
+        font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+    `}
 `;
 
 
@@ -38,9 +46,61 @@ const Title = Styled.li`
  * @returns {React.ReactElement}
  */
 function NavigationList(props) {
-    const { isHidden, className, message, listID, onGrab, useExact, onAction, children } = props;
+    const { isHidden, className, message, listID, onGrab, useExact, onAction, smallNav, children } = props;
 
-    const { smallNav } = Store.useState("core");
+
+    const { showTooltip, hideTooltip } = Store.useAction("core");
+
+
+    // The References
+    const titleRef = React.useRef(null);
+
+    // The Current State
+    const [ label, setLabel ] = React.useState("");
+
+
+    // The browsers cut a text in the middle of a letter, so the Title is cut by hand to the
+    // most letters that fit followed by an ellipsis, measured in a hidden copy. The width
+    // of the Navigation is animated, so it is measured again each time the Title resizes
+    React.useLayoutEffect(() => {
+        const text = NLS.get(message);
+        const elem = titleRef.current;
+        if (!smallNav || !elem) {
+            setLabel(text);
+            return undefined;
+        }
+
+        const measure = () => {
+            const probe = document.createElement("span");
+            probe.style.position   = "absolute";
+            probe.style.visibility = "hidden";
+            elem.appendChild(probe);
+
+            let result = text;
+            for (let length = text.length; length > 0; length -= 1) {
+                result = length === text.length ? text : `${text.slice(0, length).trim()}…`;
+                probe.textContent = result;
+                if (probe.offsetWidth <= elem.clientWidth) {
+                    break;
+                }
+            }
+            elem.removeChild(probe);
+            setLabel(result);
+        };
+
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(elem);
+        return () => observer.disconnect();
+    }, [ smallNav, message, isHidden ]);
+
+
+    // Handles the Tooltip, which shows the whole Title when it is cut
+    const handleTooltip = () => {
+        if (smallNav && label !== NLS.get(message)) {
+            showTooltip(titleRef, "right", message, 0, 0.2);
+        }
+    };
 
 
     // Clone the Children. When the Items can be dragged, the ones with an ID can be grabbed,
@@ -57,8 +117,13 @@ function NavigationList(props) {
         return <React.Fragment />;
     }
     return <Container className={className} data-nav-list={canDrag ? listID : undefined}>
-        {!!message && <Title>
-            {NLS.get(message)}
+        {!!message && <Title
+            ref={titleRef}
+            smallNav={smallNav}
+            onMouseEnter={handleTooltip}
+            onMouseLeave={hideTooltip}
+        >
+            {label}
         </Title>}
         {items}
     </Container>;
@@ -77,6 +142,7 @@ NavigationList.propTypes = {
     variant   : PropTypes.string,
     useExact  : PropTypes.bool,
     onAction  : PropTypes.func,
+    smallNav  : PropTypes.bool,
     children  : PropTypes.any,
 };
 
@@ -88,6 +154,7 @@ NavigationList.defaultProps = {
     isHidden  : false,
     className : "",
     message   : "",
+    smallNav  : false,
 };
 
 export default NavigationList;
