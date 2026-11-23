@@ -118,10 +118,10 @@ function Menu(props) {
         }
     }, [ open ]);
 
-    // Set the custom filter
+    // Set the custom filter, in lowercase as the texts it is compared with
     React.useEffect(() => {
         if (!withSearch) {
-            setFilter(filterText);
+            setFilter(String(filterText || "").toLocaleLowerCase());
         }
     }, [ filterText ]);
 
