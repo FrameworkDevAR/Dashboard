@@ -2,6 +2,9 @@ import React                from "react";
 import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
+// Hooks
+import useSubmenu           from "../../Hooks/Submenu";
+
 // Components
 import Menu                 from "../Menu/Menu";
 import Html                 from "../Common/Html";
@@ -175,8 +178,9 @@ function InputOption(props) {
     // The References
     const itemRef = React.useRef(null);
 
-    // The Current State
-    const [ menuOpen, setMenuOpen ] = React.useState(false);
+    // The Submenu
+    const submenu  = useSubmenu();
+    const menuOpen = submenu.menuOpen;
 
 
     // Variable
@@ -209,8 +213,8 @@ function InputOption(props) {
             leftSpace={leftSpace}
             level={level}
             onMouseDown={isTitle ? undefined : onMouseDown}
-            onMouseEnter={() => setMenuOpen(true)}
-            onMouseLeave={() => setMenuOpen(false)}
+            onMouseEnter={submenu.handleItemEnter}
+            onMouseLeave={submenu.handleItemLeave}
         >
             <Content
                 isSelected={isSelected}
@@ -250,12 +254,13 @@ function InputOption(props) {
         </Container>
 
         {hasMenu && <Menu
+            menuRef={submenu.menuRef}
             open={menuOpen}
             targetRef={itemRef}
             direction={direction}
             maxWidth={menuWidth}
-            onMouseEnter={() => setMenuOpen(true)}
-            onMouseLeave={() => setMenuOpen(false)}
+            onMouseEnter={submenu.handleMenuEnter}
+            onMouseLeave={submenu.handleMenuLeave}
             onClose={onClose}
             isSubmenu
         >

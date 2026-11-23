@@ -91,7 +91,7 @@ const Empty = Styled.li`
  */
 function Menu(props) {
     const {
-        containerRef, className, open, variant, direction,
+        containerRef, menuRef, className, open, variant, direction,
         gap, width, maxWidth, targetRef, iconHeight, minHeight,
         onAction, onClose, onMouseEnter, onMouseLeave,
         withSearch, emptyText, filterText, keyCode,
@@ -505,7 +505,12 @@ function Menu(props) {
         onMouseDown={handleClose}
     >
         <Container
-            ref={(ref) => setContentRef(ref)}
+            ref={(ref) => {
+                setContentRef(ref);
+                if (menuRef) {
+                    menuRef.current = ref;
+                }
+            }}
             className={className}
             isVisible={isVisible}
             withPos={hasStyles}
@@ -563,6 +568,7 @@ function Menu(props) {
 Menu.propTypes = {
     open           : PropTypes.bool,
     containerRef   : PropTypes.any,
+    menuRef        : PropTypes.any,
     targetRef      : PropTypes.any,
     variant        : PropTypes.string,
     className      : PropTypes.string,

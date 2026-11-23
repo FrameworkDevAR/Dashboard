@@ -7,6 +7,7 @@ import Action               from "../../Core/Action";
 import Navigate             from "../../Core/Navigate";
 import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
+import useSubmenu           from "../../Hooks/Submenu";
 
 // Components
 import Menu                 from "./Menu";
@@ -153,8 +154,8 @@ function MenuItem(props) {
     // The References
     const itemRef = React.useRef(null);
 
-    // The Current State
-    const [ menuOpen, setMenuOpen ] = React.useState(false);
+    // The Submenu
+    const submenu = useSubmenu();
 
 
     // Variables
@@ -227,8 +228,8 @@ function MenuItem(props) {
             isTitle={isTitle}
             level={level}
             onMouseDown={handleClick}
-            onMouseEnter={() => setMenuOpen(true)}
-            onMouseLeave={() => setMenuOpen(false)}
+            onMouseEnter={submenu.handleItemEnter}
+            onMouseLeave={submenu.handleItemLeave}
         >
             <Icon
                 isHidden={!hasIcon}
@@ -268,11 +269,12 @@ function MenuItem(props) {
         </Container>
 
         {hasMenu && <Menu
-            open={menuOpen}
+            menuRef={submenu.menuRef}
+            open={submenu.menuOpen}
             targetRef={itemRef}
             direction={direction}
-            onMouseEnter={() => setMenuOpen(true)}
-            onMouseLeave={() => setMenuOpen(false)}
+            onMouseEnter={submenu.handleMenuEnter}
+            onMouseLeave={submenu.handleMenuLeave}
             onClose={onClose}
             isSubmenu
         >
