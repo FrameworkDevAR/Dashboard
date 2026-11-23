@@ -186,14 +186,19 @@ function MediaViewer(props) {
     }, [ open, index ]);
 
     // The keys move between the Images and close the viewer. They are caught before the
-    // rest of the page, which would close the dialog or the details under it
+    // rest of the page, which would close the dialog or the details under it. The Escape
+    // closes on the keyup, as the Dialog does, or that keyup would reach the one under it
     React.useEffect(() => {
         if (!open) {
             return undefined;
         }
         const handleKey = (e) => {
             if (e.key === "Escape") {
-                onClose();
+                if (e.type === "keyup") {
+                    onClose();
+                }
+            } else if (e.type === "keyup") {
+                return;
             } else if (e.key === "ArrowLeft") {
                 setCurrent((value) => getIndex(value - 1));
             } else if (e.key === "ArrowRight") {
@@ -205,7 +210,11 @@ function MediaViewer(props) {
             e.stopPropagation();
         };
         window.addEventListener("keydown", handleKey, true);
-        return () => window.removeEventListener("keydown", handleKey, true);
+        window.addEventListener("keyup", handleKey, true);
+        return () => {
+            window.removeEventListener("keydown", handleKey, true);
+            window.removeEventListener("keyup", handleKey, true);
+        };
     }, [ open, images.length ]);
 
     // Handles the Click on an Arrow
