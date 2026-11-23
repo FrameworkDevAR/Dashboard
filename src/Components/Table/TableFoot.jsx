@@ -11,10 +11,12 @@ import TableRowCnt          from "../Table/TableRowCnt";
 
 
 // Styles
-const TFoot = Styled.tfoot.attrs(({ isLarge }) => ({ isLarge }))`
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
+const TFoot = Styled.tfoot.attrs(({ isLarge, notFixed }) => ({ isLarge, notFixed }))`
+    ${(props) => !props.notFixed && `
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+    `}
 
     background: var(--table-background);
     border-radius: var(--table-border-radius);
@@ -29,12 +31,13 @@ const TFoot = Styled.tfoot.attrs(({ isLarge }) => ({ isLarge }))`
 
 
 /**
- * The Table Foot
+ * The Table Foot, which sticks to the bottom of a fixed Table, but not of one that is not fixed,
+ * like the ones in a Dialog, as it would cover its rows when the Dialog scrolls
  * @param {object} props
  * @returns {React.ReactElement}
  */
 function TableFoot(props) {
-    const { isLarge, hasActions, columns, children } = props;
+    const { isLarge, notFixed, hasActions, columns, children } = props;
 
 
     // Clone the Children
@@ -44,7 +47,7 @@ function TableFoot(props) {
 
 
     // Do the Render
-    return <TFoot isLarge={isLarge}>
+    return <TFoot isLarge={isLarge} notFixed={notFixed}>
         <TableRowCnt hasActions={hasActions}>
             {items}
             {hasActions && <th />}
@@ -58,6 +61,7 @@ function TableFoot(props) {
  */
 TableFoot.propTypes = {
     isLarge    : PropTypes.bool,
+    notFixed   : PropTypes.bool,
     hasActions : PropTypes.bool,
     columns    : PropTypes.array,
     children   : PropTypes.any,
@@ -69,6 +73,7 @@ TableFoot.propTypes = {
  */
 TableFoot.defaultProps = {
     isLarge    : false,
+    notFixed   : false,
     hasActions : false,
 };
 

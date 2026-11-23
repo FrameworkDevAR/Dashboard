@@ -70,10 +70,34 @@ function TableRow(props) {
     };
 
 
+    // Returns the Column of a Cell. One that spans some Columns takes the size of all of them,
+    // or it would be as narrow as the first one
+    const getColumn = (child, realIndex) => {
+        const column = columns[realIndex] || {};
+        const span   = Number(child.props.colSpan) || 1;
+        if (span <= 1) {
+            return column;
+        }
+
+        const spanned  = columns.slice(realIndex, realIndex + span);
+        const grow     = spanned.reduce((total, col) => total + (Number(col.grow) || 1), 0);
+        const minWidth = spanned.reduce((total, col) => total + (Number(col.minWidth) || 0), 0);
+        const hasMax   = spanned.every((col) => Boolean(col.maxWidth));
+        const maxWidth = spanned.reduce((total, col) => total + (Number(col.maxWidth) || 0), 0);
+
+        return {
+            ...column,
+            grow     : String(grow),
+            minWidth : minWidth ? String(minWidth) : "",
+            maxWidth : hasMax ? String(maxWidth) : "",
+            align    : child.props.align || "",
+        };
+    };
+
     // Clone the Children. Each one takes the Column at its position among all of them, as the
     // hidden ones are skipped but still have their Column
     const items = Utils.cloneChildren(children, (child, index, realIndex) => ({
-        ...columns[realIndex], isEditable,
+        ...getColumn(child, realIndex), isEditable,
     }));
     if (isEditable) {
         items.sort((a, b) => a.props.position - b.props.position);
