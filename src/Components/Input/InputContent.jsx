@@ -64,6 +64,7 @@ const Container = Styled.div.attrs(({ isFocused, isDisabled, isSmall, withBorder
     `}
     ${(props) => (props.withBorder && props.isDisabled) && `
         --input-border: var(--input-border-disabled);
+        background-color: var(--input-disabled-background, var(--lightest-gray));
     `}
     ${(props) => (props.withBorder && !props.isDisabled && !props.isFocused) && `
         &:hover, &:hover .inputfield {

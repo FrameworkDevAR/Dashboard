@@ -107,10 +107,10 @@ const Container = Styled.div.attrs(({ width, fullWidth, isFilter, hasError, bigL
     `}
 
     ${(props) => props.disabledBackground && `
-        .input-content {
-            background-color: var(--lightest-gray);
-        }
-        .input-content input {
+        --input-label-background: var(--input-disabled-background, var(--lightest-gray));
+
+        .input-content input,
+        .input-content textarea {
             background-color: transparent;
         }
     `}
