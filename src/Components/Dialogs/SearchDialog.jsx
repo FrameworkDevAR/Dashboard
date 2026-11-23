@@ -4,6 +4,7 @@ import Styled, { keyframes } from "styled-components";
 
 // Core & Utils
 import NLS                  from "../../Core/NLS";
+import Responsive           from "../../Core/Responsive";
 import Utils                from "../../Utils/Utils";
 
 // Components
@@ -207,6 +208,12 @@ const Footer = Styled.footer`
         border-radius: var(--border-radius-small);
         font-weight: 500;
         text-align: center;
+    }
+
+    @media (max-width: ${Responsive.WIDTH_FOR_MOBILE}px) {
+        div {
+            display: none;
+        }
     }
 `;
 
