@@ -39,7 +39,7 @@ function ViewDialog(props) {
         hideFooter, primary, primaryVariant, primaryIcon, onSubmit,
         secondary, secondaryVariant, secondaryIcon, onSecondary, secondaryLoading,
         tertiary, tertiaryVariant, tertiaryIcon, onTertiary, tertiaryLoading,
-        cancel, onClose, children,
+        footerActions, cancel, onClose, children,
     } = props;
 
 
@@ -85,7 +85,9 @@ function ViewDialog(props) {
             tertiaryLoading={tertiaryLoading}
             onTertiary={onTertiary}
             cancel={cancel}
-        />
+        >
+            {footerActions}
+        </DialogFooter>
     </Dialog>;
 }
 
@@ -126,6 +128,7 @@ ViewDialog.propTypes = {
     tertiaryLoading  : PropTypes.bool,
     onSecondary      : PropTypes.func,
     onTertiary       : PropTypes.func,
+    footerActions    : PropTypes.any,
     cancel           : PropTypes.string,
     onClose          : PropTypes.func.isRequired,
     children         : PropTypes.any,
