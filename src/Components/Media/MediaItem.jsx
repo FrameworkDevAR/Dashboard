@@ -114,6 +114,10 @@ const FileIcon = Styled(Icon).attrs(({ iconColor }) => ({ iconColor }))`
 
 const MediaName = Styled.div`
     position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 7px 8px;
     text-align: center;
     font-size: 12px;
