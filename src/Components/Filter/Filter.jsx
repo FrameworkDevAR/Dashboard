@@ -19,6 +19,7 @@ import ChipList             from "../Chip/ChipList";
 import ChipItem             from "../Chip/ChipItem";
 import InputOptions         from "../Input/InputOptions";
 import InputOption          from "../Input/InputOption";
+import Menu                 from "../Menu/Menu";
 import MenuItem             from "../Menu/MenuItem";
 import IconLink             from "../Link/IconLink";
 import MainHeaderContext    from "../Header/MainHeaderContext";
@@ -146,6 +147,7 @@ function Filter(props) {
     const optionsRef     = React.useRef(null);
     const selectedRef    = React.useRef(-1);
     const selectedSubRef = React.useRef(-1);
+    const chipRef        = React.useRef(null);
 
     // The Current State
     const [ isNarrow,     setIsNarrow   ] = React.useState(false);
@@ -160,6 +162,7 @@ function Filter(props) {
     const [ showRange,   setShowRange   ] = React.useState(false);
     const [ editItem,    setEditItem    ] = React.useState({ name : "", message : "", withHour : false, onlyHour : false, prefix : "", suffix : "" });
     const [ update,      setUpdate      ] = React.useState(0);
+    const [ chipMenu,    setChipMenu    ] = React.useState({ name : "", value : "" });
 
 
     // The actions of the Main Header go at the end of the first row
@@ -452,14 +455,39 @@ function Filter(props) {
         handleFilter(newData);
     };
 
-    // Handles the Click on a Chip
-    const handleChipClick = (name, forDates, forRange) => {
+    // Handles the Click on a Chip. The close of the Chip is inside it, so its click is not one
+    const handleChipClick = (e, name, value, forDates, forRange, forMenu) => {
         const item = items[name];
-        if (item && forDates) {
-            showDatesDialog(name, item);
-        } else if (item && forRange) {
-            showRangeDialog(name, item);
+        if (!item || e.target.closest(".chip-close")) {
+            return;
         }
+        if (forDates) {
+            showDatesDialog(name, item);
+        } else if (forRange) {
+            showRangeDialog(name, item);
+        } else if (forMenu) {
+            chipRef.current = e.currentTarget;
+            setChipMenu({ name, value });
+        }
+    };
+
+    // Handles the Option of the Menu of a Chip, which takes the place of the value of the Chip
+    const handleChipOption = (name, value) => {
+        const item = items[name];
+        setChipMenu({ name : "", value : "" });
+        if (!item || String(value) === String(chipMenu.value)) {
+            return;
+        }
+        if (!item.allowMultiple) {
+            handleSelect(name, value);
+            return;
+        }
+
+        const currentValues = data[name] || [];
+        const newValues     = currentValues.filter((val) => val !== value).map((val) => (val === chipMenu.value ? value : val));
+        const newData       = { ...data, [name] : newValues };
+        setData(newData);
+        handleFilter(newData);
     };
 
     // Handles the Refresh
@@ -740,6 +768,7 @@ function Filter(props) {
                 let valueName = val;
                 let forDates  = false;
                 let forRange  = false;
+                let forMenu   = false;
 
                 if ((item.type === "period" && val === Period.CUSTOM) || item.type === "date") {
                     forDates = true;
@@ -798,6 +827,7 @@ function Filter(props) {
                     }
                 } else if (val && item.options) {
                     valueName = item.options.find((opt) => opt.key === val)?.value || val;
+                    forMenu   = item.type !== "toggle" && item.options.length > 0;
                 }
                 if (!valueName) {
                     continue;
@@ -815,6 +845,7 @@ function Filter(props) {
                     message  : message,
                     forDates : forDates,
                     forRange : forRange,
+                    forMenu  : forMenu,
                 });
             }
         }
@@ -929,11 +960,11 @@ function Filter(props) {
                 fadeLeft={fades.left}
                 fadeRight={fades.right}
             >
-                {chipList.map(({ key, name, value, message, forDates, forRange }) => <ChipItem
+                {chipList.map(({ key, name, value, message, forDates, forRange, forMenu }) => <ChipItem
                     key={key}
                     message={message}
-                    canClick={forDates || forRange}
-                    onClick={() => handleChipClick(name, forDates, forRange)}
+                    canClick={forDates || forRange || forMenu}
+                    onClick={(e) => handleChipClick(e, name, value, forDates, forRange, forMenu)}
                     canClose={initialValues ? String(initialValues[name]) !== String(value) : true}
                     onClose={() => handleRemove(name, value)}
                 />)}
@@ -976,6 +1007,22 @@ function Filter(props) {
             </InputOption>)}
         </InputOptions>}
 
+        <Menu
+            open={Boolean(chipMenu.name)}
+            targetRef={chipRef}
+            direction="bottom"
+            gap={4}
+            onClose={() => setChipMenu({ name : "", value : "" })}
+        >
+            {(items[chipMenu.name]?.options || []).map((option) => <MenuItem
+                key={option.key}
+                message={option.value}
+                isTitle={Boolean(option.isTitle)}
+                level={Number(option.level) || 0}
+                isSelected={String(option.key) === String(chipMenu.value)}
+                onClick={() => handleChipOption(chipMenu.name, option.key)}
+            />)}
+        </Menu>
         <FilterDate
             open={showDates}
             currData={data}
