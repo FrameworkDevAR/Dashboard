@@ -12,7 +12,7 @@ import Icon                 from "./Icon";
 
 
 // Styles
-const Container = Styled.section.attrs(({ forPage, forPanel, hasTabs, fullWidth, withSpacing, isSmall }) => ({ forPage, forPanel, hasTabs, fullWidth, withSpacing, isSmall }))`
+const Container = Styled.section.attrs(({ forPage, forPanel, hasTabs, hasFilter, fullWidth, withSpacing, isSmall }) => ({ forPage, forPanel, hasTabs, hasFilter, fullWidth, withSpacing, isSmall }))`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -35,7 +35,10 @@ const Container = Styled.section.attrs(({ forPage, forPanel, hasTabs, fullWidth,
         padding: 24px 16px;
     `}
     ${(props) => props.forPage && `
-        height: var(--page-height${props.hasTabs ? "-tabs" : ""});
+        height: calc(
+            var(--page-height${props.hasTabs ? "-tabs" : ""})
+            - ${props.hasFilter ? "calc(var(--filter-height) + var(--filter-chips-height, 0px))" : "0px"}
+        );
     `}
     ${(props) => props.fullWidth && `
         width: 100%;
@@ -147,7 +150,7 @@ const Sample = Styled.li`
 function EmptyContent(props) {
     const {
         isHidden, className, icon, message, description,
-        forPage, forPanel, hasTabs, fullWidth, withSpacing, noIconMargin, isSmall,
+        forPage, forPanel, hasTabs, hasFilter, fullWidth, withSpacing, noIconMargin, isSmall,
         samples, sampleIcon, onSample, children,
     } = props;
 
@@ -168,6 +171,7 @@ function EmptyContent(props) {
         forPage={forPage}
         forPanel={forPanel}
         hasTabs={hasTabs}
+        hasFilter={hasFilter}
         fullWidth={fullWidth}
         withSpacing={withSpacing}
         isSmall={isSmall}
@@ -218,6 +222,7 @@ EmptyContent.propTypes = {
     forPage      : PropTypes.bool,
     forPanel     : PropTypes.bool,
     hasTabs      : PropTypes.bool,
+    hasFilter    : PropTypes.bool,
     fullWidth    : PropTypes.bool,
     noIconMargin : PropTypes.bool,
     withSpacing  : PropTypes.bool,
