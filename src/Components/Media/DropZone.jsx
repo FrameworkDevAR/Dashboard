@@ -48,10 +48,10 @@ const Container = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
     `}
 `;
 
-const Content = Styled.div.attrs(({ isStacked }) => ({ isStacked }))`
+const Content = Styled.div.attrs(({ isStacked, isWrapped }) => ({ isStacked, isWrapped }))`
     display: flex;
     align-items: center;
-    flex-grow: ${(props) => props.isStacked ? 0 : 2};
+    flex-grow: ${(props) => (props.isStacked || props.isWrapped) ? 0 : 2};
     gap: 10px;
     min-width: 0;
 
@@ -64,12 +64,14 @@ const UploadIcon = Styled(Icon)`
     color: var(--primary-color);
 `;
 
-const Buttons = Styled.div`
+const Buttons = Styled.div.attrs(({ isWrapped }) => ({ isWrapped }))`
     display: flex;
     justify-content: center;
     flex-shrink: 0;
     gap: 8px;
     flex-wrap: wrap;
+
+    ${(props) => props.isWrapped && "flex-basis: 100%;"}
 `;
 
 const Title = Styled.h3`
@@ -119,6 +121,8 @@ function DropZone(props) {
 
     // The References
     const containerRef = React.useRef(null);
+    const contentRef   = React.useRef(null);
+    const buttonsRef   = React.useRef(null);
     const inputRef     = React.useRef(null);
     const heightRef    = React.useRef(0);
     const startRef     = React.useRef(0);
@@ -129,6 +133,7 @@ function DropZone(props) {
     const [ showUpload, setShowUpload ] = React.useState(false);
     const [ error,      setError      ] = React.useState("");
     const [ lastUpload, setLastUpload ] = React.useState(null);
+    const [ isWrapped,  setIsWrapped  ] = React.useState(false);
 
 
     // Handles the Click
@@ -239,6 +244,33 @@ function DropZone(props) {
         }
     });
 
+    // The Buttons go below the Title when they do not fit next to it, and then both are
+    // centered. It is measured with the layout of a single line, as the centered one
+    // always keeps the Buttons below
+    React.useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (isStacked || !container || !window.ResizeObserver) {
+            return undefined;
+        }
+        const checkWrap = () => {
+            const content = contentRef.current;
+            const buttons = buttonsRef.current;
+            if (!content || !buttons) {
+                return;
+            }
+            buttons.style.flexBasis = "auto";
+            content.style.flexGrow  = "2";
+            const wrapped = buttons.offsetTop > content.offsetTop + 4;
+            buttons.style.flexBasis = "";
+            content.style.flexGrow  = "";
+            setIsWrapped(wrapped);
+        };
+        const observer = new ResizeObserver(checkWrap);
+        observer.observe(container);
+        checkWrap();
+        return () => observer.disconnect();
+    }, [ isHidden, isStacked, Boolean(upload || lastUpload) ]);
+
     // Handles the Upload Url
     const handleUploadUrl = async (fileUrl, fileName) => {
         if (!onUrl) {
@@ -323,14 +355,14 @@ function DropZone(props) {
                 />
             </>}
 
-            {!current && <Content isStacked={isStacked}>
+            {!current && <Content ref={contentRef} isStacked={isStacked} isWrapped={isWrapped}>
                 <UploadIcon icon="upload" />
                 <div>
                     <Title>{NLS.get(`${prefix}TITLE`)}</Title>
                     {!!Number(maxSize) && <Text>{sizeText}</Text>}
                 </div>
             </Content>}
-            {!current && <Buttons>
+            {!current && <Buttons ref={buttonsRef} isWrapped={isWrapped}>
                 <Button
                     variant="outlined"
                     icon="upload"
