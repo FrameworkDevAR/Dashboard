@@ -16,6 +16,7 @@ const SCROLL_MARGIN  = 30;
 const SCROLL_AMOUNT  = 5;
 const COLUMN_MARGIN  = 60;
 const COLLAPSED_SIZE = "50px";
+const FADE_SIZE      = "24px";
 
 // Styles
 const Container = Styled.div.attrs(({ atStart, atEnd }) => ({ atStart, atEnd }))`
@@ -31,7 +32,7 @@ const Container = Styled.div.attrs(({ atStart, atEnd }) => ({ atStart, atEnd }))
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 24px;
+        width: ${FADE_SIZE};
         pointer-events: none;
         transition: opacity 0.2s ease;
         z-index: 2;
@@ -59,6 +60,9 @@ const Columns = Styled.section.attrs(({ grid }) => ({ grid }))`
     min-height: 0;
     overflow: auto;
 
+    .board-card {
+        scroll-margin-inline: ${FADE_SIZE};
+    }
     &.dragging .board-card:not(.dragging) {
         pointer-events: none;
     }
@@ -352,6 +356,13 @@ function Board(props) {
             }
             return;
         }
+
+        // The browser clicks what is under the cursor once the Card is released, which is not
+        // a click of the user, so it is stopped. It comes right after, so the listener is
+        // removed after it in case the mouse was released where no click comes
+        const stopClick = (event) => event.stopPropagation();
+        window.addEventListener("click", stopClick, { capture : true, once : true });
+        window.setTimeout(() => window.removeEventListener("click", stopClick, { capture : true }), 0);
 
         // Remove the drag element styles
         containerRef.current?.classList.remove("dragging");
