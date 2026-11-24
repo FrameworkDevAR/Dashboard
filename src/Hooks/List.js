@@ -18,6 +18,16 @@ function useList(slice, type = "", loadOnStart = true) {
     const data   = Store.useState(slice);
     const { startLoader, fetchList } = Store.useAction(slice);
 
+    // The data is loaded after the first fetch ends, which the next loads do not change
+    const [ isLoaded, setLoaded ] = React.useState(false);
+
+
+    // Sets the loaded state
+    React.useEffect(() => {
+        if (!data.loading) {
+            setLoaded(true);
+        }
+    }, [ data.loading ]);
 
     // Load the data
     React.useEffect(() => {
@@ -72,7 +82,7 @@ function useList(slice, type = "", loadOnStart = true) {
 
 
     // The API
-    return { fetch, load, loadTab, loadFilter };
+    return { isLoaded, fetch, load, loadTab, loadFilter };
 }
 
 
