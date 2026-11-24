@@ -10,6 +10,7 @@ import NLS                  from "../../Core/NLS";
 import Icon                 from "../Common/Icon";
 import Html                 from "../Common/Html";
 import InputCopy            from "../Input/InputCopy";
+import HyperLink            from "../Link/HyperLink";
 
 
 
@@ -187,7 +188,7 @@ const Children = Styled.div.attrs(({ inlineChildren }) => ({ inlineChildren }))`
  */
 function Banner(props) {
     const {
-        isHidden, className, variant, icon, iconColor, title, message, value, hasCopy,
+        isHidden, className, variant, icon, iconColor, title, message, value, href, hasCopy,
         topSpace, bottomSpace, maxWidth, noBorder, inlineChildren, isTight, children,
     } = props;
 
@@ -222,7 +223,12 @@ function Banner(props) {
         <Html>{NLS.get(message)}</Html>
     </Text> : <Html>{NLS.get(message)}</Html>;
     const valueElem   = !!value && <Value className="banner-value" isTight={isTight}>
-        {value}
+        {href ? <HyperLink
+            variant="primary"
+            href={href}
+            message={String(value)}
+            target="_blank"
+        /> : value}
         <InputCopy
             className="banner-copy"
             isHidden={!hasCopy}
@@ -271,6 +277,7 @@ Banner.propTypes = {
     title          : PropTypes.string,
     message        : PropTypes.string,
     value          : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    href           : PropTypes.string,
     hasCopy        : PropTypes.bool,
     topSpace       : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
     bottomSpace    : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
