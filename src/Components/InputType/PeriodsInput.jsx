@@ -140,6 +140,10 @@ const Fields = Styled.div`
     grid-template-columns: repeat(2, 1fr);
     gap: var(--main-gap);
     width: 100%;
+
+    .periods-double {
+        grid-column: span 2;
+    }
 `;
 
 const Remove = Styled(IconLink)`
@@ -400,6 +404,7 @@ function PeriodsInput(props) {
                 {extras.map((extra) => <InputField
                     {...extra}
                     key={extra.name}
+                    className={Number(extra.columns) > 1 ? "periods-double" : extra.className}
                     name={`${name}-${extra.name}-${index}`}
                     value={period[extra.name] ?? ""}
                     error={getError(index, extra.name)}
