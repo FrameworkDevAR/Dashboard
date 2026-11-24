@@ -41,7 +41,7 @@ const Content = Styled.div`
     gap: 6px;
 `;
 
-const Item = Styled.div.attrs(({ withError, withStates, isDisabled, canSort, canRemove }) => ({ withError, withStates, isDisabled, canSort, canRemove }))`
+const Item = Styled.div.attrs(({ withError, withStates, isDisabled, canSort, canRemove, ownPadding }) => ({ withError, withStates, isDisabled, canSort, canRemove, ownPadding }))`
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -79,18 +79,19 @@ const Item = Styled.div.attrs(({ withError, withStates, isDisabled, canSort, can
             margin-right: 0;
         }
     `}
-    ${(props) => (props.canSort ? "padding-left: 6px;" : "padding-left: 0;")}
+    ${(props) => props.canSort && "padding-left: 6px;"}
+    ${(props) => (!props.canSort && props.ownPadding) && "padding-left: 0;"}
     ${(props) => props.canRemove && "padding-right: 6px;"}
 `;
 
-const Inside = Styled.div.attrs(({ canSort, canRemove }) => ({ canSort, canRemove }))`
+const Inside = Styled.div.attrs(({ canSort, canRemove, ownPadding }) => ({ canSort, canRemove, ownPadding }))`
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 4px;
 
-    ${(props) => props.canSort && "margin-left: -8px;"}
-    ${(props) => props.canRemove && "margin-right: -8px;"}
+    ${(props) => (props.canSort && props.ownPadding) && "margin-left: -8px;"}
+    ${(props) => (props.canRemove && props.ownPadding) && "margin-right: -8px;"}
 `;
 
 const RemoveIcon = Styled(IconLink)`
@@ -310,6 +311,9 @@ function ListInput(props) {
     const canSort   = Boolean(!isDisabled && isSortable && parts.length > 1);
     const canRemove = Boolean(!isDisabled && (parts.length > 1 || String(parts[0]).length));
 
+    // Only the Textarea has a padding of its own, so the rows of the other inputs keep theirs
+    const ownPadding = inputType === InputType.TEXTAREA;
+
 
     // Do the Render
     return <InputContent
@@ -330,6 +334,7 @@ function ListInput(props) {
                     isDisabled={isDisabled}
                     canSort={canSort}
                     canRemove={canRemove}
+                    ownPadding={ownPadding}
                 >
                     <Icon
                         isHidden={!canSort}
@@ -339,7 +344,7 @@ function ListInput(props) {
                         onMouseDown={(e) => handleGrab(e, elem, index)}
                     />
 
-                    <Inside canSort={canSort} canRemove={canRemove}>
+                    <Inside canSort={canSort} canRemove={canRemove} ownPadding={ownPadding}>
                         <InputField
                             passedRef={inputRefs[index]}
                             className={`inputfield-item-${name}-${index}`}
