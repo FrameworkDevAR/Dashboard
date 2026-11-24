@@ -202,8 +202,14 @@ const Inside = Styled.div.attrs(({ columns, withTitle }) => ({ columns, withTitl
 
 const Input = Styled.div.attrs(({ columns }) => ({ columns }))`
     position: relative;
+    display: flex;
+    flex-direction: column;
     ${(props) => props.columns && `grid-column-end: span ${props.columns};`}
     width: 100%;
+
+    .inputfield {
+        flex-grow: 1;
+    }
 
     :empty {
         display: none;
