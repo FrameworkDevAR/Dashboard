@@ -23,6 +23,7 @@ import MediaInput           from "../InputType/MediaInput";
 import MultipleInput        from "../InputType/MultipleInput";
 import NumberInput          from "../InputType/NumberInput";
 import PasswordInput        from "../InputType/PasswordInput";
+import PeriodsInput         from "../InputType/PeriodsInput";
 import RadioInput           from "../InputType/RadioInput";
 import RadioboxInput        from "../InputType/RadioboxInput";
 import SelectInput          from "../InputType/SelectInput";
@@ -79,6 +80,8 @@ function Input(props) {
         return <NumberInput {...props} />;
     case InputType.PASSWORD:
         return <PasswordInput {...props} />;
+    case InputType.PERIODS:
+        return <PeriodsInput {...props} />;
     case InputType.RADIO:
         return <RadioInput {...props} />;
     case InputType.RADIOBOX:

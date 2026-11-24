@@ -23,6 +23,7 @@ const MEDIA    = "media";
 const MULTIPLE = "multiple";
 const NUMBER   = "number";
 const PASSWORD = "password";
+const PERIODS  = "periods";
 const RADIO    = "radio";
 const RADIOBOX = "radiobox";
 const SELECT   = "select";
@@ -67,7 +68,7 @@ function canShrink(type) {
     return ![
         BUTTONS, CHIPS, CODE, DOUBLE, EDITOR, MULTIPLE, FILE, MEDIA,
         CHECKBOX, RADIO, RADIOBOX,
-        TOGGLE, FIELDS, LIST, COLOR, ICON, DATE, TIME,
+        TOGGLE, FIELDS, LIST, PERIODS, COLOR, ICON, DATE, TIME,
     ].includes(type);
 }
 
@@ -79,7 +80,7 @@ function canShrink(type) {
 function canFocus(type) {
     return ![
         BUTTONS, CHECKBOX, CHIPS, COLOR, DOUBLE, EMOJI, FIELDS,
-        FILE, ICON, LIST, MEDIA, MULTIPLE, RADIO, RADIOBOX, TOGGLE,
+        FILE, ICON, LIST, MEDIA, MULTIPLE, PERIODS, RADIO, RADIOBOX, TOGGLE,
     ].includes(type);
 }
 
@@ -202,6 +203,7 @@ export default {
     MEDIA,
     MULTIPLE,
     NUMBER,
+    PERIODS,
     RADIO,
     RADIOBOX,
     SELECT,

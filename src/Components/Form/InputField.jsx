@@ -420,6 +420,8 @@ InputField.propTypes = {
     getExtraIcon      : PropTypes.func,
     onExtraIcon       : PropTypes.func,
     autoFocus         : PropTypes.bool,
+    startMonday       : PropTypes.bool,
+    withHolidays      : PropTypes.bool,
     onlyImages        : PropTypes.bool,
     accept            : PropTypes.string,
     maxSize           : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
