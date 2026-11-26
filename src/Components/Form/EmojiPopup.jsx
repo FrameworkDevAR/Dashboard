@@ -3,13 +3,10 @@ import PropTypes            from "prop-types";
 import Styled               from "styled-components";
 
 // Core & Utils
-import NLS                  from "../../Core/NLS";
 import Utils                from "../../Utils/Utils";
 
-// Emoji
-import EmojiPicker, {
-    EmojiStyle, Categories,
-} from "emoji-picker-react";
+// Components
+import EmojiPicker          from "./EmojiPicker";
 
 
 
@@ -33,28 +30,6 @@ const Emoji = Styled.div.attrs(({ top, left }) => ({ top, left }))`
     top: ${(props) => `${props.top}px`};
     left: ${(props) => `${props.left}px`};
     z-index: var(--z-menu);
-
-    aside {
-        --epr-picker-border-color: white;
-        --epr-picker-border-radius: var(--border-radius);
-        --epr-category-label-bg-color: var(--lighter-gray);
-        --epr-search-input-bg-color: var(--lighter-gray);
-        --epr-category-label-bg-color: var(--lighter-gray);
-        --epr-category-label-text-color: var(--title-color);
-        --epr-emoji-hover-color: var(--dark-gray);
-        --epr-search-border-color: var(--primary-color);
-        --epr-highlight-color: var(--primary-color);
-        --epr-header-padding: 8px;
-
-        box-sizing: border-box;
-        box-shadow: rgb(9 30 66 / 25%) 0px 4px 8px -2px, rgb(9 30 66 / 31%) 0px 0px 1px;
-    }
-    .EmojiPickerReact ul.epr-emoji-list {
-        padding: 0 8px;
-    }
-    .EmojiPickerReact li.epr-emoji-category>.epr-emoji-category-label {
-        border-radius: var(--border-radius);
-    }
 `;
 
 
@@ -149,50 +124,9 @@ function EmojiPopup(props) {
     return <Backdrop onMouseDown={handleClose}>
         <Emoji ref={contentRef} top={posTop} left={posLeft}>
             <EmojiPicker
-                onEmojiClick={(elem) => onClick(elem.emoji)}
-                emojiStyle={EmojiStyle.NATIVE}
-                previewConfig={{ showPreview : false }}
-                skinTonesDisabled={true}
-                searchPlaceHolder={NLS.get("GENERAL_SEARCH")}
+                width={POPUP_WIDTH}
                 height={POPUP_HEIGHT}
-                categories={[
-                    {
-                        category : Categories.SUGGESTED,
-                        name     : NLS.get("EMOJI_SUGGESTED"),
-                    },
-                    {
-                        category : Categories.SMILEYS_PEOPLE,
-                        name     : NLS.get("EMOJI_SMILEYS"),
-                    },
-                    {
-                        category : Categories.ANIMALS_NATURE,
-                        name     : NLS.get("EMOJI_ANIMALS"),
-                    },
-                    {
-                        category : Categories.FOOD_DRINK,
-                        name     : NLS.get("EMOJI_FOOD"),
-                    },
-                    {
-                        category : Categories.TRAVEL_PLACES,
-                        name     : NLS.get("EMOJI_TRAVEL"),
-                    },
-                    {
-                        category : Categories.ACTIVITIES,
-                        name     : NLS.get("EMOJI_ACTIVITIES"),
-                    },
-                    {
-                        category : Categories.OBJECTS,
-                        name     : NLS.get("EMOJI_OBJECTS"),
-                    },
-                    {
-                        category : Categories.SYMBOLS,
-                        name     : NLS.get("EMOJI_SYMBOLS"),
-                    },
-                    {
-                        category : Categories.FLAGS,
-                        name     : NLS.get("EMOJI_FLAGS"),
-                    },
-                ]}
+                onClick={onClick}
             />
         </Emoji>
     </Backdrop>;
