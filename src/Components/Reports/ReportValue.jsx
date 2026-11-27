@@ -39,12 +39,19 @@ const Container = Styled.div.attrs(({ withLinks, isSmall }) => ({ withLinks, isS
     }
 `;
 
-const Content = Styled.div`
+const Content = Styled.div.attrs(({ isInline }) => ({ isInline }))`
     display: flex;
     flex-direction: column;
     flex-grow: 2;
     gap: 2px;
     min-width: 0;
+
+    ${(props) => props.isInline && `
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    `}
 `;
 
 const Header = Styled.header`
@@ -77,7 +84,7 @@ const Action = Styled(IconLink)`
     right: 12px;
 `;
 
-const Amount = Styled.div.attrs(({ color, isSmall }) => ({ color, isSmall }))`
+const Amount = Styled.div.attrs(({ color, isSmall, isInline }) => ({ color, isSmall, isInline }))`
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -88,6 +95,13 @@ const Amount = Styled.div.attrs(({ color, isSmall }) => ({ color, isSmall }))`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    ${(props) => props.isInline && `
+        flex-grow: 0;
+        flex-shrink: 0;
+        font-size: 32px;
+        line-height: 1;
+    `}
 `;
 
 const Detail = Styled.span`
@@ -131,7 +145,7 @@ const Unread = Styled.div`
 function ReportValue(props) {
     const {
         index, label, icon, value, detail, unread, tooltip,
-        withLinks, isSmall, url, onClick,
+        withLinks, isSmall, isInline, amountColor, url, onClick,
         action, actionTooltip, onAction,
     } = props;
 
@@ -159,7 +173,7 @@ function ReportValue(props) {
             size={isSmall ? "22" : "28"}
             isSmall={isSmall}
         />
-        <Content>
+        <Content isInline={isInline}>
             <Header>
                 <Title message={label} isSmall={isSmall} />
                 {!!tooltip && <Help
@@ -172,7 +186,12 @@ function ReportValue(props) {
                 />}
             </Header>
 
-            <Amount color={color} isSmall={isSmall} title={String(value)}>
+            <Amount
+                color={amountColor || color}
+                isSmall={isSmall}
+                isInline={isInline}
+                title={String(value)}
+            >
                 {value}
                 {!!detail && <Detail>{detail}</Detail>}
             </Amount>
@@ -201,6 +220,8 @@ ReportValue.propTypes = {
     tooltip       : PropTypes.string,
     withLinks     : PropTypes.bool,
     isSmall       : PropTypes.bool,
+    isInline      : PropTypes.bool,
+    amountColor   : PropTypes.string,
     url           : PropTypes.string,
     onClick       : PropTypes.func,
     action        : PropTypes.string,
