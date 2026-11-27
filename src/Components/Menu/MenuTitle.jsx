@@ -8,7 +8,7 @@ import NLS                  from "../../Core/NLS";
 
 
 // Styles
-const Container = Styled.li.attrs(({ isSelected, isDisabled }) => ({ isSelected, isDisabled }))`
+const Container = Styled.li.attrs(({ level }) => ({ level }))`
     display: flex;
     align-items: center;
     width: auto;
@@ -18,6 +18,10 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled }) => ({ isSelected,
     font-size: 12px;
     white-space: nowrap;
     color: var(--font-lighter);
+
+    ${(props) => props.level > 0 && `
+        margin-left: ${props.level * 16}px;
+    `}
 `;
 
 
@@ -28,11 +32,11 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled }) => ({ isSelected,
  * @returns {React.ReactElement}
  */
 function MenuTitle(props) {
-    const { className, message } = props;
+    const { className, message, level } = props;
 
 
     // Do the Render
-    return <Container className={className}>
+    return <Container className={className} level={level}>
         {NLS.get(message)}
     </Container>;
 }
@@ -44,6 +48,7 @@ function MenuTitle(props) {
 MenuTitle.propTypes = {
     className : PropTypes.string,
     message   : PropTypes.string,
+    level     : PropTypes.number,
     isTitle   : PropTypes.bool,
 };
 
@@ -53,6 +58,7 @@ MenuTitle.propTypes = {
  */
 MenuTitle.defaultProps = {
     className : "",
+    level     : 0,
     isTitle   : true,
 };
 

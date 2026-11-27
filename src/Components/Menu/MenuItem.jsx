@@ -36,7 +36,7 @@ const ShortcutKey = Styled.span`
     transition: all 0.2s;
 `;
 
-const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace, isTitle, level }) => ({ isSelected, isDisabled, isSmall, leftSpace, isTitle, level }))`
+const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace, level }) => ({ isSelected, isDisabled, isSmall, leftSpace, level }))`
     display: flex;
     align-items: center;
     gap: 10px;
@@ -78,17 +78,6 @@ const Container = Styled.li.attrs(({ isSelected, isDisabled, isSmall, leftSpace,
     `}
     ${(props) => props.level > 0 && `
         margin-left: ${props.level * 16}px;
-    `}
-    ${(props) => props.isTitle && `
-        padding-top: 6px;
-        padding-bottom: 6px;
-        font-size: 12px;
-        color: var(--font-lighter);
-        opacity: 0.6;
-        cursor: default;
-        &:hover {
-            background-color: transparent;
-        }
     `}
 
     ${(props) => props.isSelected && `
@@ -144,7 +133,7 @@ function MenuItem(props) {
     const {
         className, action, icon, iconColor, avatar, circle, title, message, description, shortcut,
         url, href, target,
-        isDisabled, isSelected, isSmall, leftSpace, noIcon, isTitle, level,
+        isDisabled, isSelected, isSmall, leftSpace, noIcon, level,
         onAction, onClick, dontClose, onClose,
         direction, index, selectedIdx, filter,
         trigger, setTrigger, children,
@@ -163,9 +152,9 @@ function MenuItem(props) {
     const icn         = icon || act.icon;
     const uri         = url ? NLS.baseUrl(url) : href;
     const navigate    = Navigate.useGotoUrl();
-    const isInactive  = isDisabled || isTitle;
+    const isInactive  = isDisabled;
     const isSelection = !isInactive && (isSelected || selectedIdx === index);
-    const hasIcon     = Boolean(icn && !noIcon && !isTitle);
+    const hasIcon     = Boolean(icn && !noIcon);
     const hasCircle   = Boolean(circle);
     const hasMenu     = Boolean(children && children.length);
 
@@ -225,7 +214,6 @@ function MenuItem(props) {
             isDisabled={isDisabled}
             isSmall={isSmall}
             leftSpace={leftSpace}
-            isTitle={isTitle}
             level={level}
             onMouseDown={handleClick}
             onMouseEnter={submenu.handleItemEnter}

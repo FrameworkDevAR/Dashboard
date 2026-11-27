@@ -11,6 +11,7 @@ import Utils                from "../../Utils/Utils";
 // Components
 import InputField           from "../Form/InputField";
 import MenuLine             from "./MenuLine";
+import MenuTitle            from "./MenuTitle";
 
 // Variants
 const Variant = {
@@ -295,19 +296,27 @@ function Menu(props) {
             const { isHidden, isTitle } = child.props;
             const isFiltered = filtered[idx];
 
-            if (!isHidden && !isFiltered) {
-                const itemIndex = isTitle ? -1 : index;
+            if (isHidden || isFiltered) {
+                continue;
+            }
+
+            // Every Title looks the same, even when it is given as an Item of a list
+            if (isTitle) {
+                const { className, message, level } = child.props;
+                items.push(<MenuTitle
+                    key={key}
+                    className={className}
+                    message={message}
+                    level={level}
+                />);
+            } else {
                 items.push(React.cloneElement(child, {
-                    index : itemIndex,
-                    key, selectedIdx, filter, onAction, onClose,
+                    index, key, selectedIdx, filter, onAction, onClose,
                     trigger, setTrigger,
                 }));
-
-                if (!isTitle) {
-                    index += 1;
-                }
-                key += 1;
+                index += 1;
             }
+            key += 1;
         }
         return items;
     }, [ children, filter, selectedIdx, trigger ]);
