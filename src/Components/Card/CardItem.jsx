@@ -41,8 +41,8 @@ const Copy = Styled.div`
     margin-block: -6px;
     margin-right: -8px;
 
-    .link {
-        margin-top: 0;
+    & > * > * {
+        margin: 0;
     }
 `;
 
